@@ -1,10 +1,10 @@
 const Router = require("express")
 const { check } = require("express-validator")
-const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const logger = require("winston")
+const mongoose = require("mongoose")
 
-const processValidaion = require("../middleware/validation.middleware")
+const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
 const User = require("../model/user.model")
 
 const user_router = Router()
@@ -12,6 +12,7 @@ const user_router = Router()
 //Not so RESTful :(
 user_router.post("/create",
     [
+        rejectIfAlreadyLogined,
         check('username', "field_empty").isString().isLength({ min: 5, max: 30 }).withMessage("invalid_length"),
         check('password', "field_empty").isString().isLength({ min: 10, max: 255 }).withMessage("invalid_length"),
         processValidaion
@@ -19,11 +20,45 @@ user_router.post("/create",
 
 user_router.post("/login",
     [
+        rejectIfAlreadyLogined,
         check('username', "field_empty").isString().isLength({ min: 5, max: 30 }).withMessage("invalid_length"),
         check('password', "field_empty").isString().isLength({ min: 10, max: 255 }).withMessage("invalid_length"),
         processValidaion
     ], processLogin);
 
+user_router.get("/logout", rejectIfNotLogined, processLogout)
+
+user_router.post("/editbio",
+    [
+        rejectIfNotLogined,
+        check('bio', "field_empty").isString().isLength({ max: 255 }).withMessage("length_too_big")
+    ],
+    processEditBio
+)
+
+async function processEditBio(req, res) {
+    try {
+        const {bio} = req.body;
+        req.user.bio = bio;
+        await req.user.save();
+        res.status(201).json({ status: "no_error" });
+    }
+    catch (e) {
+        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
+        logger.error("[user.routes] %s", e.message);
+    }
+}
+
+async function processLogout(req, res) {
+    try {
+        req.session.destroy();
+        res.status(200).json({ status: "no_error" });
+    }
+    catch (e) {
+        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
+        logger.error("[user.routes] %s", e.message);
+    }
+}
 
 async function processLogin(req, res) {
     try {
@@ -33,7 +68,14 @@ async function processLogin(req, res) {
         if (userExists) {
             const isValidPassword = await bcrypt.compare(password, userExists.passwordHash);
             if (isValidPassword) {
-                res.status(201).json({ status: "no_error", value: "" });
+                req.session.userid = userExists._id.toString();
+                req.session.loginTime = Date.now();
+                res.status(200).json({ status: "no_error", value: "" });
+            }
+            else {
+                //delay for nasty spammers
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                res.status(400).json({ status: "user_wrong_password", value: "" });
             }
         }
         else {

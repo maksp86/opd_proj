@@ -2,6 +2,7 @@ require('dotenv').config()
 
 const express = require("express");
 const session = require('express-session')
+const cookie_parser = require("cookie-parser")
 const MongoStore = require("connect-mongo");
 const mongoose = require("mongoose");
 
@@ -9,13 +10,6 @@ const logger = require("./logger");
 const dbConnect = require("./db");
 
 const app = express();
-
-app.set('trust proxy', 1);
-app.use(express.json({ extended: true }));
-
-
-app.use('/api/user', require('./routes/user.routes'))
-
 
 async function start() {
     try {
@@ -25,7 +19,7 @@ async function start() {
         app.use(session({
             secret: process.env.SESSIONSECRET,
             cookie: {
-                maxAge: 2592000 //month
+                maxAge: 2592000 * (process.env.NODE_ENV === "dev" ? 1 : 1000) //month
             },
             resave: true,
             saveUninitialized: true,
@@ -38,6 +32,13 @@ async function start() {
                 autoRemoveInterval: 1
             })
         }))
+
+        app.use(cookie_parser(process.env.SESSIONSECRET))
+
+        app.set('trust proxy', 1);
+        app.use(express.json({ extended: true }));
+
+        app.use('/api/user', require('./routes/user.routes'))
 
         app.listen(process.env.PORT, () => { logger.info("Server listening on %s", process.env.PORT) })
     }
