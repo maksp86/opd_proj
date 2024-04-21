@@ -6,6 +6,7 @@ const mongoose = require("mongoose")
 
 const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
 const User = require("../model/user.model")
+const UserRole = require("../model/userrole.model")
 
 const user_router = Router()
 
@@ -31,17 +32,49 @@ user_router.get("/logout", rejectIfNotLogined, processLogout)
 user_router.post("/editbio",
     [
         rejectIfNotLogined,
-        check('bio', "field_empty").isString().isLength({ max: 255 }).withMessage("length_too_big")
+        check('bio', "field_empty").isString().isLength({ max: 255 }).withMessage("length_too_big"),
+        processValidaion
     ],
     processEditBio
 )
 
+user_router.post("/editpassword",
+    [
+        rejectIfNotLogined,
+        check('oldpassword', "field_empty").isString().isLength({ min: 10, max: 255 }).withMessage("invalid_length"),
+        check('newpassword', "field_empty").isString().isLength({ min: 10, max: 255 }).withMessage("invalid_length"),
+        processValidaion
+    ],
+    processEditPassword
+)
+
+async function processEditPassword(req, res) {
+    try {
+        const { oldpassword, newpassword } = req.body;
+
+        const isValidOldPassword = await bcrypt.compare(oldpassword, req.user.passwordHash)
+        if (isValidOldPassword) {
+            const newPasswordHash = await bcrypt.hash(newpassword, 10);
+            req.user.passwordHash = newPasswordHash;
+            await req.user.save();
+            res.status(200).json({ status: "no_error" });
+        }
+        else {
+            res.status(400).json({ status: "user_wrong_password" });
+        }
+    }
+    catch (e) {
+        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
+        logger.error("[user.routes] %s", e.message);
+    }
+}
+
 async function processEditBio(req, res) {
     try {
-        const {bio} = req.body;
+        const { bio } = req.body;
         req.user.bio = bio;
         await req.user.save();
-        res.status(201).json({ status: "no_error" });
+        res.status(200).json({ status: "no_error" });
     }
     catch (e) {
         res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
@@ -70,12 +103,12 @@ async function processLogin(req, res) {
             if (isValidPassword) {
                 req.session.userid = userExists._id.toString();
                 req.session.loginTime = Date.now();
-                res.status(200).json({ status: "no_error", value: "" });
+                res.status(200).json({ status: "no_error" });
             }
             else {
                 //delay for nasty spammers
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                res.status(400).json({ status: "user_wrong_password", value: "" });
+                res.status(400).json({ status: "user_wrong_password" });
             }
         }
         else {
@@ -98,7 +131,8 @@ async function processRegister(req, res) {
             res.status(400).json({ status: "user_exists" });
         }
         else {
-            await (new User({ username, passwordHash })).save();
+            const userRole = await UserRole.findOne({ name: "User" })
+            await (new User({ username, passwordHash, role: userRole._id })).save();
             res.status(201).json({ status: "no_error" });
         }
     }
