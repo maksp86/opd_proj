@@ -3,6 +3,7 @@ const { check } = require("express-validator")
 const logger = require("winston")
 
 const UserRole = require("../model/userrole.model");
+const User = require("../model/user.model");
 
 const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
 
@@ -12,25 +13,194 @@ const admin_router = Router()
 admin_router.post("/role/edit",
     [
         rejectIfNotLogined,
-        check("name").isString(),
-        check("permisions").isNumeric(),
+        check("id").isHexadecimal(),
+        check("permissions").isNumeric(),
         processValidaion
     ], processRoleEdit)
 
+admin_router.post("/role/add",
+    [
+        rejectIfNotLogined,
+        check("name").isString(),
+        check("permissions").isNumeric(),
+        processValidaion
+    ], processRoleAdd)
+
+admin_router.post("/role/remove",
+    [
+        rejectIfNotLogined,
+        check("id").isHexadecimal(),
+        processValidaion
+    ], processRoleRemove)
+
+admin_router.post("/role/list",
+    [
+        rejectIfNotLogined,
+        processValidaion
+    ], processRoleList)
+
+admin_router.post("/user/remove",
+    [
+        rejectIfNotLogined,
+        check("id").isHexadecimal(),
+        processValidaion
+    ], processUserRemove)
+
+admin_router.post("/user/edit",
+    [
+        rejectIfNotLogined,
+        check("id").isHexadecimal(),
+        check('bio', "field_empty").isString().isLength({ max: 255 }).withMessage("length_too_big"),
+        check('name', "field_empty").isString().isLength({ min: 5, max: 100 }).withMessage("invalid_length"),
+        processValidaion
+    ], processUserEdit)
+
 async function processRoleEdit(req, res) {
     try {
-        const { name, permissions } = req.body;
-        const selectedRole = await UserRole.findOne({ name })
+        const { id, permissions } = req.body;
+        const selectedRole = await UserRole.findById(id)
+        req.user = await req.user.populate("role");
 
         if (selectedRole) {
-            if (req.user.role == selectedRole._id)
-                res.status(400).json({ status: "cant_edit_your_role" })
-            else {
-
+            if (req.user.role._id.toString() === selectedRole._id.toString())
+                res.status(400).json({ status: "error_cant_edit_your_role" })
+            else if (req.user.role.permissions % 10 == 6) {
+                selectedRole.permissions = permissions
+                await selectedRole.save()
+                res.status(200).json({ status: "no_error", value: selectedRole.toJSON() })
             }
+            else
+                res.status(403).json({ status: "error_no_permission" })
         }
         else
             res.status(400).json({ status: "role_not_found" });
+    }
+    catch (e) {
+        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
+        logger.error("[user.routes] %s", e.message);
+    }
+}
+
+async function processRoleAdd(req, res) {
+    try {
+        const { name, permissions } = req.body;
+        const selectedRole = await UserRole.findOne({ name })
+        req.user = await req.user.populate("role");
+
+        if (selectedRole)
+            return res.status(400).json({ status: "role_exist" });
+
+        if (req.user.role.permissions % 10 == 6) {
+            let createdRole = await UserRole.create({ name, permissions })
+            res.status(200).json({ status: "no_error", value: createdRole.toJSON() })
+        }
+        else
+            res.status(403).json({ status: "error_no_permission" })
+    }
+    catch (e) {
+        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
+        logger.error("[user.routes] %s", e.message);
+    }
+}
+
+async function processRoleRemove(req, res) {
+    try {
+        const { id } = req.body;
+        const selectedRole = await UserRole.findById(id)
+        req.user = await req.user.populate("role");
+
+        if (!selectedRole)
+            return res.status(400).json({ status: "role_not_found" });
+
+        if (req.user.role._id.toString() === selectedRole._id.toString())
+            return res.status(400).json({ status: "error_cant_edit_your_role" })
+
+        if (req.user.role.permissions % 10 == 6) {
+            await selectedRole.deleteOne()
+            return res.status(200).json({ status: "no_error" })
+        }
+        else
+            return res.status(403).json({ status: "error_no_permission" })
+    }
+    catch (e) {
+        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
+        logger.error("[user.routes] %s", e.message);
+    }
+}
+
+async function processRoleList(req, res) {
+    try {
+        const roles = await UserRole.find().lean()
+        req.user = await req.user.populate("role");
+
+        res.status(200).json({ status: "no_error", value: roles, userRole: req.user.role.toJSON() })
+    }
+    catch (e) {
+        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
+        logger.error("[user.routes] %s", e.message);
+    }
+}
+
+async function processUserRemove(req, res) {
+    try {
+        const { id } = req.body;
+        const selectedUser = await User.findById(id)
+        req.user = await req.user.populate("role");
+
+        if (!selectedUser)
+            return res.status(400).json({ status: "user_not_found" });
+
+        let isSameUser = req.user._id.toString() === selectedUser._id.toString()
+        if (isSameUser || req.user.username == "admin") {
+            res.status(400).json({ status: "error_cant_remove_user" })
+        }
+        else {
+            if (isSameUser) {
+                req.sesstion.destroy()
+                await selectedUser.deleteOne()
+                res.status(200).json({ status: "no_error" })
+            }
+            else if (req.user.role.permissions % 10 == 6) {
+                await selectedUser.deleteOne()
+                res.status(200).json({ status: "no_error" })
+            }
+            else
+                res.status(403).json({ status: "error_no_permission" })
+        }
+    }
+    catch (e) {
+        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
+        logger.error("[user.routes] %s", e.message);
+    }
+}
+
+async function processUserEdit(req, res) {
+    try {
+        const { id, bio, name } = req.body;
+        const selectedUser = await User.findById(id).populate("role")
+        req.user = await req.user.populate("role");
+
+        if (!selectedUser)
+            return res.status(400).json({ status: "user_not_found" });
+
+        let isSameUser = req.user._id.toString() === selectedUser._id.toString()
+        let isSameRole = req.user.role._id.toString() === selectedUser.role._id.toString()
+
+        if (isSameUser)
+            return res.status(400).json({ status: "use_standart_method" });
+
+        if (isSameRole || req.user.role.permissions % 10 != 6)
+            res.status(403).json({ status: "error_no_permission" })
+        else {
+            selectedUser.bio = bio;
+            selectedUser.name = name;
+            await selectedUser.save()
+            res.status(200).json({ status: "no_error", value: selectedUser.toJSON() })
+        }
+
+
+        await req.user.updateOne({ bio, name })
+        res.status(200).json({ status: "no_error" });
     }
     catch (e) {
         res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });

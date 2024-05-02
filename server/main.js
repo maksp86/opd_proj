@@ -39,6 +39,7 @@ async function start() {
         app.use(express.json({ extended: true }));
 
         app.use('/api/user', require('./routes/user.routes'))
+        app.use('/api/admin', require('./routes/admin.routes'))
 
         app.listen(process.env.PORT, () => { logger.info("Server listening on %s", process.env.PORT) })
     }

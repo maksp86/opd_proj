@@ -14,7 +14,8 @@ const user_router = Router()
 user_router.post("/create",
     [
         rejectIfAlreadyLogined,
-        check('username', "field_empty").isString().isLength({ min: 5, max: 30 }).withMessage("invalid_length"),
+        check('username', "field_empty").isAlphanumeric().isLength({ min: 5, max: 30 }).withMessage("invalid_length"),
+        check('name', "field_empty").isString().isLength({ min: 5, max: 100 }).withMessage("invalid_length"),
         check('password', "field_empty").isString().isLength({ min: 10, max: 255 }).withMessage("invalid_length"),
         processValidaion
     ], processRegister);
@@ -22,20 +23,21 @@ user_router.post("/create",
 user_router.post("/login",
     [
         rejectIfAlreadyLogined,
-        check('username', "field_empty").isString().isLength({ min: 5, max: 30 }).withMessage("invalid_length"),
+        check('username', "field_empty").isAlphanumeric().isLength({ min: 5, max: 30 }).withMessage("invalid_length"),
         check('password', "field_empty").isString().isLength({ min: 10, max: 255 }).withMessage("invalid_length"),
         processValidaion
     ], processLogin);
 
 user_router.get("/logout", rejectIfNotLogined, processLogout)
 
-user_router.post("/editbio",
+user_router.post("/editinfo",
     [
         rejectIfNotLogined,
         check('bio', "field_empty").isString().isLength({ max: 255 }).withMessage("length_too_big"),
+        check('name', "field_empty").isString().isLength({ min: 5, max: 100 }).withMessage("invalid_length"),
         processValidaion
     ],
-    processEditBio
+    processEditInfo
 )
 
 user_router.post("/editpassword",
@@ -69,11 +71,10 @@ async function processEditPassword(req, res) {
     }
 }
 
-async function processEditBio(req, res) {
+async function processEditInfo(req, res) {
     try {
-        const { bio } = req.body;
-        req.user.bio = bio;
-        await req.user.save();
+        const { bio, name } = req.body;
+        await req.user.updateOne({ bio, name })
         res.status(200).json({ status: "no_error" });
     }
     catch (e) {
@@ -123,7 +124,7 @@ async function processLogin(req, res) {
 
 async function processRegister(req, res) {
     try {
-        const { username, password } = req.body;
+        const { username, password, name } = req.body;
         const passwordHash = await bcrypt.hash(password, 10);
 
         const userExists = await User.findOne({ username })
@@ -132,7 +133,7 @@ async function processRegister(req, res) {
         }
         else {
             const userRole = await UserRole.findOne({ name: "User" })
-            await (new User({ username, passwordHash, role: userRole._id })).save();
+            await (new User({ username, passwordHash, role: userRole._id, name })).save();
             res.status(201).json({ status: "no_error" });
         }
     }
