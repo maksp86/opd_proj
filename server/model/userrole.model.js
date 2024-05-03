@@ -1,5 +1,4 @@
-const { text } = require("express")
-const { Schema, model, Types } = require("mongoose")
+const { Schema, model } = require("mongoose")
 
 module.exports = model("UserRole", new Schema(
     {
