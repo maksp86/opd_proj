@@ -43,6 +43,7 @@ async function start() {
         app.use('/api/category', require('./routes/category.routes'))
         app.use('/api/task', require('./routes/task.routes'))
         app.use('/api/difficulty', require('./routes/difficulty.routes'))
+        app.use('/api/attachments', require('./routes/attachments.routes'))
 
         app.listen(process.env.PORT, () => { logger.info("Server listening on %s", process.env.PORT) })
     }
