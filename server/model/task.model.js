@@ -14,7 +14,7 @@ module.exports = model("Task", new Schema(
          },
         commentable: { type: Boolean, default: true },
 
-        attachments: { type: [String] }, //attachment urls
+        attachments: [{ type: Types.ObjectId, ref: "Attachment" }], //attachment urls
         
         difficulty: { type: Types.ObjectId, ref: "Difficulty" },
         parent: { type: Types.ObjectId, ref: "Category" },

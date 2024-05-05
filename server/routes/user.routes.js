@@ -129,7 +129,7 @@ async function processRegister(req, res) {
 
         const userExists = await User.findOne({ username })
         if (userExists) {
-            res.status(400).json({ status: "user_exists" });
+            res.status(400).json({ status: "error_already_exists" });
         }
         else {
             const userRole = await UserRole.findOne({ name: "User" })

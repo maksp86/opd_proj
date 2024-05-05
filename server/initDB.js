@@ -17,8 +17,8 @@ function genPass(passLen) {
 
 async function databaseInit() {
     if (!await UserRole.findOne()) {
-        const userRole = await (new UserRole({ name: "User", permisions: 444 })).save()
-        const adminRole = await (new UserRole({ name: "Administrator", permisions: 666 })).save()
+        const userRole = await (new UserRole({ name: "User", permisions: "444" })).save()
+        const adminRole = await (new UserRole({ name: "Administrator", permisions: "666" })).save()
 
         const adminAccount = await User.findOne({ username: "admin" })
         if (adminAccount) {

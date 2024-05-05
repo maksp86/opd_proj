@@ -8,5 +8,5 @@ module.exports = model("Category", new Schema(
         owner: { type: Types.ObjectId, ref: "User" },
         isLearning: { type: Boolean, default: false },
         //Linux like permissions (without executable bit) 4-r 2-w
-        permissions: { type: Number, default: 644 }
+        permissions: { type: String, default: "644" }
     }))
