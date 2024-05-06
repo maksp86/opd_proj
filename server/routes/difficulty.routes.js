@@ -62,7 +62,7 @@ async function processAddDifficulty(req, res) {
                 let difficulty = await Difficulty.findById(id)
 
                 if (!difficulty)
-                    return res.status(400).json({ status: "error_not_found" });
+                    return res.status(404).json({ status: "error_not_found" });
 
                 await difficulty.updateOne({ value, title })
                 res.status(200).json({ status: "no_error", value: { _id: id, value, title } });
@@ -88,7 +88,7 @@ async function processCategoryRemove(req, res) {
             let foundDifficulty = await Difficulty.findById(id)
 
             if (!foundDifficulty)
-                return res.status(400).json({ status: "error_not_found" });
+                return res.status(404).json({ status: "error_not_found" });
 
             if (await Task.exists({ difficulty: foundDifficulty._id }))
                 return res.status(400).json({ status: "error_currently_used" });

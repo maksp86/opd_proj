@@ -74,7 +74,7 @@ async function processCategoryCreate(req, res) {
                 let category = await Category.findById(id)
 
                 if (!category)
-                    return res.status(400).json({ status: "error_not_found" });
+                    return res.status(404).json({ status: "error_not_found" });
 
                 category = await category.populate("owner")
 
@@ -114,7 +114,7 @@ async function processCategoryRemove(req, res) {
             let foundCategory = await Category.findById(id)
 
             if (!foundCategory)
-                return res.status(400).json({ status: "error_not_found" });
+                return res.status(404).json({ status: "error_not_found" });
 
             const categoryPermissions = getPermissionsStruct(foundCategory.permissions)
             if (req.user.role.name != "Administrator" && !foundCategory.owner._id.equals(req.user._id)

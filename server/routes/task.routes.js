@@ -82,7 +82,7 @@ async function processTaskRemove(req, res) {
             let foundTask = await Task.findById(id)
 
             if (!foundTask)
-                return res.status(400).json({ status: "error_not_found" });
+                return res.status(404).json({ status: "error_not_found" });
             foundTask = await foundTask.populate("parent")
 
             const categoryPermissions = getPermissionsStruct(foundTask.parent.permissions)
@@ -114,7 +114,7 @@ async function processTaskGet(req, res) {
             let foundTask = await Task.findById(id)
 
             if (!foundTask)
-                return res.status(400).json({ status: "error_not_found" });
+                return res.status(404).json({ status: "error_not_found" });
             foundTask = await foundTask.populate("parent")
 
             const categoryPermissions = getPermissionsStruct(foundTask.parent.permissions)

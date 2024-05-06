@@ -7,6 +7,7 @@ const mongoose = require("mongoose")
 const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
 const User = require("../model/user.model")
 const UserRole = require("../model/userrole.model")
+const Attachment = require("../model/attachment.model")
 
 const user_router = Router()
 
@@ -35,6 +36,7 @@ user_router.post("/editinfo",
         rejectIfNotLogined,
         check('bio', "field_empty").isString().isLength({ max: 255 }).withMessage("length_too_big"),
         check('name', "field_empty").isString().isLength({ min: 5, max: 100 }).withMessage("invalid_length"),
+        check('image', "field_empty").isMongoId(),
         processValidaion
     ],
     processEditInfo
@@ -73,9 +75,14 @@ async function processEditPassword(req, res) {
 
 async function processEditInfo(req, res) {
     try {
-        const { bio, name } = req.body;
-        await req.user.updateOne({ bio, name })
-        res.status(200).json({ status: "no_error" });
+        const { bio, name, image } = req.body;
+        if (Attachment.exists({ _id: image })) {
+            await req.user.updateOne({ bio, name, image })
+            res.status(200).json({ status: "no_error" });
+        }
+        else
+            res.status(400).json({ status: "validation_failed", errors: [{ msg: "error_not_found", path: "image" }] });
+
     }
     catch (e) {
         res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });

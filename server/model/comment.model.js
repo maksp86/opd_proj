@@ -4,6 +4,6 @@ module.exports = model("Comment", new Schema(
     {
         author: { type: Types.ObjectId, ref: "User" },
         text: { type: String, default: "Comment text" },
-        parent: {type: Types.ObjectId, ref: "Comment" },
+        parent: { type: Types.ObjectId, ref: "Comment" },
         subject: { type: Types.ObjectId, ref: "Task" }
-    }))
+    }, { timestamps: true }))

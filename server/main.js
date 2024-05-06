@@ -5,6 +5,7 @@ const session = require('express-session')
 const cookie_parser = require("cookie-parser")
 const MongoStore = require("connect-mongo");
 const mongoose = require("mongoose");
+const { rateLimit } = require("express-rate-limit");
 
 const logger = require("./logger");
 const dbConnect = require("./db");
@@ -37,6 +38,13 @@ async function start() {
 
         app.set('trust proxy', 1);
         app.use(express.json({ extended: true }));
+
+        const limiter = rateLimit({
+            windowMs: 2000,
+            limit: 5,
+            message: { status: "error_too_many_requests" }
+        })
+        app.use(limiter)
 
         app.use('/api/user', require('./routes/user.routes'))
         app.use('/api/admin', require('./routes/admin.routes'))

@@ -37,7 +37,7 @@ async function uploadFilter(req, file, cb) {
                     cb("error_wrong_mimetype", false);
                 if (file.size > 1 * 1024 * 1024)
                     cb("error_too_big", false);
-                
+
                 cb(null, true)
                 break
         }
@@ -51,17 +51,88 @@ attachment_router.post("/upload",
         rejectIfNotLogined,
         storage.single("file"),
         (err, req, res, next) => {
-            if (err && typeof err === "string") {
-                res.status(400).json({ status: err })
+            if (err) {
+                if (typeof err === "string") {
+                    res.status(400).json({ status: err })
+                }
+                else
+                    logger.error("[attachments.routes.upload] %s", err.message);
             }
             else
                 next()
         },
     ], processAttachmentUpload)
 
+attachment_router.get("/get",
+    [
+        rejectIfNotLogined,
+        check("id", "field_empty").isMongoId(),
+        processValidaion
+    ],
+    processAttachmentGet
+)
+
+attachment_router.post("/remove",
+    [
+        rejectIfNotLogined,
+        check("id", "field_empty").isMongoId(),
+        processValidaion
+    ],
+    processAttachmentRemove
+)
+
+async function processAttachmentRemove(req, res) {
+    try {
+        const { id } = req.body
+        let foundAttachment = await Attachment.findById(id)
+
+        if (!foundAttachment)
+            return res.status(404).json({ status: "error_not_found" })
+
+        foundAttachment = await foundAttachment.populate("owner")
+
+        req.user = await req.user.populate("role")
+        const userPermissions = getPermissionsStruct(req.user.role.permissions)
+
+        if (foundAttachment.owner.equals(req.user._id) || userPermissions.others.write
+            || (userPermissions.group.write && foundAttachment.owner.role.equals(req.user.role._id))) {
+
+            await foundAttachment.deleteOne()
+            await fs.unlink(path.join(dest, foundAttachment.path), (err) => {
+                if (err)
+                    logger.error("[attachments.routes.remove] %s", err.message);
+            })
+            return res.status(200).json({ status: "no_error" })
+        }
+        else
+            res.status(403).json({ status: "error_no_permission" })
+    }
+    catch (e) {
+        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
+        logger.error("[attachments.routes] %s", e.message);
+    }
+}
+
+async function processAttachmentGet(req, res) {
+    try {
+        const { id } = req.query
+        let foundAttachment = await Attachment.findById(id)
+
+        if (!foundAttachment)
+            return res.status(404).json({ status: "error_not_found" })
+
+        res.download(path.join(dest, foundAttachment.path), foundAttachment.name)
+    }
+    catch (e) {
+        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
+        logger.error("[attachments.routes] %s", e.message);
+    }
+}
 
 async function processAttachmentUpload(req, res) {
     try {
+        if (req.body.type === "avatar")
+            req.body.file.originalname = req.user._id.toString() + "-avatar"
         let attachment = new Attachment({
             owner: req.user._id,
             type: req.body.type,
@@ -69,7 +140,7 @@ async function processAttachmentUpload(req, res) {
             name: req.file.originalname
         })
         await attachment.save()
-        res.status(200).json({ status: "no_error", value: attachment.toJSON() })
+        res.status(200).json({ status: "no_error", value: { _id: attachment._id, name: req.file.originalname } })
     }
     catch (e) {
         res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });

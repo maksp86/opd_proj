@@ -7,4 +7,4 @@ module.exports = model("Submit", new Schema(
         task: { type: Types.ObjectId, ref: "Task" },
         isValid: { type: Boolean, default: false },
         reward: { type: Number, default: 0 }
-    }))
+    }, { timestamps: true }))

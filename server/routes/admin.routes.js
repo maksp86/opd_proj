@@ -76,7 +76,7 @@ async function processRoleEdit(req, res) {
                 res.status(403).json({ status: "error_no_permission" })
         }
         else
-            res.status(400).json({ status: "error_not_found" });
+            res.status(404).json({ status: "error_not_found" });
     }
     catch (e) {
         res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
@@ -115,7 +115,7 @@ async function processRoleRemove(req, res) {
         const userPermissions = getPermissionsStruct(req.user.permissions)
 
         if (!selectedRole)
-            return res.status(400).json({ status: "error_not_found" });
+            return res.status(404).json({ status: "error_not_found" });
 
         if (req.user.role._id.toString() === selectedRole._id.toString())
             return res.status(400).json({ status: "error_cant_edit_your_role" })
@@ -154,7 +154,7 @@ async function processUserRemove(req, res) {
         const userPermissions = getPermissionsStruct(req.user.permissions)
 
         if (!selectedUser)
-            return res.status(400).json({ status: "error_not_found" });
+            return res.status(404).json({ status: "error_not_found" });
 
         let isSameUser = req.user._id.toString() === selectedUser._id.toString()
         if (isSameUser || req.user.username == "admin") {
@@ -188,7 +188,7 @@ async function processUserEdit(req, res) {
         const userPermissions = getPermissionsStruct(req.user.permissions)
 
         if (!selectedUser)
-            return res.status(400).json({ status: "error_not_found" });
+            return res.status(404).json({ status: "error_not_found" });
 
         let isSameUser = req.user._id.toString() === selectedUser._id.toString()
         let isSameRole = req.user.role._id.toString() === selectedUser.role._id.toString()

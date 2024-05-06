@@ -10,4 +10,4 @@ module.exports = model("Attachment", new Schema(
         },
         owner: { type: Types.ObjectId, ref: "User" },
         path: { type: String }
-    }))
+    }, { timestamps: true }))
