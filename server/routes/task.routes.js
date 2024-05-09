@@ -5,6 +5,8 @@ const logger = require("winston")
 const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
 const { getPermissionsStruct } = require("../lib/user.functions")
 const Task = require("../model/task.model");
+const Category = require("../model/category.model");
+const Difficulty = require("../model/difficulty.model");
 
 const task_router = Router()
 
@@ -15,10 +17,9 @@ task_router.post("/create",
         check("summary", "field_empty").isString().isLength({ max: 200 }).withMessage("invalid_length"),
         check("shortname", "field_empty").isString().isLength({ max: 20 }).withMessage("invalid_length"),
         check("text", "field_empty").isString(),
-        check("type", "field_empty").isIn(Task.schema.obj.type.enum).withMessage("invalid_value"),
         check("commentable", "field_empty").isBoolean(),
         check("attachments", "field_empty").isArray(),
-        check("parentCategory", "field_empty").isMongoId(),
+        check("parent", "field_empty").isMongoId(),
         check("difficulty", "field_empty").isMongoId(),
         processValidaion
     ],
@@ -67,76 +68,188 @@ task_router.get("/list",
     processTaskList
 )
 
-async function processTaskCreate(req, res) {
+function checkIsAnswerFields(answerFields) {
+    if (answerFields && Array.isArray(answerFields)) {
+        for (let i = 0; i < answerFields.length; i++) {
+            const field = answerFields[i];
+            if ("text" in field && typeof field.text === "string")
+                if ("hint" in field && typeof field.hint === "string" || !("hint" in field))
+                    if ("answer" in field && typeof field.answer === "string")
+                        if (!("hint" in field) || ("variants" in field && Array.isArray(field.variants) && field.variants.every(x => typeof x === "string")))
+                            return true;
+        }
+    }
+    return false
+}
 
+async function processTaskCreate(req, res) {
+    const { title,
+        summary,
+        shortname,
+        text,
+        commentable,
+        attachments,
+        parent,
+        difficulty,
+        answerFields,
+        maxTries } = req.body
+
+    req.user = await req.user.populate("role");
+    const userPermissions = getPermissionsStruct(req.user.role.permissions)
+
+    if (userPermissions.group.write || userPermissions.others.write) {
+        let foundTask = await Task.findOne({ shortname })
+        let parentCategory = undefined;
+
+        if (req.url === "/create") {
+            parentCategory = await Category.findById(parent)
+        }
+        else if (req.url === "/edit") {
+            if (!foundTask)
+                return res.status(400).json({ status: "error_not_found" });
+            parentCategory = await Category.findById(foundTask.parent)
+        }
+
+        if (!parentCategory)
+            return res.status(400).json({
+                status: "error_not_found",
+                errors: [{ msg: "error_not_found", path: "parent" }]
+            });
+
+        if (!Difficulty.exists(difficulty))
+            return res.status(400).json({
+                status: "error_not_found",
+                errors: [{ msg: "error_not_found", path: "difficulty" }]
+            });
+
+        if (!parentCategory.isLearning) {
+            let errors = []
+            if (!checkIsAnswerFields(answerFields)) {
+                errors.push({ msg: "field_invalid", path: "answerFields" })
+            }
+            if (!maxTries || typeof maxTries !== "number")
+                errors.push({ msg: "field_invalid", path: "maxTries" })
+
+            if (errors.length > 0)
+                return res.status(400).json({ status: "validation_failed", errors });
+        }
+
+        const categoryPermissions = getPermissionsStruct(parentCategory.permissions)
+        if (req.user.role.name == "Administrator"
+            || parentCategory.owner.equals(req.user._id)
+            || (categoryPermissions.group.write && parentCategory.owner.equals(req.user.role._id))
+            || categoryPermissions.others.write) {
+            if (req.url === "/create") {
+                if (foundTask)
+                    return res.status(400).json({ status: "error_already_exists" });
+
+                let newTask = new Task({
+                    title,
+                    summary,
+                    shortname,
+                    text,
+                    commentable,
+                    attachments,
+                    parent,
+                    difficulty,
+                    answerFields,
+                    maxTries
+                })
+                await newTask.save()
+                return res.status(201).json({
+                    status: "no_error",
+                    value: { _id: newTask._id.toString(), title, summary, shortname, parent, owner: req.user._id.toString() }
+                })
+            }
+            else if (req.url === "/edit") {
+                await foundTask.updateOne({
+                    title,
+                    summary,
+                    text,
+                    commentable,
+                    attachments,
+                    difficulty,
+                    answerFields,
+                    maxTries
+                })
+
+                return res.status(201).json({
+                    status: "no_error",
+                    value: { _id: foundTask._id.toString(), title, summary, shortname, parent, owner: req.user._id.toString() }
+                })
+            }
+        }
+
+    }
+    return res.status(403).json({ status: "error_no_permission" })
 }
 
 async function processTaskRemove(req, res) {
-    try {
-        const { id } = req.body
-        req.user = await req.user.populate("role");
+    const { id } = req.body
+    req.user = await req.user.populate("role");
 
-        const userPermissions = getPermissionsStruct(req.user.role.permissions)
+    const userPermissions = getPermissionsStruct(req.user.role.permissions)
 
-        if (userPermissions.group.write || userPermissions.others.write) {
-            let foundTask = await Task.findById(id)
+    if (userPermissions.group.write || userPermissions.others.write) {
+        let foundTask = await Task.findById(id)
 
-            if (!foundTask)
-                return res.status(404).json({ status: "error_not_found" });
-            foundTask = await foundTask.populate("parent")
+        if (!foundTask)
+            return res.status(404).json({ status: "error_not_found" });
+        foundTask = await foundTask.populate("parent")
 
-            const categoryPermissions = getPermissionsStruct(foundTask.parent.permissions)
-            if (req.user.role.name != "Administrator" && !foundTask.owner._id.equals(req.user._id)
-                && (!categoryPermissions.others.write || (categoryPermissions.group.write && !req.user.role.equals(foundTask.owner.role)))) {
-                return res.status(403).json({ status: "error_no_permission" })
-            }
-
-            await foundTask.deleteOne()
-            res.status(200).json({ status: "no_error" });
+        const categoryPermissions = getPermissionsStruct(foundTask.parent.permissions)
+        if (req.user.role.name != "Administrator" && !foundTask.owner._id.equals(req.user._id)
+            && (!categoryPermissions.others.write || (categoryPermissions.group.write && !req.user.role._id.equals(foundTask.owner.role)))) {
+            return res.status(403).json({ status: "error_no_permission" })
         }
-        else
-            res.status(403).json({ status: "error_no_permission" })
+
+        await foundTask.deleteOne()
+        res.status(200).json({ status: "no_error" });
     }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[task.routes] %s", e.message);
-    }
+    else
+        res.status(403).json({ status: "error_no_permission" })
 }
 
 async function processTaskGet(req, res) {
-    try {
-        const { id } = req.body
-        req.user = await req.user.populate("role");
+    const { id } = req.query
+    req.user = await req.user.populate("role");
 
-        const userPermissions = getPermissionsStruct(req.user.role.permissions)
+    let foundTask = await Task.findById(id)
 
-        if (userPermissions.group.write || userPermissions.others.write) {
-            let foundTask = await Task.findById(id)
+    if (!foundTask)
+        return res.status(404).json({ status: "error_not_found" });
+    foundTask = await foundTask.populate("parent")
 
-            if (!foundTask)
-                return res.status(404).json({ status: "error_not_found" });
-            foundTask = await foundTask.populate("parent")
-
-            const categoryPermissions = getPermissionsStruct(foundTask.parent.permissions)
-            if (req.user.role.name != "Administrator" && !foundTask.owner._id.equals(req.user._id)
-                && (!categoryPermissions.others.read || (categoryPermissions.group.read && !req.user.role.equals(foundTask.owner.role)))) {
-                return res.status(403).json({ status: "error_no_permission" })
-            }
-            
-            foundTask = await foundTask.populate(["parent", "attachments", "difficulty", "owner"])
-            res.status(200).json({ status: "no_error", value: foundTask.toJSON() });
-        }
-        else
-            res.status(403).json({ status: "error_no_permission" })
+    const categoryPermissions = getPermissionsStruct(foundTask.parent.permissions)
+    if (req.user.role.name != "Administrator" && !foundTask.owner._id.equals(req.user._id)
+        && (!categoryPermissions.others.read || (categoryPermissions.group.read && !req.user.role._id.equals(foundTask.owner.role)))) {
+        return res.status(403).json({ status: "error_no_permission" })
     }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[task.routes] %s", e.message);
-    }
+
+    foundTask = await foundTask.populate(["parent", "attachments", "difficulty", "owner"])
+    res.status(200).json({ status: "no_error", value: foundTask.toJSON() });
 }
 
 async function processTaskList(req, res) {
+    const { parent } = req.query
 
+    const parentCategory = await Category.findById(parent)
+
+    if (!parentCategory)
+        return res.status(404).json({ status: "error_not_found" });
+
+    const categoryPermissions = getPermissionsStruct(parentCategory.permissions)
+
+    if (req.user.role.name == "Administrator" || (userPermissions.others.read
+        || categoryPermissions.others.read
+        || parentCategory.owner._id.equals(req.user._id)
+        || (categoryPermissions.group.read && req.user.role._id.equals(parentCategory.owner.role._id)))) {
+        let tasks = await Task.find({ parent }, { commentable: 0, attachments: 0, text: 0, maxTries: 0, answerFields: 0 }).lean()
+        return res.status(200).json({ status: "no_error", value: tasks })
+    }
+    else {
+        return res.status(403).json({ status: "error_no_permission" })
+    }
 }
 
 module.exports = task_router

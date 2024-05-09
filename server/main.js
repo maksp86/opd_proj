@@ -14,7 +14,7 @@ const app = express();
 
 async function start() {
     try {
-        logger.info("Starting");
+        logger.info("Starting server in %s mode", process.env.NODE_ENV);
         dbConnect();
 
         app.use(session({
@@ -52,6 +52,10 @@ async function start() {
         app.use('/api/task', require('./routes/task.routes'))
         app.use('/api/difficulty', require('./routes/difficulty.routes'))
         app.use('/api/attachments', require('./routes/attachments.routes'))
+
+        app.get('/api/healthcheck', (req, res) => { res.status(200).json({ status: "no_error" }) })
+
+        app.use(require('./middleware/errorHandler.middleware'))
 
         app.listen(process.env.PORT, () => { logger.info("Server listening on %s", process.env.PORT) })
     }

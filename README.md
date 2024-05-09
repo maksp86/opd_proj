@@ -23,5 +23,6 @@ Status codes:
 - [x] Ability to upload files as attachments
 - [ ] Comments for tasks (30% done)
 - [ ] Server self-cleaning from unused files/tasks/categories
+- [x] Global error handler
 
 Prod server will be located at https://edplatform.maksp.gsqd.ru (80, 443)

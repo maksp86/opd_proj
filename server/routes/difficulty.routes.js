@@ -45,76 +45,58 @@ difficulty_router.get("/list",
     processGetList)
 
 async function processAddDifficulty(req, res) {
-    try {
-        const { value, title } = req.body
-        req.user = await req.user.populate("role");
+    const { value, title } = req.body
+    req.user = await req.user.populate("role");
 
-        const userPermissions = getPermissionsStruct(req.user.role.permissions)
+    const userPermissions = getPermissionsStruct(req.user.role.permissions)
 
-        if (userPermissions.group.write || userPermissions.others.write) {
-            if (req.url === "/create") {
-                let newDifficulty = new Difficulty({ value, title });
-                await newDifficulty.save();
-                res.status(201).json({ status: "no_error", value: newDifficulty.toJSON() });
-            }
-            if (req.url === "/edit") {
-                const id = req.body.id
-                let difficulty = await Difficulty.findById(id)
-
-                if (!difficulty)
-                    return res.status(404).json({ status: "error_not_found" });
-
-                await difficulty.updateOne({ value, title })
-                res.status(200).json({ status: "no_error", value: { _id: id, value, title } });
-            }
+    if (userPermissions.group.write || userPermissions.others.write) {
+        if (req.url === "/create") {
+            let newDifficulty = new Difficulty({ value, title });
+            await newDifficulty.save();
+            res.status(201).json({ status: "no_error", value: newDifficulty.toJSON() });
         }
-        else
-            res.status(403).json({ status: "error_no_permission" })
+        if (req.url === "/edit") {
+            const id = req.body.id
+            let difficulty = await Difficulty.findById(id)
+
+            if (!difficulty)
+                return res.status(404).json({ status: "error_not_found" });
+
+            await difficulty.updateOne({ value, title })
+            res.status(200).json({ status: "no_error", value: { _id: id, value, title } });
+        }
     }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[difficulty.routes] %s", e.message);
-    }
+    else
+        res.status(403).json({ status: "error_no_permission" })
 }
 
 async function processCategoryRemove(req, res) {
-    try {
-        const { id } = req.body
-        req.user = await req.user.populate("role");
+    const { id } = req.body
+    req.user = await req.user.populate("role");
 
-        const userPermissions = getPermissionsStruct(req.user.role.permissions)
+    const userPermissions = getPermissionsStruct(req.user.role.permissions)
 
-        if (userPermissions.group.write || userPermissions.others.write) {
-            let foundDifficulty = await Difficulty.findById(id)
+    if (userPermissions.group.write || userPermissions.others.write) {
+        let foundDifficulty = await Difficulty.findById(id)
 
-            if (!foundDifficulty)
-                return res.status(404).json({ status: "error_not_found" });
+        if (!foundDifficulty)
+            return res.status(404).json({ status: "error_not_found" });
 
-            if (await Task.exists({ difficulty: foundDifficulty._id }))
-                return res.status(400).json({ status: "error_currently_used" });
+        if (await Task.exists({ difficulty: foundDifficulty._id }))
+            return res.status(400).json({ status: "error_currently_used" });
 
-            await foundDifficulty.deleteOne()
-            res.status(200).json({ status: "no_error" });
-        }
-        else
-            res.status(403).json({ status: "error_no_permission" })
+        await foundDifficulty.deleteOne()
+        res.status(200).json({ status: "no_error" });
     }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[difficulty.routes] %s", e.message);
-    }
+    else
+        res.status(403).json({ status: "error_no_permission" })
 }
 
 async function processGetList(req, res) {
-    try {
-        const difficulties = await Difficulty.find().lean()
+    const difficulties = await Difficulty.find().lean()
 
-        res.status(200).json({ status: "no_error", value: difficulties })
-    }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[admin.routes] %s", e.message);
-    }
+    res.status(200).json({ status: "no_error", value: difficulties })
 }
 
 module.exports = difficulty_router

@@ -24,7 +24,6 @@ category_router.post("/create",
 category_router.post("/edit",
     [
         rejectIfNotLogined,
-        check("id", "field_empty").isMongoId(),
         check("title", "field_empty").isString().isLength({ max: 100 }).withMessage("invalid_length"),
         check("shortname", "field_empty").isString().isLength({ max: 20 }).withMessage("invalid_length"),
         check("color", "field_empty").isHexColor(),
@@ -70,26 +69,21 @@ async function processCategoryCreate(req, res) {
                 res.status(201).json({ status: "no_error", value: newCategoty.toJSON() });
             }
             if (req.url === "/edit") {
-                const id = req.body.id
-                let category = await Category.findById(id)
 
-                if (!category)
+                if (!foundCategory)
                     return res.status(404).json({ status: "error_not_found" });
 
-                category = await category.populate("owner")
+                foundCategory = await foundCategory.populate("owner")
 
-                const categoryPermissions = getPermissionsStruct(category.permissions)
+                const categoryPermissions = getPermissionsStruct(foundCategory.permissions)
 
                 if (req.user.role.name != "Administrator"
-                    && (!category.owner._id.equals(req.user._id) && !categoryPermissions.others.write
-                        || (categoryPermissions.group.write && !req.user.role.equals(category.owner.role)))) {
+                    && (!foundCategory.owner._id.equals(req.user._id) && !categoryPermissions.others.write
+                        || (categoryPermissions.group.write && !req.user.role.equals(foundCategory.owner.role)))) {
                     return res.status(403).json({ status: "error_no_permission" })
                 }
 
-                if (foundCategory && !foundCategory._id.equals(id))
-                    return res.status(400).json({ status: "error_already_exists" });
-
-                await category.updateOne({ title, shortname, color, isLearning, permissions })
+                await foundCategory.updateOne({ title, color, isLearning, permissions })
 
                 res.status(201).json({ status: "no_error", value: { _id: id, title, shortname, color, isLearning, permissions } });
             }
@@ -137,7 +131,21 @@ async function processCategoryRemove(req, res) {
 async function processGetList(req, res) {
     try {
         const { isLearning } = req.query
-        const categories = await Category.find({isLearning}).lean()
+
+        req.user = await req.user.populate("role");
+        const userPermissions = getPermissionsStruct(req.user.role.permissions)
+
+        const categories = await Category.find({ isLearning }).populate("owner")
+
+        categories.filter((category) => {
+            const categoryPermissions = getPermissionsStruct(category.permissions)
+            if (req.user.role.name == "Administrator" || (userPermissions.others.read
+                || categoryPermissions.others.read
+                || category.owner._id.equals(req.user._id)
+                || (categoryPermissions.group.read && req.user.role._id.equals(category.owner.role._id))))
+                return true;
+            return false;
+        })
 
         res.status(200).json({ status: "no_error", value: categories })
     }

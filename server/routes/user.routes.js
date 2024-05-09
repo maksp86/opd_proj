@@ -2,7 +2,6 @@ const Router = require("express")
 const { check } = require("express-validator")
 const bcrypt = require('bcrypt')
 const logger = require("winston")
-const mongoose = require("mongoose")
 
 const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
 const User = require("../model/user.model")
@@ -53,100 +52,70 @@ user_router.post("/editpassword",
 )
 
 async function processEditPassword(req, res) {
-    try {
-        const { oldpassword, newpassword } = req.body;
+    const { oldpassword, newpassword } = req.body;
 
-        const isValidOldPassword = await bcrypt.compare(oldpassword, req.user.passwordHash)
-        if (isValidOldPassword) {
-            const newPasswordHash = await bcrypt.hash(newpassword, 10);
-            req.user.passwordHash = newPasswordHash;
-            await req.user.save();
-            res.status(200).json({ status: "no_error" });
-        }
-        else {
-            res.status(400).json({ status: "user_wrong_password" });
-        }
+    const isValidOldPassword = await bcrypt.compare(oldpassword, req.user.passwordHash)
+    if (isValidOldPassword) {
+        const newPasswordHash = await bcrypt.hash(newpassword, 10);
+        req.user.passwordHash = newPasswordHash;
+        await req.user.save();
+        res.status(200).json({ status: "no_error" });
     }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[user.routes] %s", e.message);
+    else {
+        res.status(400).json({ status: "user_wrong_password" });
     }
 }
 
 async function processEditInfo(req, res) {
-    try {
-        const { bio, name, image } = req.body;
-        if (Attachment.exists({ _id: image })) {
-            await req.user.updateOne({ bio, name, image })
-            res.status(200).json({ status: "no_error" });
-        }
-        else
-            res.status(400).json({ status: "validation_failed", errors: [{ msg: "error_not_found", path: "image" }] });
+    const { bio, name, image } = req.body;
+    if (Attachment.exists({ _id: image })) {
+        await req.user.updateOne({ bio, name, image })
+        res.status(200).json({ status: "no_error" });
+    }
+    else
+        res.status(400).json({ status: "validation_failed", errors: [{ msg: "error_not_found", path: "image" }] });
 
-    }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[user.routes] %s", e.message);
-    }
 }
 
 async function processLogout(req, res) {
-    try {
-        req.session.destroy();
-        res.status(200).json({ status: "no_error" });
-    }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[user.routes] %s", e.message);
-    }
+    req.session.destroy();
+    res.status(200).json({ status: "no_error" });
 }
 
 async function processLogin(req, res) {
-    try {
-        const { username, password } = req.body;
+    const { username, password } = req.body;
 
-        const userExists = await User.findOne({ username })
-        if (userExists) {
-            const isValidPassword = await bcrypt.compare(password, userExists.passwordHash);
-            if (isValidPassword) {
-                req.session.userid = userExists._id.toString();
-                req.session.loginTime = Date.now();
-                res.status(200).json({ status: "no_error" });
-            }
-            else {
-                //delay for nasty spammers
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                res.status(400).json({ status: "user_wrong_password" });
-            }
+    const userExists = await User.findOne({ username })
+    if (userExists) {
+        const isValidPassword = await bcrypt.compare(password, userExists.passwordHash);
+        if (isValidPassword) {
+            req.session.userid = userExists._id.toString();
+            req.session.loginTime = Date.now();
+            res.status(200).json({ status: "no_error" });
         }
         else {
-            res.status(400).json({ status: "user_not_exist" });
+            //delay for nasty spammers
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            res.status(400).json({ status: "user_wrong_password" });
         }
     }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[user.routes] %s", e.message);
+    else {
+        res.status(400).json({ status: "user_not_exist" });
     }
 }
 
 async function processRegister(req, res) {
-    try {
-        const { username, password, name } = req.body;
-        const passwordHash = await bcrypt.hash(password, 10);
+    const { username, password, name } = req.body;
+    const passwordHash = await bcrypt.hash(password, 10);
 
-        const userExists = await User.findOne({ username })
-        if (userExists) {
-            res.status(400).json({ status: "error_already_exists" });
-        }
-        else {
-            const userRole = await UserRole.findOne({ name: "User" })
-            await (new User({ username, passwordHash, role: userRole._id, name })).save();
-            res.status(201).json({ status: "no_error" });
-        }
+    const userExists = await User.findOne({ username })
+    if (userExists) {
+        res.status(400).json({ status: "error_already_exists" });
     }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[user.routes] %s", e.message);
+    else {
+        const userRole = await UserRole.findOne({ name: "User" })
+        await (new User({ username, passwordHash, role: userRole._id, name })).save();
+        res.status(201).json({ status: "no_error" });
     }
 }
 

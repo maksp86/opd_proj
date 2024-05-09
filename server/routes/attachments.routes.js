@@ -82,70 +82,51 @@ attachment_router.post("/remove",
 )
 
 async function processAttachmentRemove(req, res) {
-    try {
-        const { id } = req.body
-        let foundAttachment = await Attachment.findById(id)
+    const { id } = req.body
+    let foundAttachment = await Attachment.findById(id)
 
-        if (!foundAttachment)
-            return res.status(404).json({ status: "error_not_found" })
+    if (!foundAttachment)
+        return res.status(404).json({ status: "error_not_found" })
 
-        foundAttachment = await foundAttachment.populate("owner")
+    foundAttachment = await foundAttachment.populate("owner")
 
-        req.user = await req.user.populate("role")
-        const userPermissions = getPermissionsStruct(req.user.role.permissions)
+    req.user = await req.user.populate("role")
+    const userPermissions = getPermissionsStruct(req.user.role.permissions)
 
-        if (foundAttachment.owner.equals(req.user._id) || userPermissions.others.write
-            || (userPermissions.group.write && foundAttachment.owner.role.equals(req.user.role._id))) {
+    if (foundAttachment.owner.equals(req.user._id) || userPermissions.others.write
+        || (userPermissions.group.write && foundAttachment.owner.role.equals(req.user.role._id))) {
 
-            await foundAttachment.deleteOne()
-            await fs.unlink(path.join(dest, foundAttachment.path), (err) => {
-                if (err)
-                    logger.error("[attachments.routes.remove] %s", err.message);
-            })
-            return res.status(200).json({ status: "no_error" })
-        }
-        else
-            res.status(403).json({ status: "error_no_permission" })
+        await foundAttachment.deleteOne()
+        await fs.unlink(path.join(dest, foundAttachment.path), (err) => {
+            if (err) throw err
+        })
+        return res.status(200).json({ status: "no_error" })
     }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[attachments.routes] %s", e.message);
-    }
+    else
+        res.status(403).json({ status: "error_no_permission" })
 }
 
 async function processAttachmentGet(req, res) {
-    try {
-        const { id } = req.query
-        let foundAttachment = await Attachment.findById(id)
+    const { id } = req.query
+    let foundAttachment = await Attachment.findById(id)
 
-        if (!foundAttachment)
-            return res.status(404).json({ status: "error_not_found" })
+    if (!foundAttachment)
+        return res.status(404).json({ status: "error_not_found" })
 
-        res.download(path.join(dest, foundAttachment.path), foundAttachment.name)
-    }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[attachments.routes] %s", e.message);
-    }
+    res.download(path.join(dest, foundAttachment.path), foundAttachment.name)
 }
 
 async function processAttachmentUpload(req, res) {
-    try {
-        if (req.body.type === "avatar")
-            req.body.file.originalname = req.user._id.toString() + "-avatar"
-        let attachment = new Attachment({
-            owner: req.user._id,
-            type: req.body.type,
-            path: req.file.filename,
-            name: req.file.originalname
-        })
-        await attachment.save()
-        res.status(200).json({ status: "no_error", value: { _id: attachment._id, name: req.file.originalname } })
-    }
-    catch (e) {
-        res.status(500).json({ status: "unexpected_error", errors: [{ msg: "stupid developer" }] });
-        logger.error("[attachments.routes] %s", e.message);
-    }
+    if (req.body.type === "avatar")
+        req.body.file.originalname = req.user._id.toString() + "-avatar"
+    let attachment = new Attachment({
+        owner: req.user._id,
+        type: req.body.type,
+        path: req.file.filename,
+        name: req.file.originalname
+    })
+    await attachment.save()
+    res.status(200).json({ status: "no_error", value: { _id: attachment._id, name: req.file.originalname } })
 }
 
 module.exports = attachment_router;
