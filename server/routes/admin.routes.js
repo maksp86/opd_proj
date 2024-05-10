@@ -55,8 +55,17 @@ admin_router.post("/user/edit",
         check("id").isMongoId(),
         check('bio', "field_empty").isString().isLength({ max: 255 }).withMessage("length_too_big"),
         check('name', "field_empty").isString().isLength({ min: 5, max: 100 }).withMessage("invalid_length"),
+        check('role', "field_empty").isMongoId(),
         processValidaion
     ], processUserEdit)
+
+admin_router.post("/user/setrole",
+    [
+        rejectIfNotLogined,
+        check("id", "field_empty").isMongoId(),
+        check("role", "field_empty").isMongoId(),
+        processValidaion
+    ], processUserSetRole)
 
 async function processRoleEdit(req, res) {
     const { id, permissions } = req.body;
@@ -172,9 +181,32 @@ async function processUserEdit(req, res) {
         await selectedUser.save()
         res.status(200).json({ status: "no_error", value: selectedUser.toJSON() })
     }
+}
 
-    await req.user.updateOne({ bio, name })
-    res.status(200).json({ status: "no_error" });
+async function processUserSetRole(req, res) {
+    const { id, role } = req.body;
+    const selectedUser = await User.findById(id).populate("role")
+
+    req.user = await req.user.populate("role");
+
+    if (!selectedUser)
+        return res.status(404).json({ status: "error_not_found" });
+
+    if (!await UserRole.exists(role))
+        return res.status(404).json({
+            status: "validation_failed",
+            errors: [{ msg: "error_not_found", path: "role" }]
+        });
+
+    let isSameRole = req.user.role._id.equals(selectedUser.role._id)
+
+    if (isSameRole || !canUserDoInUsers(req.user, ["write", "execute"]))
+        res.status(403).json({ status: "error_no_permission" })
+    else {
+        selectedUser.role = role;
+        await selectedUser.save()
+        res.status(200).json({ status: "no_error", value: selectedUser.toJSON() })
+    }
 }
 
 module.exports = admin_router;

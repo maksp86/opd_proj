@@ -52,6 +52,7 @@ async function start() {
         app.use('/api/task', require('./routes/task.routes'))
         app.use('/api/difficulty', require('./routes/difficulty.routes'))
         app.use('/api/attachments', require('./routes/attachments.routes'))
+        app.use('/api/submit', require('./routes/submit.routes'))
 
         app.get('/api/healthcheck', (req, res) => { res.status(200).json({ status: "no_error" }) })
 

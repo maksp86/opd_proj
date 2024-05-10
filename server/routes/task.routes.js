@@ -3,7 +3,7 @@ const { check } = require("express-validator")
 const logger = require("winston")
 
 const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
-const { getPermissionsStruct, canUserDoIn } = require("../lib/user.functions")
+const { getPermissionsStruct, canUserDoIn, canUserDoInGroup } = require("../lib/user.functions")
 const Task = require("../model/task.model");
 const Category = require("../model/category.model");
 const Difficulty = require("../model/difficulty.model");
@@ -186,14 +186,14 @@ async function processTaskRemove(req, res) {
 
     const userPermissions = getPermissionsStruct(req.user.role.permissions)
 
-    if (userPermissions.group.write || userPermissions.others.write) {
+    if (await canUserDoInGroup(req.users, ["write", "execute"])) {
         let foundTask = await Task.findById(id)
 
         if (!foundTask)
             return res.status(404).json({ status: "error_not_found" });
         foundTask = await foundTask.populate("parent")
 
-        if (!canUserDoIn(req.user, ["write", "execute"], foundTask.parent)) {
+        if (!await canUserDoIn(req.user, ["write", "execute"], foundTask.parent)) {
             return res.status(403).json({ status: "error_no_permission" })
         }
 
@@ -214,7 +214,7 @@ async function processTaskGet(req, res) {
         return res.status(404).json({ status: "error_not_found" });
     foundTask = await foundTask.populate("parent")
 
-    if (!canUserDoIn(req.user, ["read"], foundTask.parent)) {
+    if (!await canUserDoIn(req.user, ["read"], foundTask.parent)) {
         return res.status(403).json({ status: "error_no_permission" })
     }
 
@@ -230,7 +230,7 @@ async function processTaskList(req, res) {
     if (!parentCategory)
         return res.status(404).json({ status: "error_not_found" });
 
-    if (canUserDoIn(req.user, ["read"], parentCategory)) {
+    if (await canUserDoIn(req.user, ["read"], parentCategory)) {
         let tasks = await Task.find({ parent }, { commentable: 0, attachments: 0, text: 0, maxTries: 0, answerFields: 0 }).lean()
         return res.status(200).json({ status: "no_error", value: tasks })
     }
