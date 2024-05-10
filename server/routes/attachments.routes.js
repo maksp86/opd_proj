@@ -6,7 +6,7 @@ const fs = require("fs")
 const path = require("path")
 
 const { rejectIfNotLogined, processValidaion } = require("../middleware/user.middleware")
-const { getPermissionsStruct } = require("../lib/user.functions")
+const { getPermissionsStruct, canUserDoInGroup, canUserDoIn } = require("../lib/user.functions")
 const Attachment = require("../model/attachment.model")
 const User = require("../model/user.model")
 
@@ -21,12 +21,12 @@ const attachment_router = Router()
 async function uploadFilter(req, file, cb) {
     if (file.fieldname === "file" && "type" in req.body
         && typeof req.body.type === "string"
-        && Attachment.schema.obj.type.enum.includes(req.body.type)) {
+        && Attachment.schema.obj.type.enum.includes(req.body.type)
+        && typeof req.body.permissions === String && !isNaN(req.body.permissions)) {
         switch (req.body.type) {
             case "file":
                 req.user = await req.user.populate("role")
-                const userPermissions = getPermissionsStruct(req.user.role.permissions)
-                if (userPermissions.group.write || userPermissions.others.write)
+                if (canUserDoInGroup(req.user, ["write"]))
                     cb(null, true)
                 else
                     cb("error_no_permission", false)
@@ -91,10 +91,8 @@ async function processAttachmentRemove(req, res) {
     foundAttachment = await foundAttachment.populate("owner")
 
     req.user = await req.user.populate("role")
-    const userPermissions = getPermissionsStruct(req.user.role.permissions)
 
-    if (foundAttachment.owner.equals(req.user._id) || userPermissions.others.write
-        || (userPermissions.group.write && foundAttachment.owner.role.equals(req.user.role._id))) {
+    if (canUserDoIn(req.user, ["write"], foundAttachment)) {
 
         await foundAttachment.deleteOne()
         await fs.unlink(path.join(dest, foundAttachment.path), (err) => {
@@ -108,12 +106,17 @@ async function processAttachmentRemove(req, res) {
 
 async function processAttachmentGet(req, res) {
     const { id } = req.query
+    req.user = await req.user.populate("role")
+
     let foundAttachment = await Attachment.findById(id)
 
     if (!foundAttachment)
         return res.status(404).json({ status: "error_not_found" })
 
-    res.download(path.join(dest, foundAttachment.path), foundAttachment.name)
+    if (canUserDoIn(req.user, ["read"], foundAttachment))
+        res.download(path.join(dest, foundAttachment.path), foundAttachment.name)
+    else
+        res.status(403).json({ status: "error_no_permission" })
 }
 
 async function processAttachmentUpload(req, res) {
@@ -123,9 +126,16 @@ async function processAttachmentUpload(req, res) {
         owner: req.user._id,
         type: req.body.type,
         path: req.file.filename,
-        name: req.file.originalname
+        name: req.file.originalname,
+        permissions: req.body.permissions
     })
+
     await attachment.save()
+
+    if (req.body.type === "avatar") {
+        req.user.image = attachment._id;
+        await user.save()
+    }
     res.status(200).json({ status: "no_error", value: { _id: attachment._id, name: req.file.originalname } })
 }
 

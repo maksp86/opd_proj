@@ -3,7 +3,7 @@ const { check } = require("express-validator")
 const logger = require("winston")
 
 const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
-const { getPermissionsStruct } = require("../lib/user.functions")
+const { getPermissionsStruct, canUserDoIn } = require("../lib/user.functions")
 const Task = require("../model/task.model");
 const Category = require("../model/category.model");
 const Difficulty = require("../model/difficulty.model");
@@ -134,11 +134,7 @@ async function processTaskCreate(req, res) {
                 return res.status(400).json({ status: "validation_failed", errors });
         }
 
-        const categoryPermissions = getPermissionsStruct(parentCategory.permissions)
-        if (req.user.role.name == "Administrator"
-            || parentCategory.owner.equals(req.user._id)
-            || (categoryPermissions.group.write && parentCategory.owner.equals(req.user.role._id))
-            || categoryPermissions.others.write) {
+        if (canUserDoIn(req.user, ["write"], parentCategory)) {
             if (req.url === "/create") {
                 if (foundTask)
                     return res.status(400).json({ status: "error_already_exists" });
@@ -197,9 +193,7 @@ async function processTaskRemove(req, res) {
             return res.status(404).json({ status: "error_not_found" });
         foundTask = await foundTask.populate("parent")
 
-        const categoryPermissions = getPermissionsStruct(foundTask.parent.permissions)
-        if (req.user.role.name != "Administrator" && !foundTask.owner._id.equals(req.user._id)
-            && (!categoryPermissions.others.write || (categoryPermissions.group.write && !req.user.role._id.equals(foundTask.owner.role)))) {
+        if (!canUserDoIn(req.user, ["write", "execute"], foundTask.parent)) {
             return res.status(403).json({ status: "error_no_permission" })
         }
 
@@ -220,13 +214,11 @@ async function processTaskGet(req, res) {
         return res.status(404).json({ status: "error_not_found" });
     foundTask = await foundTask.populate("parent")
 
-    const categoryPermissions = getPermissionsStruct(foundTask.parent.permissions)
-    if (req.user.role.name != "Administrator" && !foundTask.owner._id.equals(req.user._id)
-        && (!categoryPermissions.others.read || (categoryPermissions.group.read && !req.user.role._id.equals(foundTask.owner.role)))) {
+    if (!canUserDoIn(req.user, ["read"], foundTask.parent)) {
         return res.status(403).json({ status: "error_no_permission" })
     }
 
-    foundTask = await foundTask.populate(["parent", "attachments", "difficulty", "owner"])
+    foundTask = await foundTask.populate(["attachments", "difficulty", "owner"])
     res.status(200).json({ status: "no_error", value: foundTask.toJSON() });
 }
 
@@ -238,12 +230,7 @@ async function processTaskList(req, res) {
     if (!parentCategory)
         return res.status(404).json({ status: "error_not_found" });
 
-    const categoryPermissions = getPermissionsStruct(parentCategory.permissions)
-
-    if (req.user.role.name == "Administrator" || (userPermissions.others.read
-        || categoryPermissions.others.read
-        || parentCategory.owner._id.equals(req.user._id)
-        || (categoryPermissions.group.read && req.user.role._id.equals(parentCategory.owner.role._id)))) {
+    if (canUserDoIn(req.user, ["read"], parentCategory)) {
         let tasks = await Task.find({ parent }, { commentable: 0, attachments: 0, text: 0, maxTries: 0, answerFields: 0 }).lean()
         return res.status(200).json({ status: "no_error", value: tasks })
     }

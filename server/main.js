@@ -41,7 +41,7 @@ async function start() {
 
         const limiter = rateLimit({
             windowMs: 2000,
-            limit: 5,
+            limit: (process.env.NODE_ENV === "dev" ? 100 : 5),
             message: { status: "error_too_many_requests" }
         })
         app.use(limiter)

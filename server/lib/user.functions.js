@@ -1,5 +1,8 @@
+const User = require("../model/user.model")
+const Category = require("../model/category.model")
+
 function getPermissionsStruct(permissions) {
-    
+
     // Convert permission number to binary string
     let binaryString = (parseInt(permissions, 8).toString(2)).padStart(9, '0');
 
@@ -30,4 +33,87 @@ function getPermissionsStruct(permissions) {
     return permissionsStruct;
 }
 
-module.exports = {getPermissionsStruct}
+/**
+ * 
+ * @param {User} user 
+ * @param {Array} doWhat 
+ * @param {Category} category
+ * @returns {boolean} 
+ */
+async function canUserDoIn(user, doWhat, where) {
+    if (!doWhat.every(what => ["read", "write", "execute"].includes(what)))
+        throw new Error(doWhat + " not in available actions")
+
+    if (!user.role._id)
+        user = await user.populate("role")
+
+    if (!where.owner._id)
+        where = await where.populate("owner")
+
+    const categoryPermissions = getPermissionsStruct(where.permissions)
+    const userPermissions = getPermissionsStruct(user.role.permissions)
+
+    return doWhat.every(what => {
+        return userPermissions.group[what]
+            && (where.owner._id.equals(user._id)
+                || (categoryPermissions.group[what] && where.owner.role.equals(user.role._id))
+                || categoryPermissions.others[what])
+    })
+}
+
+/**
+ * 
+ * @param {User} user 
+ * @param {Array} doWhat 
+ * @returns {boolean} 
+ */
+async function canUserDoInUsers(user, doWhat) {
+    if (!doWhat.every(what => ["read", "write", "execute"].includes(what)))
+        throw new Error(doWhat + " not in available actions")
+
+    if (!user.role._id)
+        user = await user.populate("role")
+
+    const userPermissions = getPermissionsStruct(user.role.permissions)
+
+    return doWhat.every(what => userPermissions.user[what])
+}
+
+/**
+ * 
+ * @param {User} user 
+ * @param {Array} doWhat 
+ * @returns {boolean} 
+ */
+async function canUserDoInGroup(user, doWhat) {
+    if (!doWhat.every(what => ["read", "write", "execute"].includes(what)))
+        throw new Error(doWhat + " not in available actions")
+
+    if (!user.role._id)
+        user = await user.populate("role")
+
+    const userPermissions = getPermissionsStruct(user.role.permissions)
+
+    return doWhat.every(what => userPermissions.group[what])
+}
+
+/**
+ * 
+ * @param {User} user 
+ * @param {Array} doWhat 
+ * @returns {boolean} 
+ */
+async function canUserDoInOther(user, doWhat) {
+    if (!doWhat.every(what => ["read", "write", "execute"].includes(what)))
+        throw new Error(doWhat + " not in available actions")
+
+    if (!user.role._id)
+        user = await user.populate("role")
+
+    const userPermissions = getPermissionsStruct(user.role.permissions)
+
+    return doWhat.every(what => userPermissions.others[what])
+}
+
+
+module.exports = { getPermissionsStruct, canUserDoIn, canUserDoInUsers, canUserDoInOther, canUserDoInGroup }

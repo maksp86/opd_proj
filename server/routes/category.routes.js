@@ -3,7 +3,7 @@ const { check } = require("express-validator")
 const logger = require("winston")
 
 const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
-const { getPermissionsStruct } = require("../lib/user.functions")
+const { getPermissionsStruct, canUserDoIn, canUserDoInGroup } = require("../lib/user.functions")
 const Category = require("../model/category.model");
 
 const category_router = Router()
@@ -58,7 +58,7 @@ async function processCategoryCreate(req, res) {
 
         const userPermissions = getPermissionsStruct(req.user.role.permissions)
 
-        if (userPermissions.group.write || userPermissions.others.write) {
+        if (canUserDoInGroup(req.user, ["write"])) {
             let foundCategory = await Category.findOne({ shortname })
             if (req.url === "/create") {
                 if (foundCategory)
@@ -75,11 +75,7 @@ async function processCategoryCreate(req, res) {
 
                 foundCategory = await foundCategory.populate("owner")
 
-                const categoryPermissions = getPermissionsStruct(foundCategory.permissions)
-
-                if (req.user.role.name != "Administrator"
-                    && (!foundCategory.owner._id.equals(req.user._id) && !categoryPermissions.others.write
-                        || (categoryPermissions.group.write && !req.user.role.equals(foundCategory.owner.role)))) {
+                if (!canUserDoIn(req.user, ["write"], foundCategory)) {
                     return res.status(403).json({ status: "error_no_permission" })
                 }
 
@@ -110,9 +106,7 @@ async function processCategoryRemove(req, res) {
             if (!foundCategory)
                 return res.status(404).json({ status: "error_not_found" });
 
-            const categoryPermissions = getPermissionsStruct(foundCategory.permissions)
-            if (req.user.role.name != "Administrator" && !foundCategory.owner._id.equals(req.user._id)
-                && (!categoryPermissions.others.write || (categoryPermissions.group.write && !req.user.role.equals(foundCategory.owner.role)))) {
+            if (!canUserDoIn(req.user, ["write", "execute"], foundCategory)) {
                 return res.status(403).json({ status: "error_no_permission" })
             }
 
@@ -133,19 +127,10 @@ async function processGetList(req, res) {
         const { isLearning } = req.query
 
         req.user = await req.user.populate("role");
-        const userPermissions = getPermissionsStruct(req.user.role.permissions)
 
         const categories = await Category.find({ isLearning }).populate("owner")
 
-        categories.filter((category) => {
-            const categoryPermissions = getPermissionsStruct(category.permissions)
-            if (req.user.role.name == "Administrator" || (userPermissions.others.read
-                || categoryPermissions.others.read
-                || category.owner._id.equals(req.user._id)
-                || (categoryPermissions.group.read && req.user.role._id.equals(category.owner.role._id))))
-                return true;
-            return false;
-        })
+        categories.filter((category) => { return canUserDoIn(req.user, ["read"], category) })
 
         res.status(200).json({ status: "no_error", value: categories })
     }

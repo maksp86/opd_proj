@@ -3,7 +3,7 @@ const { check } = require("express-validator")
 const logger = require("winston")
 
 const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
-const { getPermissionsStruct } = require("../lib/user.functions")
+const { canUserDoInGroup } = require("../lib/user.functions")
 const Difficulty = require("../model/difficulty.model");
 const Task = require("../model/task.model");
 
@@ -48,9 +48,7 @@ async function processAddDifficulty(req, res) {
     const { value, title } = req.body
     req.user = await req.user.populate("role");
 
-    const userPermissions = getPermissionsStruct(req.user.role.permissions)
-
-    if (userPermissions.group.write || userPermissions.others.write) {
+    if (canUserDoInGroup(req.user, ["write"])) {
         if (req.url === "/create") {
             let newDifficulty = new Difficulty({ value, title });
             await newDifficulty.save();
@@ -75,9 +73,7 @@ async function processCategoryRemove(req, res) {
     const { id } = req.body
     req.user = await req.user.populate("role");
 
-    const userPermissions = getPermissionsStruct(req.user.role.permissions)
-
-    if (userPermissions.group.write || userPermissions.others.write) {
+    if (canUserDoInGroup(req.user, ["write", "execute"])) {
         let foundDifficulty = await Difficulty.findById(id)
 
         if (!foundDifficulty)

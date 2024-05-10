@@ -9,5 +9,6 @@ module.exports = model("Attachment", new Schema(
             default: "file"
         },
         owner: { type: Types.ObjectId, ref: "User" },
+        permissions: { type: String },
         path: { type: String }
     }, { timestamps: true }))
