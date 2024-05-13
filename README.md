@@ -16,12 +16,12 @@ Status codes:
 - [x] Create basic authentication (/api/user/login, /api/user/register)
 - [x] Store sessions in DB
 - [x] Define DB models for business logic
-- [ ] Admin stuff (60% done)
+- [x] Admin stuff
 - [x] General business logic for creating, storing, fetching necessary data
 - [x] Implement linux-like permissions and user groups for rights distribution
-- [ ] Logic and routes for submitting tasks, calculating user rating
+- [x] Logic and routes for submitting tasks, calculating user rating
 - [x] Ability to upload files as attachments
-- [ ] Comments for tasks (30% done)
+- [x] Comments for tasks (30% done)
 - [ ] Server self-cleaning from unused files/tasks/categories
 - [x] Global error handler
 

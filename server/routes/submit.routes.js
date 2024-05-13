@@ -34,12 +34,12 @@ function checkIsAnswerFields(answerFields) {
 async function processSubmitAnswer(req, res) {
     const { answers, task } = req.body
 
-    req.user = req.user.populate("role")
+    req.user = await req.user.populate("role")
 
-    if (!checkIsAnswerFields()) {
+    if (!checkIsAnswerFields(answers)) {
         return res.status(400).json({
             status: "validation_failed",
-            errors: [{ msg: "field_invalid", path: "answerFields" }]
+            errors: [{ msg: "field_invalid", path: "answers" }]
         })
     }
     let foundTask = await Task.findById(task)
@@ -49,7 +49,7 @@ async function processSubmitAnswer(req, res) {
 
     await foundTask.populate("parent difficulty")
 
-    if (foundTask.parent.isLearning || !await canUserDoIn(req.user, ["read"]))
+    if (foundTask.parent.isLearning || !await canUserDoIn(req.user, ["read"], foundTask.parent))
         return res.status(403).json({ status: "error_no_permission" })
 
     let submits = await Submit.find({ user: req.user._id, task: foundTask._id })
@@ -63,7 +63,7 @@ async function processSubmitAnswer(req, res) {
     let wrongFields = []
 
     foundTask.answerFields.forEach(field => {
-        let foundAnswer = answers.some(x => field._id.equals(x._id))
+        let foundAnswer = answers.find(x => field._id.equals(x._id))
         if (!foundAnswer || foundAnswer.answer !== field.answer)
             wrongFields.push(field._id)
     });
@@ -78,5 +78,7 @@ async function processSubmitAnswer(req, res) {
 
     let reward = newSubmit.isValid ? foundTask.difficulty.value : undefined;
 
-    return res.status(200).json({ status: "no_error", value: { wrongFields, reward } })
+    return res.status(200).json({ status: "no_error", value: { wrongFields, reward, isValid: (wrongFields.length == 0) } })
 }
+
+module.exports = submit_router;

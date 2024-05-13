@@ -7,6 +7,8 @@ const { getPermissionsStruct, canUserDoIn, canUserDoInGroup } = require("../lib/
 const Task = require("../model/task.model");
 const Category = require("../model/category.model");
 const Difficulty = require("../model/difficulty.model");
+const Comment = require("../model/comment.model")
+const { getSubComments } = require("../lib/comment.functions")
 
 const task_router = Router()
 
@@ -68,6 +70,46 @@ task_router.get("/list",
     processTaskList
 )
 
+task_router.post("/comment/post",
+    [
+        rejectIfNotLogined,
+        check("id", "field_empty").isMongoId(),
+        check("text", "field_empty").isString().isLength({ max: 255 }).withMessage("invalid_length"),
+        check("parent", "field_empty").optional().isMongoId(),
+        processValidaion
+    ],
+    processTaskCommentPost
+)
+
+task_router.post("/comment/edit",
+    [
+        rejectIfNotLogined,
+        check("id", "field_empty").isMongoId(),
+        check("comment_id", "field_empty").isMongoId(),
+        check("text", "field_empty").isString().isLength({ max: 255 }).withMessage("invalid_length"),
+        processValidaion
+    ],
+    processTaskCommentPost
+)
+
+task_router.get("/comment/get",
+    [
+        rejectIfNotLogined,
+        check("id", "field_empty").isMongoId(),
+        processValidaion
+    ],
+    processTaskCommentGet
+)
+
+task_router.post("/comment/remove",
+    [
+        rejectIfNotLogined,
+        check("id", "field_empty").isMongoId(),
+        processValidaion
+    ],
+    processTaskCommentRemove
+)
+
 function checkIsAnswerFields(answerFields) {
     if (answerFields && Array.isArray(answerFields)) {
         for (let i = 0; i < answerFields.length; i++) {
@@ -95,9 +137,8 @@ async function processTaskCreate(req, res) {
         maxTries } = req.body
 
     req.user = await req.user.populate("role");
-    const userPermissions = getPermissionsStruct(req.user.role.permissions)
 
-    if (userPermissions.group.write || userPermissions.others.write) {
+    if (canUserDoInGroup(req.user, ["write"])) {
         let foundTask = await Task.findOne({ shortname })
         let parentCategory = undefined;
 
@@ -184,8 +225,6 @@ async function processTaskRemove(req, res) {
     const { id } = req.body
     req.user = await req.user.populate("role");
 
-    const userPermissions = getPermissionsStruct(req.user.role.permissions)
-
     if (await canUserDoInGroup(req.users, ["write", "execute"])) {
         let foundTask = await Task.findById(id)
 
@@ -219,6 +258,10 @@ async function processTaskGet(req, res) {
     }
 
     foundTask = await foundTask.populate(["attachments", "difficulty", "owner"])
+
+    if (!await canUserDoIn(req.user, ["write"], foundTask.parent))
+        foundTask.answerFields.forEach((field) => field.answer = undefined);
+
     res.status(200).json({ status: "no_error", value: foundTask.toJSON() });
 }
 
@@ -237,6 +280,98 @@ async function processTaskList(req, res) {
     else {
         return res.status(403).json({ status: "error_no_permission" })
     }
+}
+
+async function processTaskCommentPost(req, res) {
+    const { id, text, parent, comment_id } = req.body
+    req.user = await req.user.populate("role");
+
+    let foundTask = await Task.findById(id)
+
+    if (!foundTask)
+        return res.status(404).json({ status: "error_not_found" });
+    foundTask = await foundTask.populate("parent")
+
+    if (!await canUserDoIn(req.user, ["read"], foundTask.parent))
+        return res.status(403).json({ status: "error_no_permission" })
+
+    let comment = undefined
+    if (req.url === "/comment/edit") {
+        comment = await Comment.findById(comment_id)
+
+        if (!comment)
+            return res.status(404).json({
+                status: "validation_failed",
+                errors: [{ msg: "error_not_found", path: "parent" }]
+            });
+
+        if (!await canUserDoIn(req.user, ["write"], foundTask.parent) && !req.user._id.equals(comment.author))
+            return res.status(403).json({ status: "error_no_permission" })
+    }
+    else if (req.url === "/comment/post") {
+        let foundParentComment = undefined
+        if (parent) {
+            foundParentComment = await Comment.findById(parent)
+            if (!foundParentComment)
+                return res.status(404).json({
+                    status: "validation_failed",
+                    errors: [{ msg: "error_not_found", path: "parent" }]
+                });
+        }
+
+        if (foundParentComment.depth >= 2)
+            return res.status(404).json({ status: "error_max_depth_reached" })
+
+        comment = new Comment({
+            author: req.user._id,
+            subject: id,
+            parent: foundParentComment ? foundParentComment._id : undefined
+        })
+    }
+    comment.text = text
+    await comment.save()
+    return res.status(201).json({ status: "no_error", value: comment })
+}
+
+async function processTaskCommentGet(req, res) {
+    const { id } = req.query
+    req.user = await req.user.populate("role");
+
+    let foundTask = await Task.findById(id)
+
+    if (!foundTask)
+        return res.status(404).json({ status: "error_not_found" });
+    foundTask = await foundTask.populate("parent")
+
+    if (!foundTask.commentable || !await canUserDoIn(req.user, ["read"], foundTask.parent))
+        return res.status(403).json({ status: "error_no_permission" })
+
+    let comments = await Comment.find({ subject: id, parent: undefined }, { subject: 0 }).populate({
+        path: "author",
+        select: "username name image"
+    }).lean()
+    comments = await getSubComments(comments)
+    return res.status(200).json({ status: "no_error", value: comments })
+}
+
+async function processTaskCommentRemove(req, res) {
+    const { id } = req.body
+    req.user = await req.user.populate("role");
+
+    let foundComment = await Comment.findById(id).populate({
+        path: "subject",
+        select: "category",
+        populate: { path: "category", select: "permissions" }
+    })
+
+    if (!foundComment)
+        return res.status(404).json({ status: "error_not_found" });
+
+    if (!await canUserDoIn(req.user, ["write"], foundComment.subject.parent) && !req.user._id.equals(foundComment.author))
+        return res.status(403).json({ status: "error_no_permission" })
+
+    await foundComment.deleteOne()
+    return res.status(200).json({ status: "no_error", value: comment })
 }
 
 module.exports = task_router

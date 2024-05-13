@@ -1,5 +1,7 @@
 const User = require("../model/user.model")
 const Category = require("../model/category.model")
+const Task = require("../model/task.model")
+const Submit = require("../model/submit.model")
 
 function getPermissionsStruct(permissions) {
 
@@ -115,5 +117,34 @@ async function canUserDoInOther(user, doWhat) {
     return doWhat.every(what => userPermissions.others[what])
 }
 
+/**
+ * 
+ * @param {User} user 
+ */
+async function calculateRating(user) {
+    const userSubmits = await Submit.find({ user: user._id, isValid: true }).populate({
+        path: "task",
+        select: "difficulty",
+        populate: { path: "difficulty", select: "value" }
+    })
 
-module.exports = { getPermissionsStruct, canUserDoIn, canUserDoInUsers, canUserDoInOther, canUserDoInGroup }
+    let xp = 0
+    userSubmits.forEach(submit => {
+        if (submit.reward)
+            xp += submit.reward
+        else {
+            xp += submit.task.difficulty.value
+        }
+    })
+    return xp;
+}
+
+
+module.exports = {
+    getPermissionsStruct,
+    canUserDoIn,
+    canUserDoInUsers,
+    canUserDoInOther,
+    canUserDoInGroup,
+    calculateRating
+}

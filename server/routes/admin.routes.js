@@ -161,7 +161,7 @@ async function processUserRemove(req, res) {
 
 async function processUserEdit(req, res) {
     const { id, bio, name } = req.body;
-    const selectedUser = await User.findById(id).populate("role")
+    const selectedUser = await User.findById(id, { passwordHash: 0 }).populate("role")
     req.user = await req.user.populate("role");
 
     if (!selectedUser)
@@ -185,7 +185,7 @@ async function processUserEdit(req, res) {
 
 async function processUserSetRole(req, res) {
     const { id, role } = req.body;
-    const selectedUser = await User.findById(id).populate("role")
+    const selectedUser = await User.findById(id, { passwordHash: 0 }).populate("role")
 
     req.user = await req.user.populate("role");
 

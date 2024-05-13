@@ -8,4 +8,4 @@ module.exports = model("User", new Schema(
         bio: { type: String, default: "" },
         image: { type: Types.ObjectId, ref: "Attachment" },
         role: { type: Types.ObjectId, ref: "UserRole" }
-    }))
+    }, { timestamps: true }))
