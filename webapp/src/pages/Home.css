@@ -1,0 +1,40 @@
+.navchild {
+    color: white;
+    min-height: 60px;
+    max-height: 80px;
+    margin: 0;
+    padding: 5px 0;
+    max-width: 200px;
+    user-select: none;
+}
+
+.navchild:hover {
+    transition: ease-in 0.1s;
+    background-color: rgb(from gray 100 100 100);
+}
+
+.navchild > svg
+{
+    fill: white;
+    height: 50%;
+}
+
+.navchild.selected_navchild {
+    background-color: rgb(from gray 80 80 80);
+}
+
+.navigation {
+    background-color: gray;
+    border-radius: 2vh;
+    margin-bottom: 1%;
+}
+
+.navigation>.row> :first-child {
+    border-top-left-radius: 2vh;
+    border-bottom-left-radius: 2vh;
+}
+
+.navigation>.row> :last-child {
+    border-top-right-radius: 2vh;
+    border-bottom-right-radius: 2vh;
+}
