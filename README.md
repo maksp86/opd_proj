@@ -11,7 +11,7 @@ Status codes:
 -  403 - not authorized / not enough rights 
 -  500 - server in trouble.. probably, or it is just a crook-handed devs fault :)  
 
-### Current progress
+### Current progress (backend)
 - [x] Some logging stuff, DB connection
 - [x] Create basic authentication (/api/user/login, /api/user/register)
 - [x] Store sessions in DB
@@ -24,5 +24,8 @@ Status codes:
 - [x] Comments for tasks (30% done)
 - [ ] Server self-cleaning from unused files/tasks/categories
 - [x] Global error handler
+
+### Current progress (frontend)
+- [ ] Login and registration pages
 
 Prod server will be located at https://edplatform.maksp.gsqd.ru (80, 443)
