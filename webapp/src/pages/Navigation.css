@@ -1,0 +1,81 @@
+.navigation {
+    border-top: 1px solid transparent;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 0;
+    min-height: 60px;
+    user-select: none;
+}
+
+@media (min-width: 576px) {
+    .navigation {
+        min-width: 576px;
+        max-width: 70%;
+        margin-bottom: 10px;
+        border-radius: 35px;
+    }
+
+    .navigation-selectors>.navigation-button:first-child {
+        border-radius: 35px 0 0 35px;
+    }
+
+    .navigation-selectors>.navigation-button:last-child {
+        border-radius: 0 35px 35px 0;
+    }
+}
+
+.navigation-selectors {
+    height: 100%;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.navigation-selectors .navigation-button, .navigation-button, .navigation-button:active.inactive, .navigation-button:focus.inactive {
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    margin-left: 0;
+    color: white;
+}
+
+.navigation-selectors .navigation-button:not(big) {
+    min-width: 80px;
+}
+
+.navigation-selectors .navigation-button {
+    min-width: 120px;
+    width: 120px;
+}
+
+
+.navigation-selectors .navigation-button:active, .navigation-button:active {
+    border: 0;
+}
+
+.navigation-selectors .navigation-button:focus, .navigation-button:focus {
+    border: 0;
+    outline: 0;
+    box-shadow: 0 0 0 0px;
+}
+
+.active, .navigation-selector-holder {
+    display: flex;
+    flex-direction: column;
+}
+
+.navigation-selector-holder svg {
+    margin: 4px auto;
+}
+
+.inactive {
+    display: none;
+}
+
+.navigation-selector-holder span {
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.navigation-selector-holder h5 {
+    margin: 0;
+    line-height: 30px;
+}

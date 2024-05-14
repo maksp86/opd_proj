@@ -13,8 +13,7 @@
     background-color: rgb(from gray 100 100 100);
 }
 
-.navchild > svg
-{
+.navchild>svg {
     fill: white;
     height: 50%;
 }
@@ -27,6 +26,13 @@
     background-color: gray;
     border-radius: 2vh;
     margin-bottom: 1%;
+}
+
+@media (max-width: 576px) {
+    .navigation {
+        border-radius: 0;
+        margin-bottom: 0;
+    }
 }
 
 .navigation>.row> :first-child {
