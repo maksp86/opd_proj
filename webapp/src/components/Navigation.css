@@ -1,6 +1,6 @@
 .navigation {
     border-top: 1px solid transparent;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 0px 20px 1px var(--bs-btn-color);
     margin-bottom: 0;
     min-height: 60px;
     user-select: none;
@@ -29,35 +29,21 @@
     margin: 0 auto;
 }
 
-.navigation-selectors .navigation-button, .navigation-button, .navigation-button:active.inactive, .navigation-button:focus.inactive {
+.navigation-selectors .navigation-button {
     border: 0;
     border-radius: 0;
     background-color: transparent;
     margin-left: 0;
-    color: white;
 }
 
-.navigation-selectors .navigation-button:not(big) {
-    min-width: 80px;
+.navigation-button-active
+{
+    color: var(--bs-btn-active-color) !important;
+    background-color: var(--bs-btn-active-bg) !important;
+    border-color: var(--bs-btn-active-border-color) !important;
 }
 
-.navigation-selectors .navigation-button {
-    min-width: 120px;
-    width: 120px;
-}
-
-
-.navigation-selectors .navigation-button:active, .navigation-button:active {
-    border: 0;
-}
-
-.navigation-selectors .navigation-button:focus, .navigation-button:focus {
-    border: 0;
-    outline: 0;
-    box-shadow: 0 0 0 0px;
-}
-
-.active, .navigation-selector-holder {
+.navigation-selector-holder {
     display: flex;
     flex-direction: column;
 }
@@ -66,16 +52,7 @@
     margin: 4px auto;
 }
 
-.inactive {
-    display: none;
-}
-
 .navigation-selector-holder span {
     font-size: 1rem;
     margin-bottom: 4px;
-}
-
-.navigation-selector-holder h5 {
-    margin: 0;
-    line-height: 30px;
 }
