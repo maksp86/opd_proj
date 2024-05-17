@@ -5,9 +5,8 @@ import { useState } from "react"
 function Home() {
     return (
         <>
-            <Container className="my-6">
-                <h1>Home</h1>
-            </Container>
+            <h1>Home</h1>
+            <Button>12</Button>
         </>
     )
 }
