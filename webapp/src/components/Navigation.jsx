@@ -12,7 +12,7 @@ function NavButton(props) {
     return (
         <Button
             variant="light"
-            className={"navigation-button " + (useMatch(props.path) ? "navigation-button-active " : "")}
+            className={"navigation-button " + (useMatch(props.path + props.match) ? "navigation-button-active " : "")}
             onClick={() => navigate(props.path)
             }>
             <div className="navigation-selector-holder">
@@ -32,19 +32,19 @@ function Navigation() {
             className="navigation p-0 mx-auto">
 
             <ButtonGroup className="navigation-selectors">
-                <NavButton path="/" exact={true} text="Home">
+                <NavButton path="/" match="" exact={true} text="Home">
                     <HouseDoor size={30} />
                 </NavButton>
 
-                <NavButton path="/2" text="Tasks">
+                <NavButton path="/tasks" match="*" text="Tasks">
                     <Grid size={30} />
                 </NavButton>
 
-                <NavButton path="/3" text="Learning">
+                <NavButton path="/learning" match="*" text="Learning">
                     <Map size={30} />
                 </NavButton>
 
-                <NavButton path="/account" text="Account">
+                <NavButton path="/account" match="" text="Account">
                     <Person size={30} />
                 </NavButton>
             </ButtonGroup>

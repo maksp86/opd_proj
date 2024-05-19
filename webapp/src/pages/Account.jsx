@@ -17,11 +17,13 @@ function Account(props) {
                     </Row>
                 </Col>
                 <Col xs="6" sm="auto" className="d-grid align-self-center">
-                    <Button variant="outline-dark" className="">Edit</Button>
+                    <Button
+                        variant="outline-dark"
+                        className="">Edit</Button>
                 </Col>
             </Row>
             <Row className="mt-5">
-                <Row><h4>Level</h4></Row>
+                <Row><h4>Progress</h4></Row>
                 <Row className="align-items-center">
                     <Col>
                         <ProgressBar variant="success" now={60} />
@@ -34,7 +36,7 @@ function Account(props) {
             <Row className="mt-5">
                 <h3>Last solved tasks</h3>
                 <div>
-                    12
+                    You not solved any tasks yet
                 </div>
             </Row>
         </>

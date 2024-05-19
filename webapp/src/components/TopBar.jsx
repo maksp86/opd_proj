@@ -1,7 +1,7 @@
 import { Container, Row, Col, ProgressBar, Button } from "react-bootstrap"
 import { CursorFill } from "react-bootstrap-icons"
 
-import { useMatch } from "react-router-dom"
+import { useMatch, useNavigate } from "react-router-dom"
 
 import "./TopBar.css"
 
@@ -12,8 +12,9 @@ function ShowForPath(props) {
 }
 
 function TopBar(props) {
+    const navigate = useNavigate()
     return (
-        <Container id="topbar" fluid="sm" className="mt-3 mb-3">
+        <Container id="topbar" fluid="sm" className="mt-4 mb-3">
             <Row className="align-items-center">
                 <ShowForPath path={"/"}>
                     <Col md="6" className="align-items-left">
@@ -41,7 +42,42 @@ function TopBar(props) {
                     <Col>
                         <Row className="justify-content-end">
                             <Col xs="auto">
-                                <Button variant="secondary" type="button">Logoff</Button>
+                                <Button
+                                    variant="secondary"
+                                    type="button"
+                                onClick={() => navigate("/login")}>Logoff</Button>
+                            </Col>
+                        </Row>
+                    </Col>
+                </ShowForPath>
+
+                <ShowForPath path={"/tasks*"}>
+                    <Col md="6" className="align-items-left">
+                        <h1 className="m-0">Task categories</h1>
+                    </Col>
+                    <Col>
+                        <Row className="align-items-center">
+                            <Col>
+                                <ProgressBar variant="success" now={60} />
+                            </Col>
+                            <Col xs="auto">
+                                <h5 className="m-0 text-end">{props.user.xp}xp</h5>
+                            </Col>
+                        </Row>
+                    </Col>
+                </ShowForPath>
+
+                <ShowForPath path={"/learning*"}>
+                    <Col md="6" className="align-items-left">
+                        <h1 className="m-0">Learning categories</h1>
+                    </Col>
+                    <Col>
+                        <Row className="align-items-center">
+                            <Col>
+                                <ProgressBar variant="success" now={60} />
+                            </Col>
+                            <Col xs="auto">
+                                <h5 className="m-0 text-end">{props.user.xp}xp</h5>
                             </Col>
                         </Row>
                     </Col>

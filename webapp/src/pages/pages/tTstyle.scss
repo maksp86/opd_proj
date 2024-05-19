@@ -1,0 +1,90 @@
+:root {
+    --color1: #dbdada;
+    --color2: rgb(178, 176, 176);
+    --color3: rgb(152, 150, 150);
+    --colorp: rgb(89, 2, 89);
+    --colorlp: rgb(173, 115, 173);
+    --colorb: rgb(22, 185, 0);
+    --colorlg: rgb(0, 177, 204);
+    --colorr: rgb(168, 0, 0);
+    --colory: rgb(132, 132, 0);
+  }
+
+.task {
+    padding-top: 50px;
+    padding-bottom: 100px;
+
+    .task-text {
+        padding: 100px;
+        padding-left: 30px;
+        padding-top: 30px;
+        background-color: var(--color1);
+        margin-right: 100px;
+        border-radius: 5px;
+    }
+
+    .h2 {
+        margin-bottom: 30px;
+    }
+
+    .h4 {
+        margin-bottom: 20px;
+    }
+
+    .a {
+        margin-bottom: 100px;
+    }
+
+    .answer {
+        background-color: var(--color1);
+        margin-bottom: 100px;
+        padding: 30px;
+        border-radius: 10px;
+    }
+
+    .otstyp {
+        margin-bottom: 40px;
+    }   
+
+    .btn-answer {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    padding-bottom: 100px;
+
+    .new-info {
+        background-color: var(--color1);
+        padding: 0;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+
+    .all-info {
+        background-color: var(--color3);
+        border-radius: 10px;
+    }
+
+    .btn-light {
+        background-color: var(--color1) !important;
+        border-color: var(--color1);
+    }
+}
+
+/* Additional styles */
+
+.up-button {
+    margin-top: 5px;
+}
+
+.progress-up {
+    margin-top: 20px;
+}
+
+.text-black {
+    margin-top: 0;
+}
+
+.level {
+    margin-top: 12px;
+}
