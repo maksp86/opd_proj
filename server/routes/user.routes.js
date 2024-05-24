@@ -11,7 +11,7 @@ const Attachment = require("../model/attachment.model")
 const user_router = Router()
 
 //Not so RESTful :(
-user_router.post("/create",
+user_router.post("/register",
     [
         rejectIfAlreadyLogined,
         check('username', "field_empty").isAlphanumeric().isLength({ min: 5, max: 30 }).withMessage("invalid_length"),
@@ -30,7 +30,7 @@ user_router.post("/login",
 
 user_router.get("/logout", rejectIfNotLogined, processLogout)
 
-user_router.post("/editinfo",
+user_router.post("/edit",
     [
         rejectIfNotLogined,
         check('bio', "field_empty").isString().isLength({ max: 255 }).withMessage("length_too_big"),
@@ -91,7 +91,7 @@ async function processLogin(req, res) {
         if (isValidPassword) {
             req.session.userid = userExists._id.toString();
             req.session.loginTime = Date.now();
-            res.status(200).json({ status: "no_error" });
+            res.status(200).json({ status: "no_error", value: { ...userExists.toObject(), passwordHash: undefined } });
         }
         else {
             //delay for nasty spammers
@@ -114,8 +114,11 @@ async function processRegister(req, res) {
     }
     else {
         const userRole = await UserRole.findOne({ name: "User" })
-        await (new User({ username, passwordHash, role: userRole._id, name })).save();
-        res.status(201).json({ status: "no_error" });
+        let createdUser = new User({ username, passwordHash, role: userRole._id, name })
+        await createdUser.save();
+        req.session.userid = createdUser._id.toString();
+        req.session.loginTime = Date.now();
+        res.status(201).json({ status: "no_error", value: { ...createdUser.toObject(), passwordHash: undefined } });
     }
 }
 

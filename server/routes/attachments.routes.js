@@ -22,7 +22,7 @@ async function uploadFilter(req, file, cb) {
     if (file.fieldname === "file" && "type" in req.body
         && typeof req.body.type === "string"
         && Attachment.schema.obj.type.enum.includes(req.body.type)
-        && typeof req.body.permissions === String && !isNaN(req.body.permissions)) {
+        && typeof req.body.permissions === "string" && !isNaN(req.body.permissions)) {
         switch (req.body.type) {
             case "file":
                 req.user = await req.user.populate("role")
@@ -55,8 +55,10 @@ attachment_router.post("/upload",
                 if (typeof err === "string") {
                     res.status(400).json({ status: err })
                 }
-                else
+                else {
                     logger.error("[attachments.routes.upload] %s", err.message);
+                    res.status(500).json({ status: "unexpected_error" })
+                }
             }
             else
                 next()
@@ -121,7 +123,7 @@ async function processAttachmentGet(req, res) {
 
 async function processAttachmentUpload(req, res) {
     if (req.body.type === "avatar")
-        req.body.file.originalname = req.user._id.toString() + "-avatar"
+        req.file.originalname = req.user._id.toString() + "-avatar"
     let attachment = new Attachment({
         owner: req.user._id,
         type: req.body.type,
@@ -131,11 +133,7 @@ async function processAttachmentUpload(req, res) {
     })
 
     await attachment.save()
-
-    if (req.body.type === "avatar") {
-        req.user.image = attachment._id;
-        await user.save()
-    }
+    
     res.status(200).json({ status: "no_error", value: { _id: attachment._id, name: req.file.originalname } })
 }
 

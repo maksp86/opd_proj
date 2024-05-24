@@ -26,7 +26,7 @@ async function processUserStats(req, res) {
 
     req.user = await req.user.populate("role")
 
-    let foundUser = await User.findById(id, { passwordHash: 0 })
+    let foundUser = await User.findById(id, { passwordHash: 0 }).populate("role")
 
     if (!foundUser)
         return res.status(404).json({ status: "error_not_found" })

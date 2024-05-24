@@ -2,17 +2,10 @@ import { Row, Col, ProgressBar, Button } from "react-bootstrap"
 import { CaretRightFill } from "react-bootstrap-icons"
 import { useLocation, useNavigate } from "react-router-dom";
 
-
 function CategoryCard(props) {
     const navigate = useNavigate()
     return (
-        <Col style={{
-            borderRadius: "20px",
-            backgroundColor: "var(--bs-tertiary-bg)",
-            overflow: "hidden",
-            maxHeight: "200px",
-            userSelect: "none"
-        }} xs="11" md="11" lg="5" className="mx-2 my-4">
+        <Col xs="11" md="11" lg="5" className="category-card mx-2 my-4">
             <Row>
                 <Col xs="auto" className="p-0">
                     <div
@@ -28,9 +21,8 @@ function CategoryCard(props) {
                     <div className="w-100 my-auto mx-0">
                         <h3 className="m-0">{props.name || "Name"}</h3>
                         <ProgressBar
-                            variant="success"
+                            variant="primary"
                             now={props.progress || 0}
-                            label={(props.progress || 0) + "%"}
                             className="mt-2" />
                         {props.lastTask &&
                             <p className="fw-medium mt-2 mb-1">
@@ -46,7 +38,7 @@ function CategoryCard(props) {
                     }}
                         variant="light"
                         onClick={() => navigate("list")}>
-                        <CaretRightFill size={20} />
+                        <CaretRightFill className="category-card-go-icon" size={20} />
                     </Button>
                 </Col>
             </Row>

@@ -93,7 +93,7 @@ async function processRoleAdd(req, res) {
     req.user = await req.user.populate("role");
 
     if (selectedRole)
-        return res.status(400).json({ status: "role_exist" });
+        return res.status(400).json({ status: "error_already_exists" });
 
     if (canUserDoInOther(req.user, ["execute"])) {
         let createdRole = await UserRole.create({ name, permissions })
