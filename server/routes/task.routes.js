@@ -320,10 +320,10 @@ async function processTaskCommentPost(req, res) {
                     status: "validation_failed",
                     errors: [{ msg: "error_not_found", path: "parent" }]
                 });
-        }
 
-        if (foundParentComment.depth >= 2)
-            return res.status(404).json({ status: "error_max_depth_reached" })
+            if (foundParentComment.depth >= 2)
+                return res.status(404).json({ status: "error_max_depth_reached" })
+        }
 
         comment = new Comment({
             author: req.user._id,
@@ -363,8 +363,8 @@ async function processTaskCommentRemove(req, res) {
 
     let foundComment = await Comment.findById(id).populate({
         path: "subject",
-        select: "category",
-        populate: { path: "category", select: "permissions" }
+        select: "parent",
+        populate: { path: "parent", select: "permissions owner" }
     })
 
     if (!foundComment)
@@ -374,7 +374,7 @@ async function processTaskCommentRemove(req, res) {
         return res.status(403).json({ status: "error_no_permission" })
 
     await foundComment.deleteOne()
-    return res.status(200).json({ status: "no_error", value: comment })
+    return res.status(200).json({ status: "no_error" })
 }
 
 module.exports = task_router

@@ -74,18 +74,20 @@ function CategoryEditPage(props) {
                 </Row>
                 <Row>
                     <Col>
-                        <Form.Group className="mx-3">
-                            <Form.Check
-                                type="switch"
-                                label="Learning category"
-                                className="mb-3"
-                                checked={formData.isLearning}
-                                onChange={(e) => setField("isLearning", e.target.checked)}
-                                isInvalid={!!errors.isLearning} />
-                            <Form.Control.Feedback type='invalid'>
-                                {errors.isLearning}
-                            </Form.Control.Feedback>
-                        </Form.Group>
+                        {!isEdit &&
+                            <Form.Group className="mx-3">
+                                <Form.Check
+                                    type="switch"
+                                    label="Learning category"
+                                    className="mb-3"
+                                    checked={formData.isLearning}
+                                    onChange={(e) => setField("isLearning", e.target.checked)}
+                                    isInvalid={!!errors.isLearning} />
+                                <Form.Control.Feedback type='invalid'>
+                                    {errors.isLearning}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        }
                         <FloatingLabel
                             controlId="titleInput"
                             label="Title"

@@ -2,8 +2,6 @@ import { Container, Row, Col, ProgressBar, Button } from "react-bootstrap"
 import { CursorFill } from "react-bootstrap-icons"
 
 import { useMatch, useNavigate } from "react-router-dom"
-
-import "./TopBar.css"
 import { UserContext } from "../context/user.context"
 import { useContext } from "react"
 import OnlyLogined from "./OnlyLogined"
@@ -43,7 +41,7 @@ function TopBar(props) {
     }
 
     return (
-        <Container id="topbar" fluid="sm" className="py-4 px-3 mb-3">
+        <Container id="topbar" fluid="sm" className="py-4 px-3 mb-3 user-select-none">
             <Row className="align-items-center">
                 <OnlyLogined>
                     <ShowForPath path={"/"}>

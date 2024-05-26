@@ -1,5 +1,5 @@
 import { Container, Row, Col, ProgressBar, Navbar, ButtonGroup, Button, Image, InputGroup, Form, ListGroup } from "react-bootstrap"
-import { ArrowLeft, ArrowRight, CaretRightFill, Check, Download, HouseDoor, PencilFill, Person } from "react-bootstrap-icons"
+import { ArrowLeft, ArrowRight, CaretRightFill, Check, Download, HouseDoor, PencilFill, Person, Reply } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import CategoryCard from "../components/CategoryCard"
 import { ApiContext } from "../context/api.context"
@@ -8,8 +8,11 @@ import { usePageTitle } from "../hooks/pageTitle.hook"
 import Markdown from 'markdown-to-jsx'
 import { useConstructor } from "../hooks/constructor.hook"
 import { ModalContext } from "../context/modal.context"
+import { UserContext } from "../context/user.context"
+import CommentsComponent from "../components/CommentsComponent"
 
 function TaskPage() {
+    const userContext = useContext(UserContext)
     const api = useContext(ApiContext)
     const modal = useContext(ModalContext)
     const pageTitle = usePageTitle()
@@ -180,7 +183,13 @@ function TaskPage() {
                         }
                     </Row>
                 </Col>
-            </Row >
+            </Row>
+            {
+                task._id && <CommentsComponent item={task} />
+            }
+            <Row className="mb-5" />
+            <Row className="mb-5" />
+            <Row className="mb-5" />
         </>
     )
 }

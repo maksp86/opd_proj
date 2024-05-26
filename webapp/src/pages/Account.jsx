@@ -77,7 +77,7 @@ function Account(props) {
                                     key={submit._id}
                                     as="li"
                                     onClick={() => navigate("/task/" + submit.task._id)}
-                                    className="d-flex justify-content-between align-items-center">
+                                    className="d-flex justify-content-between align-items-center user-select-none">
                                     <div className="ms-2 me-auto">
                                         <div className="fw-semibold fs-5">{submit.task.title}</div>
                                         <TimeAgo date={submit.createdAt} />
