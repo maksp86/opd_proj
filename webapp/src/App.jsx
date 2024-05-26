@@ -9,8 +9,6 @@ import Account from './pages/Account.jsx'
 import NotFound from './pages/NotFound.jsx'
 import LoginPage from './pages/Login.jsx'
 import CategoriesPage from './pages/CategoriesPage.jsx'
-import Taskchoose from './pages/Taskchoose.jsx'
-import Leaningchoose from './pages/Leaningchoose.jsx'
 
 import './main.scss'
 import { UserContext } from './context/user.context.js'

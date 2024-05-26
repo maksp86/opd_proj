@@ -1,5 +1,5 @@
 import { Container, Row, Col, ProgressBar, Navbar, ButtonGroup, Button, Image } from "react-bootstrap"
-import { ArrowLeft, ArrowRight, CaretRightFill, HouseDoor, Person } from "react-bootstrap-icons"
+import { ArrowLeft, ArrowRight, CaretRightFill, HouseDoor, Person, Plus } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import CategoryCard from "../components/CategoryCard"
 import { ApiContext } from "../context/api.context"
@@ -28,7 +28,7 @@ function CategoriesPage(props) {
         <>
             <Row>
                 <Col>
-                    <Button onClick={() => { navigate("/category/edit", { state: { isLearning: props.isLearning } }) }}>Add</Button>
+                    <Button variant="outline-secondary" onClick={() => { navigate("/category/edit", { state: { isLearning: props.isLearning } }) }}><Plus /></Button>
                 </Col>
             </Row>
             <Row className="justify-content-evenly text-center">

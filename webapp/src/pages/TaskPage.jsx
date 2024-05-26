@@ -44,6 +44,7 @@ function TaskPage() {
 
         if (result) {
             console.log(result.data.value)
+            pageTitle.set(result.data.value.title)
             setTask(result.data.value)
             setFormData(result.data.value.answerFields.reduce((obj, item) => { return { ...obj, [item._id]: item.answer || "" } }, {}))
             isAlreadySubmitted()

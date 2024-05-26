@@ -8,7 +8,7 @@ function TaskCard(props) {
     const navigate = useNavigate()
     const user = useContext(UserContext)
     return (
-        <Col xs="11" md="11" lg="5" className="category-card mx-2 my-4">
+        <Col xs="11" md="11" lg="4" className="category-card my-2 mx-2">
             <Row>
                 <Col xs className="align-items-center my-3">
                     <div className="w-100 my-auto mx-2">
