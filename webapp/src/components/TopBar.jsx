@@ -23,7 +23,7 @@ function UserProgressBar(props) {
                     <ProgressBar variant="secondary" min={0} max={1000} now={props.userContext.computedXp % 1000} />
                 </Col>
                 <Col xs="auto">
-                    <h5 className="m-0 text-end">{props.userContext.computedXp}xp</h5>
+                    <h5 className="m-0 text-end">{props.userContext.computedXp} xp</h5>
                 </Col>
             </Row>
         </Col>
@@ -43,7 +43,7 @@ function TopBar(props) {
     }
 
     return (
-        <Container id="topbar" fluid="sm" className="mt-4 mb-3">
+        <Container id="topbar" fluid="sm" className="py-4 px-3 mb-3">
             <Row className="align-items-center">
                 <OnlyLogined>
                     <ShowForPath path={"/"}>

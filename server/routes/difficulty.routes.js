@@ -48,7 +48,7 @@ async function processAddDifficulty(req, res) {
     const { value, title } = req.body
     req.user = await req.user.populate("role");
 
-    if (canUserDoInGroup(req.user, ["write"])) {
+    if (await canUserDoInGroup(req.user, ["write"])) {
         if (req.url === "/create") {
             let newDifficulty = new Difficulty({ value, title });
             await newDifficulty.save();
@@ -73,7 +73,7 @@ async function processCategoryRemove(req, res) {
     const { id } = req.body
     req.user = await req.user.populate("role");
 
-    if (canUserDoInGroup(req.user, ["write", "execute"])) {
+    if (await canUserDoInGroup(req.user, ["write", "execute"])) {
         let foundDifficulty = await Difficulty.findById(id)
 
         if (!foundDifficulty)

@@ -46,10 +46,10 @@ async function canUserDoIn(user, doWhat, where) {
     if (!doWhat.every(what => ["read", "write", "execute"].includes(what)))
         throw new Error(doWhat + " not in available actions")
 
-    if (!user.role._id)
+    if (!user.role.name)
         user = await user.populate("role")
 
-    if (!where.owner._id)
+    if (!where.owner.role)
         where = await where.populate("owner")
 
     const categoryPermissions = getPermissionsStruct(where.permissions)

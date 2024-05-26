@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { Container, Row, Col, ProgressBar, Button, Image } from "react-bootstrap"
+import { Container, Row, Col, ProgressBar, Button, Image, ListGroup, Badge } from "react-bootstrap"
+import TimeAgo from "react-timeago"
 import { usePageTitle } from "../hooks/pageTitle.hook"
 import { UserContext } from "../context/user.context";
 import { useNavigate } from "react-router-dom";
@@ -16,17 +17,15 @@ function Account(props) {
 
     const [taskStats, setTasksStats] = useState([]);
 
-    async function fetchUserStats() {
-        let result = await api.request("/stats/user?id=" + userContext.user._id)
-
-        if (result) {
-            userContext.updateUser(result.data.value.foundUser)
-            userContext.setComputedXp(result.data.value.rating)
-        }
+    async function fetchUserSubmits() {
+        const result = await api.request("/submit/list?id=" + userContext.user._id)
+        if (result)
+            setTasksStats(result.data.value)
     }
 
     useEffect(() => {
         pageTitle.set("Account")
+        fetchUserSubmits()
     }, []);
 
     useEffect(() => {
@@ -69,9 +68,28 @@ function Account(props) {
             </Row>
             <Row className="mt-5">
                 <h3>Last solved tasks</h3>
-                <div>
-                    You not solved any tasks yet
-                </div>
+                <Col md="12">
+                    <ListGroup as="ol">
+                        {
+                            !!taskStats && taskStats.map((submit) =>
+                                <ListGroup.Item
+                                    action
+                                    key={submit._id}
+                                    as="li"
+                                    onClick={() => navigate("/task/" + submit.task._id)}
+                                    className="d-flex justify-content-between align-items-center">
+                                    <div className="ms-2 me-auto">
+                                        <div className="fw-semibold fs-5">{submit.task.title}</div>
+                                        <TimeAgo date={submit.createdAt} />
+                                    </div>
+                                    <Badge bg="secondary fs-6 fw-medium" pill>
+                                        {submit.task.difficulty.value} xp
+                                    </Badge>
+                                </ListGroup.Item>
+                            )
+                        }
+                    </ListGroup>
+                </Col>
             </Row>
         </>
     )

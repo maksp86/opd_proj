@@ -75,7 +75,7 @@ async function processRoleEdit(req, res) {
     if (selectedRole) {
         if (req.user.role._id.equals(selectedRole._id))
             res.status(400).json({ status: "error_cant_edit_your_role" })
-        else if (canUserDoInOther(req.user, ["execute"])) {
+        else if (await canUserDoInOther(req.user, ["execute"])) {
             selectedRole.permissions = permissions
             await selectedRole.save()
             res.status(200).json({ status: "no_error", value: selectedRole.toJSON() })
@@ -95,7 +95,7 @@ async function processRoleAdd(req, res) {
     if (selectedRole)
         return res.status(400).json({ status: "error_already_exists" });
 
-    if (canUserDoInOther(req.user, ["execute"])) {
+    if (await canUserDoInOther(req.user, ["execute"])) {
         let createdRole = await UserRole.create({ name, permissions })
         res.status(200).json({ status: "no_error", value: createdRole.toJSON() })
     }
@@ -114,7 +114,7 @@ async function processRoleRemove(req, res) {
     if (await User.exists({ role: id }))
         return res.status(200).json({ status: "error_currently_used" })
 
-    if (canUserDoInOther(req.user, ["execute"])) {
+    if (await canUserDoInOther(req.user, ["execute"])) {
         await selectedRole.deleteOne()
         return res.status(200).json({ status: "no_error" })
     }
@@ -126,7 +126,7 @@ async function processRoleList(req, res) {
     const roles = await UserRole.find().lean()
     req.user = await req.user.populate("role");
 
-    if (!canUserDoInUsers(req.user, ["read"]))
+    if (!(await canUserDoInUsers(req.user, ["read"])))
         return res.status(403).json({ status: "error_no_permission" })
 
     res.status(200).json({ status: "no_error", value: roles, userRole: req.user.role.toJSON() })
@@ -150,7 +150,7 @@ async function processUserRemove(req, res) {
             await selectedUser.deleteOne()
             res.status(200).json({ status: "no_error" })
         }
-        else if (canUserDoInUsers(req.user, ["execute"])) {
+        else if (await canUserDoInUsers(req.user, ["execute"])) {
             await selectedUser.deleteOne()
             res.status(200).json({ status: "no_error" })
         }
@@ -173,7 +173,7 @@ async function processUserEdit(req, res) {
     if (isSameUser)
         return res.status(400).json({ status: "use_standart_method" });
 
-    if (isSameRole || !canUserDoInUsers(req.user, ["write"]))
+    if (isSameRole || !(await canUserDoInUsers(req.user, ["write"])))
         res.status(403).json({ status: "error_no_permission" })
     else {
         selectedUser.bio = bio;
@@ -200,7 +200,7 @@ async function processUserSetRole(req, res) {
 
     let isSameRole = req.user.role._id.equals(selectedUser.role._id)
 
-    if (isSameRole || !canUserDoInUsers(req.user, ["write", "execute"]))
+    if (isSameRole || !(await canUserDoInUsers(req.user, ["write", "execute"])))
         res.status(403).json({ status: "error_no_permission" })
     else {
         selectedUser.role = role;

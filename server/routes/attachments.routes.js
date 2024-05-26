@@ -26,7 +26,7 @@ async function uploadFilter(req, file, cb) {
         switch (req.body.type) {
             case "file":
                 req.user = await req.user.populate("role")
-                if (canUserDoInGroup(req.user, ["write"]))
+                if (await canUserDoInGroup(req.user, ["write"]))
                     cb(null, true)
                 else
                     cb("error_no_permission", false)
@@ -94,7 +94,7 @@ async function processAttachmentRemove(req, res) {
 
     req.user = await req.user.populate("role")
 
-    if (canUserDoIn(req.user, ["write"], foundAttachment)) {
+    if (await canUserDoIn(req.user, ["write"], foundAttachment)) {
 
         await foundAttachment.deleteOne()
         await fs.unlink(path.join(dest, foundAttachment.path), (err) => {
@@ -115,7 +115,7 @@ async function processAttachmentGet(req, res) {
     if (!foundAttachment)
         return res.status(404).json({ status: "error_not_found" })
 
-    if (canUserDoIn(req.user, ["read"], foundAttachment))
+    if (await canUserDoIn(req.user, ["read"], foundAttachment))
         res.download(path.join(dest, foundAttachment.path), foundAttachment.name)
     else
         res.status(403).json({ status: "error_no_permission" })

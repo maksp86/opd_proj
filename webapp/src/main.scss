@@ -71,3 +71,10 @@ $enable-reduced-motion: false;
 @import "bootstrap/scss/bootstrap";
 
 @import "./components/CategoryCard.scss";
+
+
+#topbar
+{
+  border-radius: 0 0 30px 30px;
+  background-color: $card-bg;
+}

@@ -3,7 +3,7 @@ const { check } = require("express-validator")
 const logger = require("winston")
 
 const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
-const { getPermissionsStruct, canUserDoIn } = require("../lib/user.functions")
+const { getPermissionsStruct, canUserDoIn, canUserDoInUsers } = require("../lib/user.functions")
 const Task = require("../model/task.model");
 const Category = require("../model/category.model");
 const Difficulty = require("../model/difficulty.model");
@@ -19,6 +19,22 @@ submit_router.post("/",
         processValidaion
     ], processSubmitAnswer)
 
+submit_router.get("/get",
+    [
+        rejectIfNotLogined,
+        check("id").isMongoId(),
+        processValidaion
+    ], processSubmitGet
+)
+
+submit_router.get("/list",
+    [
+        rejectIfNotLogined,
+        check("id").isMongoId().optional(),
+        processValidaion
+    ], processSubmitList
+)
+
 function checkIsAnswerFields(answerFields) {
     if (answerFields && Array.isArray(answerFields)) {
         for (let i = 0; i < answerFields.length; i++) {
@@ -29,6 +45,50 @@ function checkIsAnswerFields(answerFields) {
         }
     }
     return false
+}
+
+async function processSubmitGet(req, res) {
+    const { id } = req.query
+    req.user = await req.user.populate("role")
+
+    let foundTask = await Task.findById(id)
+
+    if (!foundTask)
+        return res.status(400).json({ status: "error_not_found" })
+
+    await foundTask.populate("difficulty")
+
+    let submit = await Submit.findOne({ user: req.user._id, task: foundTask._id, isValid: true })
+
+    if (submit)
+        return res.status(200).json({
+            status: "no_error",
+            value: {
+                reward: foundTask.difficulty.value,
+                isValid: submit.isValid
+            }
+        })
+    else
+        return res.status(200).json({ status: "no_error" })
+}
+
+async function processSubmitList(req, res) {
+    const { id } = req.query
+    req.user = await req.user.populate("role")
+
+    let submits = await Submit.find({ user: id || req.user._id, isValid: true }).populate({
+        path: "task",
+        select: "difficulty title",
+        populate: { path: "difficulty", select: "value" }
+    })
+
+    if (await canUserDoInUsers(req.user, ["read"]))
+        return res.status(200).json({
+            status: "no_error",
+            value: submits
+        })
+    else
+        return res.status(403).json({ status: "error_no_permission" })
 }
 
 async function processSubmitAnswer(req, res) {

@@ -1,7 +1,8 @@
 import { Container, Row, Col, ProgressBar, Navbar, ButtonGroup, Button, Image, Card } from "react-bootstrap"
 import { HouseDoor, Person } from "react-bootstrap-icons"
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { UserContext } from "../context/user.context"
+import { usePageTitle } from "../hooks/pageTitle.hook"
 
 function NewsCard(props) {
     return (
@@ -31,6 +32,11 @@ function NewsCard(props) {
 
 function Home() {
     const userContext = useContext(UserContext)
+    const pageTitle = usePageTitle()
+
+    useEffect(() => {
+        pageTitle.set("Home")
+    })
     return (
         <>
             <Row className="mt-5" />

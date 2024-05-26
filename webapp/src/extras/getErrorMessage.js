@@ -5,7 +5,7 @@ const apiErrorMessages = {
     "user_not_exist": "User not exist",
 
     "validation_failed": "Validation failed",
-    "field_empty": "Field incorrect",
+    "field_empty": "Field empty",
     "length_too_big": "Input too long",
     "invalid_length": "Invalid length",
     
@@ -13,7 +13,9 @@ const apiErrorMessages = {
     "error_no_permission": "No permission",
     "error_not_found": "Object not found",
     "error_already_exists": "Already exists",
-    "error_already_logined": "Already logined"
+    "error_already_logined": "Already logined",
+    "error_limit_reached": "No more tries",
+    "field_invalid": "Field incorrect"
 }
 
 function getErrorMessage(key) {

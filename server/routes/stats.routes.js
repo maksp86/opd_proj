@@ -31,7 +31,7 @@ async function processUserStats(req, res) {
     if (!foundUser)
         return res.status(404).json({ status: "error_not_found" })
 
-    if (foundUser._id.equals(req.user._id) || canUserDoInUsers(req.user, ["read"])) {
+    if (foundUser._id.equals(req.user._id) || (await canUserDoInUsers(req.user, ["read"]))) {
         let userRating = await calculateRating(foundUser)
 
         return res.status(200).json({

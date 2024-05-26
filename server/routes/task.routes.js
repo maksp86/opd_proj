@@ -112,14 +112,17 @@ task_router.post("/comment/remove",
 
 function checkIsAnswerFields(answerFields) {
     if (answerFields && Array.isArray(answerFields)) {
+        let correctFields = 0
         for (let i = 0; i < answerFields.length; i++) {
             const field = answerFields[i];
             if ("text" in field && typeof field.text === "string")
                 if ("hint" in field && typeof field.hint === "string" || !("hint" in field))
                     if ("answer" in field && typeof field.answer === "string")
-                        if (!("hint" in field) || ("variants" in field && Array.isArray(field.variants) && field.variants.every(x => typeof x === "string")))
-                            return true;
+                        if (!("variants" in field) || ("variants" in field && Array.isArray(field.variants) && field.variants.every(x => typeof x === "string")))
+                            correctFields++;
         }
+        if (correctFields == answerFields.length)
+            return true
     }
     return false
 }
@@ -138,7 +141,7 @@ async function processTaskCreate(req, res) {
 
     req.user = await req.user.populate("role");
 
-    if (canUserDoInGroup(req.user, ["write"])) {
+    if (await canUserDoInGroup(req.user, ["write"])) {
         let foundTask = await Task.findOne({ shortname })
         let parentCategory = undefined;
 
@@ -168,14 +171,14 @@ async function processTaskCreate(req, res) {
             if (!checkIsAnswerFields(answerFields)) {
                 errors.push({ msg: "field_invalid", path: "answerFields" })
             }
-            if (!maxTries || typeof maxTries !== "number")
+            if (!maxTries || typeof maxTries !== "number" || maxTries <= 0)
                 errors.push({ msg: "field_invalid", path: "maxTries" })
 
             if (errors.length > 0)
                 return res.status(400).json({ status: "validation_failed", errors });
         }
 
-        if (canUserDoIn(req.user, ["write"], parentCategory)) {
+        if (await canUserDoIn(req.user, ["write"], parentCategory)) {
             if (req.url === "/create") {
                 if (foundTask)
                     return res.status(400).json({ status: "error_already_exists" });
@@ -232,7 +235,7 @@ async function processTaskRemove(req, res) {
             return res.status(404).json({ status: "error_not_found" });
         foundTask = await foundTask.populate("parent")
 
-        if (!await canUserDoIn(req.user, ["write", "execute"], foundTask.parent)) {
+        if (!(await canUserDoIn(req.user, ["write", "execute"], foundTask.parent))) {
             return res.status(403).json({ status: "error_no_permission" })
         }
 
@@ -253,13 +256,13 @@ async function processTaskGet(req, res) {
         return res.status(404).json({ status: "error_not_found" });
     foundTask = await foundTask.populate("parent")
 
-    if (!await canUserDoIn(req.user, ["read"], foundTask.parent)) {
+    if (!(await canUserDoIn(req.user, ["read"], foundTask.parent))) {
         return res.status(403).json({ status: "error_no_permission" })
     }
 
     foundTask = await foundTask.populate(["attachments", "difficulty", "owner"])
 
-    if (!await canUserDoIn(req.user, ["write"], foundTask.parent))
+    if (!(await canUserDoIn(req.user, ["write"], foundTask.parent)))
         foundTask.answerFields.forEach((field) => field.answer = undefined);
 
     res.status(200).json({ status: "no_error", value: foundTask.toJSON() });
@@ -292,7 +295,7 @@ async function processTaskCommentPost(req, res) {
         return res.status(404).json({ status: "error_not_found" });
     foundTask = await foundTask.populate("parent")
 
-    if (!await canUserDoIn(req.user, ["read"], foundTask.parent))
+    if (!(await canUserDoIn(req.user, ["read"], foundTask.parent)))
         return res.status(403).json({ status: "error_no_permission" })
 
     let comment = undefined
@@ -305,7 +308,7 @@ async function processTaskCommentPost(req, res) {
                 errors: [{ msg: "error_not_found", path: "parent" }]
             });
 
-        if (!await canUserDoIn(req.user, ["write"], foundTask.parent) && !req.user._id.equals(comment.author))
+        if (!(await canUserDoIn(req.user, ["write"], foundTask.parent)) && !req.user._id.equals(comment.author))
             return res.status(403).json({ status: "error_no_permission" })
     }
     else if (req.url === "/comment/post") {
@@ -343,7 +346,7 @@ async function processTaskCommentGet(req, res) {
         return res.status(404).json({ status: "error_not_found" });
     foundTask = await foundTask.populate("parent")
 
-    if (!foundTask.commentable || !await canUserDoIn(req.user, ["read"], foundTask.parent))
+    if (!foundTask.commentable || !(await canUserDoIn(req.user, ["read"], foundTask.parent)))
         return res.status(403).json({ status: "error_no_permission" })
 
     let comments = await Comment.find({ subject: id, parent: undefined }, { subject: 0 }).populate({
@@ -367,7 +370,7 @@ async function processTaskCommentRemove(req, res) {
     if (!foundComment)
         return res.status(404).json({ status: "error_not_found" });
 
-    if (!await canUserDoIn(req.user, ["write"], foundComment.subject.parent) && !req.user._id.equals(foundComment.author))
+    if (!(await canUserDoIn(req.user, ["write"], foundComment.subject.parent)) && !req.user._id.equals(foundComment.author))
         return res.status(403).json({ status: "error_no_permission" })
 
     await foundComment.deleteOne()

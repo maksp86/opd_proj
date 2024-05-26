@@ -1,5 +1,5 @@
 import Home from './pages/Home.jsx'
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Navigate, useNavigate } from 'react-router-dom'
 import { Container, Modal } from 'react-bootstrap'
 
 import Navigation from "./components/Navigation"
@@ -23,6 +23,9 @@ import { useEffect } from 'react'
 import { ModalContext } from './context/modal.context.js'
 import ErrorMessageModal from './pages/modals/ErrorMessageModal.jsx'
 import CategoryEditPage from './pages/CategoryEditPage.jsx'
+import TasksPage from './pages/TasksPage.jsx'
+import TaskEditPage from './pages/TaskEditPage.jsx'
+import TaskPage from './pages/TaskPage.jsx'
 
 
 function App() {
@@ -54,8 +57,10 @@ function App() {
     useEffect(() => {
         if (apiHook.error && !apiHook.error.preventNext) {
             console.log("api error in app.jsx ", JSON.stringify(apiHook.error))
-            if (apiHook.error.status === "error_not_logined" && apiHook.error.httpcode === 403)
+            if (apiHook.error.status === "error_not_logined" && apiHook.error.httpcode === 403) {
                 userHook.logout();
+                document.location = "/"
+            }
             else {
                 modalHook.show(<ErrorMessageModal error={apiHook.error} />)
             }
@@ -95,12 +100,14 @@ function App() {
                                 {userHook.loggedIn &&
                                     <>
                                         <Route path='/account' element={<Account />} />
-                                        <Route path='/learning' key="learning" element={<CategoriesPage isLearning={true} />} />
-                                        <Route path='/learning/:category' element={<Leaningchoose />} />
-                                        <Route path='/tasks' element={<CategoriesPage key="tasks" isLearning={false} />} />
-                                        <Route path='/tasks/:category' element={<Taskchoose />} />
+                                        <Route path='/learning' key="learningCategories" element={<CategoriesPage isLearning={true} />} />
+                                        <Route path='/learning/:category' key="learning" element={<TasksPage />} />
+                                        <Route path='/tasks' element={<CategoriesPage key="taskCategories" isLearning={false} />} />
+                                        <Route path='/task/:id' element={<TaskPage key="taskView" />} />
+                                        <Route path='/tasks/:category' element={<TasksPage key="tasks" />} />
                                         <Route path='/category/edit/' element={<CategoryEditPage />} />
-                                        <Route path='*' element={<NotFound />} />
+                                        <Route path='/task/edit/' element={<TaskEditPage />} />
+                                        <Route path='*' key="notfound" element={<NotFound />} />
                                     </>
                                 }
 
