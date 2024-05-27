@@ -24,12 +24,15 @@ import CategoryEditPage from './pages/CategoryEditPage.jsx'
 import TasksPage from './pages/TasksPage.jsx'
 import TaskEditPage from './pages/TaskEditPage.jsx'
 import TaskPage from './pages/TaskPage.jsx'
+import { BreadcrumbsContext } from './context/breadcrumbs.context.js'
+import { useBreadcrumbs } from './hooks/breadcrumbs.hook.js'
 
 
 function App() {
     const apiHook = useApi();
     const userHook = useUser();
     const modalHook = useModal();
+    const breadcrumbsHook = useBreadcrumbs()
 
     async function fetchUserStats() {
         userHook.setUpdateRequest(false)
@@ -71,48 +74,50 @@ function App() {
         <ApiContext.Provider value={apiHook}>
             <UserContext.Provider value={userHook}>
                 <ModalContext.Provider value={modalHook}>
-                    <Modal
-                        show={modalHook.isOpen}
-                        onHide={() => modalHook.close()}
-                        aria-labelledby="contained-modal-title-vcenter"
-                        centered
-                        backdrop={modalHook.isClosable ? true : "static"}
-                        keyboard={modalHook.isClosable}
-                    >
-                        <Modal.Body>
-                            {modalHook.content}
-                        </Modal.Body>
-                    </Modal>
-                    <BrowserRouter>
-                        <TopBar user={userHook.user} />
-                        <Container>
-                            <Routes>
-                                <Route path='/' element={<Home />} />
-                                {(!userHook.loggedIn) &&
-                                    <>
-                                        <Route path='/login' element={<LoginPage />} />
-                                        <Route path='*' element={<Navigate replace to="/login" />} />
-                                    </>
-                                }
+                    <BreadcrumbsContext.Provider value={breadcrumbsHook}>
+                        <Modal
+                            show={modalHook.isOpen}
+                            onHide={() => modalHook.close()}
+                            aria-labelledby="contained-modal-title-vcenter"
+                            centered
+                            backdrop={modalHook.isClosable ? true : "static"}
+                            keyboard={modalHook.isClosable}
+                        >
+                            <Modal.Body>
+                                {modalHook.content}
+                            </Modal.Body>
+                        </Modal>
+                        <BrowserRouter>
+                            <TopBar user={userHook.user} />
+                            <Container>
+                                <Routes>
+                                    <Route path='/' element={<Home />} />
+                                    {(!userHook.loggedIn) &&
+                                        <>
+                                            <Route path='/login' element={<LoginPage />} />
+                                            <Route path='*' element={<Navigate replace to="/login" />} />
+                                        </>
+                                    }
 
-                                {userHook.loggedIn &&
-                                    <>
-                                        <Route path='/account' element={<Account />} />
-                                        <Route path='/learning' key="learningCategories" element={<CategoriesPage isLearning={true} />} />
-                                        <Route path='/learning/:category' key="learning" element={<TasksPage />} />
-                                        <Route path='/tasks' element={<CategoriesPage key="taskCategories" isLearning={false} />} />
-                                        <Route path='/task/:id' element={<TaskPage key="taskView" />} />
-                                        <Route path='/tasks/:category' element={<TasksPage key="tasks" />} />
-                                        <Route path='/category/edit/' element={<CategoryEditPage />} />
-                                        <Route path='/task/edit/' element={<TaskEditPage />} />
-                                        <Route path='*' key="notfound" element={<NotFound />} />
-                                    </>
-                                }
+                                    {userHook.loggedIn &&
+                                        <>
+                                            <Route path='/account' element={<Account />} />
+                                            <Route path='/learning' key="learningCategories" element={<CategoriesPage isLearning={true} />} />
+                                            <Route path='/learning/:category' key="learning" element={<TasksPage />} />
+                                            <Route path='/tasks' element={<CategoriesPage key="taskCategories" isLearning={false} />} />
+                                            <Route path='/task/:id' element={<TaskPage key="taskView" />} />
+                                            <Route path='/tasks/:category' element={<TasksPage key="tasks" />} />
+                                            <Route path='/category/edit/' element={<CategoryEditPage />} />
+                                            <Route path='/task/edit/' element={<TaskEditPage />} />
+                                            <Route path='*' key="notfound" element={<NotFound />} />
+                                        </>
+                                    }
 
-                            </Routes>
-                        </Container>
-                        <Navigation />
-                    </BrowserRouter>
+                                </Routes>
+                            </Container>
+                            <Navigation />
+                        </BrowserRouter>
+                    </BreadcrumbsContext.Provider>
                 </ModalContext.Provider>
             </UserContext.Provider>
         </ApiContext.Provider>

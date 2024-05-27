@@ -10,11 +10,12 @@ import { useConstructor } from "../hooks/constructor.hook"
 import { ModalContext } from "../context/modal.context"
 import { UserContext } from "../context/user.context"
 import CommentsComponent from "../components/CommentsComponent"
+import { BreadcrumbsContext } from "../context/breadcrumbs.context"
+import IsAdmin from "../components/IsAdmin"
 
 function TaskPage() {
-    const userContext = useContext(UserContext)
+    const breadCrumbscontext = useContext(BreadcrumbsContext)
     const api = useContext(ApiContext)
-    const modal = useContext(ModalContext)
     const pageTitle = usePageTitle()
     const navigate = useNavigate()
     const { id } = useParams()
@@ -51,6 +52,7 @@ function TaskPage() {
             setTask(result.data.value)
             setFormData(result.data.value.answerFields.reduce((obj, item) => { return { ...obj, [item._id]: item.answer || "" } }, {}))
             isAlreadySubmitted()
+            breadCrumbscontext.setLastTask(result.data.value)
         }
     }
 
@@ -121,16 +123,18 @@ function TaskPage() {
                 <Col xs="auto">
                     <h1>{task.title}</h1>
                 </Col>
-                <Col>
-                    <Button style={{
-                        backgroundColor: "unset",
-                        border: "unset"
-                    }}
-                        variant="light"
-                        onClick={() => navigate("/task/edit", { state: { item: task, parent: task.parent } })}>
-                        <PencilFill className="category-card-edit-icon" size={20} />
-                    </Button>
-                </Col>
+                <IsAdmin>
+                    <Col>
+                        <Button style={{
+                            backgroundColor: "unset",
+                            border: "unset"
+                        }}
+                            variant="light"
+                            onClick={() => navigate("/task/edit", { state: { item: task, parent: task.parent } })}>
+                            <PencilFill className="category-card-edit-icon" size={20} />
+                        </Button>
+                    </Col>
+                </IsAdmin>
             </Row>
             <Row className="justify-content-center">
                 <Col md={7}>

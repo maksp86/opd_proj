@@ -3,6 +3,7 @@ import { Row, Col, ProgressBar, Button } from "react-bootstrap"
 import { CaretRightFill, PencilFill } from "react-bootstrap-icons"
 import { useLocation, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/user.context";
+import IsAdmin from "./IsAdmin";
 
 function CategoryCard(props) {
     const navigate = useNavigate()
@@ -39,14 +40,16 @@ function CategoryCard(props) {
                     </div>
                 </Col>
                 <Col xs="auto" className="d-flex p-0">
-                    <Button style={{
-                        backgroundColor: "unset",
-                        border: "unset"
-                    }}
-                        variant="light"
-                        onClick={() => navigate("/category/edit", { state: { item: props.item, isLearning: props.item.isLearning } })}>
-                        <PencilFill className="category-card-edit-icon" size={20} />
-                    </Button>
+                    <IsAdmin>
+                        <Button style={{
+                            backgroundColor: "unset",
+                            border: "unset"
+                        }}
+                            variant="light"
+                            onClick={() => navigate("/category/edit", { state: { item: props.item, isLearning: props.item.isLearning } })}>
+                            <PencilFill className="category-card-edit-icon" size={20} />
+                        </Button>
+                    </IsAdmin>
                     <Button style={{
                         backgroundColor: "unset",
                         border: "unset"

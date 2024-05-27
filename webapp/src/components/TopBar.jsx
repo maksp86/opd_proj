@@ -1,14 +1,16 @@
 import { Container, Row, Col, ProgressBar, Button } from "react-bootstrap"
-import { CursorFill } from "react-bootstrap-icons"
+import { ArrowLeft, CaretLeftFill, CursorFill } from "react-bootstrap-icons"
 
 import { useMatch, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/user.context"
 import { useContext } from "react"
 import OnlyLogined from "./OnlyLogined"
 import { ApiContext } from "../context/api.context"
+import { BreadcrumbsContext } from "../context/breadcrumbs.context"
 
 function ShowForPath(props) {
-    if (useMatch(props.path))
+    const isMatch = useMatch(props.path)
+    if (isMatch)
         return props.children
     return <></>
 }
@@ -31,13 +33,42 @@ function UserProgressBar(props) {
 function TopBar(props) {
     const navigate = useNavigate()
     const userContext = useContext(UserContext)
+    const breadCrumbscontext = useContext(BreadcrumbsContext)
     const api = useContext(ApiContext)
 
-    async function processLogout()
-    {
+    async function processLogout() {
         await api.request("/user/logout")
         userContext.logout();
         navigate("/login")
+    }
+
+    function onTaskBack() {
+        const pathBase = "/" + breadCrumbscontext.lastTask.parent.isLearning ? "learning" : "tasks"
+        navigate(pathBase + "/" + breadCrumbscontext.lastTask.parent.shortname,
+            { state: { item: breadCrumbscontext.lastTask.parent } })
+    }
+
+    function onCategoryBack() {
+        const pathBase = "/" + breadCrumbscontext.lastCategory.isLearning ? "learning" : "tasks"
+        navigate(pathBase)
+    }
+
+    function ForCategoriesPage(props) {
+        return (
+            <>
+                <Col md="6" className="align-items-left">
+                    <Row>
+                        <Col xs="auto">
+                            <Button variant="" onClick={() => onCategoryBack()}><CaretLeftFill /></Button>
+                        </Col>
+                        <Col>
+                            <h2 className="m-0 text-truncate">{breadCrumbscontext.lastCategory && breadCrumbscontext.lastCategory.title}</h2>
+                        </Col>
+                    </Row>
+                </Col>
+                <UserProgressBar userContext={userContext} />
+            </>
+        )
     }
 
     return (
@@ -46,7 +77,7 @@ function TopBar(props) {
                 <OnlyLogined>
                     <ShowForPath path={"/"}>
                         <Col md="6" className="align-items-left">
-                            <h1 className="m-0">hello, {userContext.user.username}</h1>
+                            <h2 className="m-0 text-truncate">hello, {userContext.user.username}</h2>
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
@@ -56,7 +87,7 @@ function TopBar(props) {
                             <CursorFill size={30} />
                         </Col>
                         <Col className="align-items-left">
-                            <h1 className="m-0">CTF Navigator</h1>
+                            <h2 className="m-0">CTF Navigator</h2>
                         </Col>
                         <Col>
                             <Row className="justify-content-end">
@@ -70,19 +101,42 @@ function TopBar(props) {
                         </Col>
                     </ShowForPath>
 
-                    <ShowForPath path={"/tasks*"}>
+                    <ShowForPath path={"/tasks"}>
                         <Col md="6" className="align-items-left">
-                            <h1 className="m-0">Task categories</h1>
+                            <h2 className="m-0">Task categories</h2>
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
 
-                    <ShowForPath path={"/learning*"}>
+                    <ShowForPath path={"/learning"}>
                         <Col md="6" className="align-items-left">
-                            <h1 className="m-0">Learning categories</h1>
+                            <h2 className="m-0">Learning categories</h2>
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
+
+                    <ShowForPath path={"/learning/:id"}>
+                        <ForCategoriesPage />
+                    </ShowForPath>
+
+                    <ShowForPath path={"/tasks/:id"}>
+                        <ForCategoriesPage />
+                    </ShowForPath>
+
+                    <ShowForPath path={"/task/:id"}>
+                        <Col md="6" className="align-items-left">
+                            <Row>
+                                <Col xs="auto">
+                                    <Button variant="" onClick={() => onTaskBack()}><CaretLeftFill /></Button>
+                                </Col>
+                                <Col>
+                                    <h2 className="m-0">Task</h2>
+                                </Col>
+                            </Row>
+                        </Col>
+                        <UserProgressBar userContext={userContext} />
+                    </ShowForPath>
+
                 </OnlyLogined>
             </Row>
         </Container>

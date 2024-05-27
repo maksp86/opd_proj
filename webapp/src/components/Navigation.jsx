@@ -40,11 +40,11 @@ function Navigation() {
 
                 {userContext.loggedIn &&
                     <>
-                        <NavButton path="/tasks" match="*" text="Tasks">
+                        <NavButton path="/tasks" match="/*" text="Tasks">
                             <Grid size={30} />
                         </NavButton>
 
-                        <NavButton path="/learning" match="*" text="Learning">
+                        <NavButton path="/learning" match="/*" text="Learning">
                             <Map size={30} />
                         </NavButton>
 

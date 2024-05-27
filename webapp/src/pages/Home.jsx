@@ -3,6 +3,10 @@ import { HouseDoor, Person } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import { UserContext } from "../context/user.context"
 import { usePageTitle } from "../hooks/pageTitle.hook"
+import { useNavigate } from "react-router-dom"
+import { BreadcrumbsContext } from "../context/breadcrumbs.context"
+import { ApiContext } from "../context/api.context"
+import TimeAgo from "react-timeago"
 
 function NewsCard(props) {
     return (
@@ -10,18 +14,24 @@ function NewsCard(props) {
             <Card className="mb-3" style={{ borderRadius: "20px", overflow: "hidden" }}>
                 <Row className="h-100 g-0">
                     <Col md="4">
-                        <Image fluid rounded className="bg-black w-100 h-100" />
+                        <Image fluid rounded className="bg-black w-100 h-100" src={props.item.img || ""} />
                     </Col>
                     <Col md="8">
                         <Card.Body>
                             <Card.Title className="fs-4">
-                                Lorem ipsum dolor sit amet
+                                {props.item.title}
                             </Card.Title>
+                            <Card.Subtitle>
+                                <p>posted <TimeAgo date={props.item.date} /></p>
+                            </Card.Subtitle>
                             <Card.Text>
-                                Lorem ipsum dolor sit amet consectetur. Orci nunc ut est diam nulla magna. Eu lacinia tempus purus justo. Id id nibh nullam scelerisque sed. Vestibulum lorem ut eu volutpat ac mi potenti. Parturient diam nunc turpis sapien ac. Erat diam at adipiscing velit aliquet leo id facilisi. Laoreet aenean amet at non neque faucibus amet. Sit euismod sociis et ac. Tortor id pharetra vitae luctus lorem eu feugiat eleifend.
-                                Penatibus sed amet commodo commodo tincidunt aliquam tincidunt. Pulvinar tortor turpis commodo posuere pellentesque egestas dictum. Viverra quam nam et aenean lacinia velit pharetra mattis. Porta felis aliquam accumsan tempor. Felis venenatis eu convallis risus gravida.
+                                {props.item.summary}
                             </Card.Text>
-                            <Button type="button" variant="outline-secondary">Read</Button>
+                            <Button
+                                type="button"
+                                variant="outline-secondary"
+                                onClick={() => window.open(props.item.link, "_blank")}
+                            >Read</Button>
                         </Card.Body>
                     </Col>
                 </Row>
@@ -31,12 +41,23 @@ function NewsCard(props) {
 }
 
 function Home() {
+    const navigate = useNavigate()
+    const api = useContext(ApiContext)
+    const breadCrumbscontext = useContext(BreadcrumbsContext)
     const userContext = useContext(UserContext)
     const pageTitle = usePageTitle()
+    const [news, setNews] = useState([])
+
+    async function LoadNews() {
+        const result = await api.request("/news/get")
+        if (result)
+            setNews(result.data.value)
+    }
 
     useEffect(() => {
         pageTitle.set("Home")
-    })
+        LoadNews()
+    }, [])
     return (
         <>
             <Row className="mt-5" />
@@ -54,28 +75,22 @@ function Home() {
                     </Col>
                 }
 
-                <Col xs="auto">
+                {!!breadCrumbscontext.lastTask && <Col xs="auto">
                     <Card style={{ width: '22rem', borderRadius: "20px", overflow: "hidden" }}>
                         <Card.Body>
                             <Card.Title>Long time no see</Card.Title>
                             <Card.Text>
                                 Lets go
                             </Card.Text>
-                            <Button variant="primary">Go to last task</Button>
+                            <Button onClick={() => navigate("/task/" + breadCrumbscontext.lastTask._id)} variant="primary">Go to last task</Button>
                         </Card.Body>
                     </Card>
-                </Col>
+                </Col>}
             </Row>
             <Row className="mt-5" />
             <Row>
-                <NewsCard />
-                <NewsCard />
-                <NewsCard />
-                <NewsCard />
-                <NewsCard />
-                <NewsCard />
+                {news.map((item) => <NewsCard key={item.link} item={item} />)}
             </Row>
-            <Row className="mt-5" />
             <Row className="mt-5" />
             <Row className="mt-5" />
         </>

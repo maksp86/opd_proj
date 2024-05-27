@@ -1,10 +1,11 @@
-import { Container, Row, Col, ProgressBar, Navbar, ButtonGroup, Button, Image } from "react-bootstrap"
+import { Container, Row, Col, ProgressBar, Navbar, ButtonGroup, Button, Image, Spinner } from "react-bootstrap"
 import { ArrowLeft, ArrowRight, CaretRightFill, HouseDoor, Person, Plus } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import CategoryCard from "../components/CategoryCard"
 import { ApiContext } from "../context/api.context"
 import { useNavigate, useParams } from "react-router-dom"
 import { usePageTitle } from "../hooks/pageTitle.hook"
+import IsAdmin from "../components/IsAdmin"
 
 
 function CategoriesPage(props) {
@@ -27,9 +28,11 @@ function CategoriesPage(props) {
     return (
         <>
             <Row>
-                <Col>
-                    <Button variant="outline-secondary" onClick={() => { navigate("/category/edit", { state: { isLearning: props.isLearning } }) }}><Plus /></Button>
-                </Col>
+                <IsAdmin>
+                    <Col>
+                        <Button variant="outline-secondary" onClick={() => { navigate("/category/edit", { state: { isLearning: props.isLearning } }) }}><Plus /></Button>
+                    </Col>
+                </IsAdmin>
             </Row>
             <Row className="justify-content-evenly text-center">
                 {/* <CategoryCard item={{title: "Cryptography", color: "#D04AFF"}} progress="33" />
@@ -41,7 +44,7 @@ function CategoriesPage(props) {
                 {
                     categories.length > 0 ? categories.map(
                         (value) => <CategoryCard key={value.shortname} item={value} progress="33" />
-                    ) : <h3>Nothing here</h3>
+                    ) : (api.busy ? <Spinner /> : <h3>Nothing here</h3>) 
                 }
             </Row>
         </>
