@@ -136,7 +136,16 @@ function TopBar(props) {
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
-
+                </OnlyLogined>
+                <OnlyLogined inverse>
+                    <ShowForPath path={"/"}>
+                        <Col xs="auto" className="align-items-left">
+                            <CursorFill size={30} />
+                        </Col>
+                        <Col className="align-items-left">
+                            <h2 className="m-0">CTF Navigator</h2>
+                        </Col>
+                    </ShowForPath>
                 </OnlyLogined>
             </Row>
         </Container>

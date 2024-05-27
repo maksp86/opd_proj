@@ -1,17 +1,14 @@
-import { Container, Row, Col, ProgressBar, Navbar, ButtonGroup, Button, Image, InputGroup, Form, ListGroup } from "react-bootstrap"
-import { ArrowLeft, ArrowRight, CaretRightFill, Check, Download, HouseDoor, PencilFill, Person, Reply } from "react-bootstrap-icons"
+import { Row, Col, Button, Image, InputGroup, Form, ListGroup } from "react-bootstrap"
+import { Check, Download, PencilFill } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
-import CategoryCard from "../components/CategoryCard"
 import { ApiContext } from "../context/api.context"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { usePageTitle } from "../hooks/pageTitle.hook"
 import Markdown from 'markdown-to-jsx'
-import { useConstructor } from "../hooks/constructor.hook"
-import { ModalContext } from "../context/modal.context"
-import { UserContext } from "../context/user.context"
 import CommentsComponent from "../components/CommentsComponent"
 import { BreadcrumbsContext } from "../context/breadcrumbs.context"
 import IsAdmin from "../components/IsAdmin"
+import AnswersCard from "../components/AnswersCard"
 
 function TaskPage() {
     const breadCrumbscontext = useContext(BreadcrumbsContext)
@@ -21,19 +18,7 @@ function TaskPage() {
     const { id } = useParams()
     const [task, setTask] = useState({})
 
-    const [invalidFields, setInvalidFields] = useState([]);
-
-    const [formData, setFormData] = useState({})
-
     const [isSubmitted, setIsSubmitted] = useState(undefined)
-
-    const setField = (field, value) => {
-        setFormData({
-            ...formData,
-            [field]: value
-        })
-        setInvalidFields([])
-    }
 
     async function isAlreadySubmitted() {
         const result = await api.request("/submit/get?id=" + id)
@@ -50,72 +35,17 @@ function TaskPage() {
             console.log(result.data.value)
             pageTitle.set(result.data.value.title)
             setTask(result.data.value)
-            setFormData(result.data.value.answerFields.reduce((obj, item) => { return { ...obj, [item._id]: item.answer || "" } }, {}))
             isAlreadySubmitted()
             breadCrumbscontext.setLastTask(result.data.value)
         }
     }
 
-    async function submitTask() {
-        setInvalidFields([])
-        const answers = Object.keys(formData).map(key => { return { _id: key, answer: formData[key] } })
-        const result = await api.request("/submit/", "POST", { task: task._id, answers })
-
-        if (result) {
-            if (result.data.value.isValid) {
-                setIsSubmitted(result.data.value)
-            }
-            else
-                setInvalidFields(result.data.value.wrongFields)
-        }
-    }
 
     useEffect(() => {
         if (!id) { navigate("..") }
         else
             loadTask()
     }, [])
-
-    function AnswersCard() {
-        if (!isSubmitted) {
-            return (
-                <>
-                    {task.answerFields.map((field) =>
-                        <Row key={field._id} className="my-2">
-                            <p className="mb-1 mx-1 fs-5 fw-semibold">
-                                {field.text}
-                            </p>
-                            <InputGroup>
-                                <Form.Control
-                                    onChange={(e) => setField(field._id, e.target.value)}
-                                    value={formData[field._id] || ""}
-                                    placeholder={"Hint: " + field.hint}
-                                    isInvalid={invalidFields.includes(field._id)}>
-                                </Form.Control>
-                                {task.answerFields.length == 1 && <Button onClick={submitTask}>Submit</Button>}
-                            </InputGroup>
-                        </Row>
-                    )}
-
-                    {task.answerFields.length > 1 &&
-                        <Row className="align-items-center justify-content-center my-3">
-                            <Col xs={6} className="d-grid">
-                                <Button onClick={submitTask}>Submit</Button>
-                            </Col>
-                        </Row>
-                    }
-                </>
-            )
-        }
-        else {
-            return (
-                <>
-                    <p className="mx-3 mb-1 mt-3 fw-semibold fs-4">Task solved <Check /></p>
-                    <p className="mx-3">You got {isSubmitted.reward} xp</p>
-                </>
-            )
-        }
-    }
 
     return (
         <>
@@ -156,7 +86,10 @@ function TaskPage() {
                     <Row>
                         {task.answerFields && task.answerFields.length > 0 &&
                             <Col className="card my-4 py-2 px-4" style={{ borderRadius: "20px" }}>
-                                <AnswersCard />
+                                <AnswersCard
+                                    isSubmitted={isSubmitted}
+                                    setIsSubmitted={setIsSubmitted}
+                                    task={task} />
                             </Col>
                         }
                     </Row>
@@ -189,7 +122,7 @@ function TaskPage() {
                 </Col>
             </Row>
             {
-                task._id && <CommentsComponent item={task} />
+                task._id && task.commentable && <CommentsComponent item={task} />
             }
             <Row className="mb-5" />
             <Row className="mb-5" />

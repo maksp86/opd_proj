@@ -14,20 +14,11 @@ function CommentsComponent(props) {
 
     const [replyingComment, setReplyingComment] = useState(undefined)
 
-    const [formData, setFormData] = useState({})
+
     const [errors, setErrors] = useState({})
 
-    const setField = (field, value) => {
-        setFormData({
-            ...formData,
-            [field]: value
-        })
 
-        if (errors[field]) setErrors({
-            ...errors,
-            [field]: null
-        })
-    }
+
 
     useEffect(() => {
         if (api.error) {
@@ -48,20 +39,6 @@ function CommentsComponent(props) {
         if (result) {
             console.log("GetComments", result)
             setComments(result.data.value)
-        }
-    }
-
-    async function SendComment() {
-        const result = await api.request("/task/comment/post", "POST", {
-            ...formData,
-            id: props.item._id,
-            parent: replyingComment ? replyingComment._id : undefined
-        })
-        if (result) {
-            console.log("SendComment", result)
-            GetComments()
-            setFormData({})
-            setReplyingComment(undefined)
         }
     }
 
@@ -110,10 +87,76 @@ function CommentsComponent(props) {
                             <div className="vr m-auto" style={{ height: "80%" }}></div>
                         </Col>
                         <Col>
-                            {props.item.children.map((item) => <CommentInstance className="mx-0" item={item} />)}
+                            {props.item.children.map((item) => <CommentInstance className="mx-0" key={item._id} item={item} />)}
                         </Col>
                     </Row>
                 }
+            </Row>
+        )
+    }
+
+    function CommentWriteArea(props) {
+        const [formData, setFormData] = useState({})
+        const setField = (field, value) => {
+            setFormData({
+                ...formData,
+                [field]: value
+            })
+
+            if (errors[field]) setErrors({
+                ...errors,
+                [field]: null
+            })
+        }
+
+        async function SendComment() {
+            const result = await api.request("/task/comment/post", "POST", {
+                ...formData,
+                id: props.item._id,
+                parent: replyingComment ? replyingComment._id : undefined
+            })
+            if (result) {
+                console.log("SendComment", result)
+                GetComments()
+                setFormData({})
+                setReplyingComment(undefined)
+            }
+        }
+
+        return (
+            <Row className="align-items-center px-3">
+                <Col xs="auto">
+                    <Image
+                        roundedCircle
+                        style={{ backgroundColor: "#000", width: "6vh", height: "6vh" }}
+                        src={props.userContext.user.image && ("/api/attachments/get?id=" + props.userContext.user.image)} />
+                </Col>
+                <Col>
+                    <Row className="align-items-center">
+                        <Col xs="auto">
+                            <p className="m-0 mb-1 fw-semibold">
+                                {!!props.replyingComment ? (`Reply to ${props.replyingComment.author.name}'s comment`) : "Leave a comment"}
+                                {!!props.replyingComment && <a onClick={() => props.setReplyingComment(undefined)} href="javascript:;"><X /></a>}
+                            </p>
+                        </Col>
+                        {/* <Col xs="auto" className="p-0">
+                        <Button className="ms-1" variant=""><X /></Button>
+                    </Col> */}
+                    </Row>
+                    <Form.Group className="mb-3">
+                        <InputGroup className="mb-2">
+                            <Form.Control
+                                value={formData.text || ""}
+                                onChange={(e) => setField("text", e.target.value)}
+                                isInvalid={!!errors.text}
+                                as="textarea"
+                                placeholder="Comment..."
+                            />
+                            <Button onClick={() => SendComment()} variant="outline-secondary"><SendFill /></Button>
+                        </InputGroup>
+                        <h6 className="text-danger text-center">{errors.summary}</h6>
+                    </Form.Group>
+                </Col>
             </Row>
         )
     }
@@ -127,40 +170,11 @@ function CommentsComponent(props) {
                 }
 
                 <hr className="hr hr-blurry mx-4 mt-3" />
-                <Row className="align-items-center px-3">
-                    <Col xs="auto">
-                        <Image
-                            roundedCircle
-                            style={{ backgroundColor: "#000", width: "6vh", height: "6vh" }}
-                            src={userContext.user.image && ("/api/attachments/get?id=" + userContext.user.image)} />
-                    </Col>
-                    <Col>
-                        <Row className="align-items-center">
-                            <Col xs="auto">
-                                <p className="m-0 mb-1 fw-semibold">
-                                    {!!replyingComment ? (`Reply to ${replyingComment.author.name}'s comment`) : "Leave a comment"}
-                                    {!!replyingComment && <a onClick={() => setReplyingComment(undefined)} href="javascript:;"><X /></a>}
-                                </p>
-                            </Col>
-                            {/* <Col xs="auto" className="p-0">
-                                <Button className="ms-1" variant=""><X /></Button>
-                            </Col> */}
-                        </Row>
-                        <Form.Group className="mb-3">
-                            <InputGroup className="mb-2">
-                                <Form.Control
-                                    value={formData.text || ""}
-                                    onChange={(e) => setField("text", e.target.value)}
-                                    isInvalid={!!errors.text}
-                                    as="textarea"
-                                    placeholder="Comment..."
-                                />
-                                <Button onClick={() => SendComment()} variant="outline-secondary"><SendFill /></Button>
-                            </InputGroup>
-                            <h6 className="text-danger text-center">{errors.summary}</h6>
-                        </Form.Group>
-                    </Col>
-                </Row>
+                <CommentWriteArea
+                    item={props.item}
+                    userContext={userContext}
+                    replyingComment={replyingComment}
+                    setReplyingComment={setReplyingComment} />
             </Col>
         </Row>
     )
