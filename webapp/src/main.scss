@@ -1,0 +1,80 @@
+#root {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+// $primary: #aac7ff;
+// $secondary: #bec6dc;
+// $success: #92d5ab;
+// $info: #ddbce0;
+// $warning: #ffb782;
+// $danger: #ffb4ab;
+// $light: #e2e2e9;
+// $dark: #2e3036;
+
+// $body-bg: #ffffff;
+// $body-color: #191c20;
+
+// $card-border-width: 0;
+// $card-bg: #f9f9ff;
+
+// $body-tertiary-color: #3f2844;
+// $body-tertiary-bg: #f3f3fa;
+
+// $secondary-text-emphasis: #283141;
+
+// $progress-bar-color: $body-color;
+
+$custom-colors: (
+  "primary":#aac7ff,
+  "primary-light": #dae2f9,
+  "primary-dark": #415f91,
+
+  "secondary": #6c7588,
+  "secondary-dark": #3a4354,
+
+  "accent": #FFCC80,
+  "accent-light": #FFE0B2,
+
+  "background": #F5F5F5,
+
+  "text-primary": #001b3e,
+
+  "danger": #ba1a1a
+);
+
+// Override Bootstrap theme colors
+$theme-colors: (
+  "primary": map-get($custom-colors, "primary"),
+  "secondary": map-get($custom-colors, "secondary"),
+  "success": map-get($custom-colors, "secondary-dark"),
+  "info": map-get($custom-colors, "accent"),
+  "warning": map-get($custom-colors, "accent-light"),
+  "danger": map-get($custom-colors, "danger"),
+  "light": map-get($custom-colors, "primary-light"),
+  "dark": map-get($custom-colors, "primary-dark")
+);
+
+// Override body background and text color
+$body-bg: map-get($custom-colors, "background");
+$body-color: map-get($custom-colors, "text-primary");
+
+$card-border-width: 0;
+$card-bg: #ededf4;
+
+$body-tertiary-color: #705575;
+$body-tertiary-bg: #f9f9ff;
+
+$enable-reduced-motion: false;
+
+@import "bootstrap/scss/bootstrap";
+
+@import "./components/CategoryCard.scss";
+
+
+#topbar
+{
+  border-radius: 0 0 30px 30px;
+  background-color: $card-bg;
+}
