@@ -89,7 +89,7 @@ function TopBar(props) {
                         <Col className="align-items-left">
                             <h2 className="m-0">CTF Navigator</h2>
                         </Col>
-                        <Col>
+                        <Col xs="auto">
                             <Row className="justify-content-end">
                                 <Col xs="auto">
                                     <Button

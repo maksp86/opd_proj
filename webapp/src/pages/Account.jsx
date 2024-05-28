@@ -39,7 +39,7 @@ function Account(props) {
             <Row className="justify-content-center mt-5">
                 <Col xs="auto" className="align-self-center">
                     <Image roundedCircle
-                        style={{ backgroundColor: "#000", width: "10vh", height: "10vh" }} src={userContext.user.image && ("/api/attachments/get?id=" + userContext.user.image)} />
+                        style={{ backgroundColor: "#000", maxWidth: "10vw", maxHeight: "10vw" }} src={userContext.user.image && ("/api/attachments/get?id=" + userContext.user.image)} />
                 </Col>
                 <Col xs="9" sm md="8">
                     <Row>
