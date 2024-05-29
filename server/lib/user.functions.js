@@ -132,7 +132,7 @@ async function calculateRating(user) {
     userSubmits.forEach(submit => {
         if (submit.reward)
             xp += submit.reward
-        else {
+        else if (!!submit.task) {
             xp += submit.task.difficulty.value
         }
     })

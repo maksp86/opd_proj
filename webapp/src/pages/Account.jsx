@@ -34,22 +34,66 @@ function Account(props) {
         }
     }, [modal.isOpen])
 
+    function LastTasks(props) {
+        if (props.taskStats && props.taskStats.length > 0)
+            return (
+                <ListGroup as="ol">
+                    {
+                        props.taskStats.map((submit) =>
+                            <ListGroup.Item
+                                action
+                                key={submit._id}
+                                as="li"
+                                onClick={() => navigate("/task/" + submit.task._id)}
+                                className="d-flex justify-content-between align-items-center user-select-none">
+                                <div className="ms-2 me-auto">
+                                    <div className="fw-semibold fs-5">{submit.task.title}</div>
+                                    <TimeAgo date={submit.createdAt} />
+                                </div>
+                                <Badge bg="secondary fs-6 fw-medium" pill>
+                                    {submit.task.difficulty.value} xp
+                                </Badge>
+                            </ListGroup.Item>
+                        )
+                    }
+                </ListGroup>
+            )
+        else
+            return (
+                <ListGroup as="ol">
+                    <ListGroup.Item className="text-center">
+                        <h6 className="my-2">No solved tasks</h6>
+                    </ListGroup.Item>
+                </ListGroup>
+            )
+    }
+
     return (
         <>
-            <Row className="justify-content-center mt-5">
-                <Col xs="auto" className="align-self-center">
+            <Row className="justify-content-center">
+                <Col xs="auto" sm="auto" className="align-self-center">
                     <Image roundedCircle
-                        style={{ backgroundColor: "#000", maxWidth: "10vw", maxHeight: "10vw" }} src={userContext.user.image && ("/api/attachments/get?id=" + userContext.user.image)} />
+                        style={{
+                            backgroundColor: "#000",
+                            maxHeight: "120px",
+                            maxWidth: "120px",
+                            width: "8vw",
+                            height: "8vw",
+                            minHeight: "80px",
+                            minWidth: "80px"
+                        }} src={userContext.user.image && ("/api/attachments/get?id=" + userContext.user.image)} />
                 </Col>
-                <Col xs="9" sm md="8">
-                    <Row>
-                        <h1>{userContext.user.name}</h1>
-                    </Row>
-                    <Row>
-                        <p className="fw-thin">{userContext.user.bio || "No bio right now"}</p>
-                    </Row>
+                <Col xs="9" sm="8" className="d-grid">
+                    <div className="my-auto">
+                        <Row>
+                            <h2>{userContext.user.name}</h2>
+                        </Row>
+                        <Row>
+                            <p className="fw-thin">{userContext.user.bio || "No bio right now"}</p>
+                        </Row>
+                    </div>
                 </Col>
-                <Col xs="6" sm="auto" className="d-grid align-self-center">
+                <Col xs="6" md="auto" className="d-grid align-self-center">
                     <Button
                         variant="outline-dark"
                         onClick={() => modal.show(<UserEditModal />, false)}>Edit</Button>
@@ -67,28 +111,9 @@ function Account(props) {
                 </Row>
             </Row>
             <Row className="mt-5">
-                <h3>Last solved tasks</h3>
+                <h4>Last solved tasks</h4>
                 <Col md="12">
-                    <ListGroup as="ol">
-                        {
-                            !!taskStats && taskStats.map((submit) =>
-                                <ListGroup.Item
-                                    action
-                                    key={submit._id}
-                                    as="li"
-                                    onClick={() => navigate("/task/" + submit.task._id)}
-                                    className="d-flex justify-content-between align-items-center user-select-none">
-                                    <div className="ms-2 me-auto">
-                                        <div className="fw-semibold fs-5">{submit.task.title}</div>
-                                        <TimeAgo date={submit.createdAt} />
-                                    </div>
-                                    <Badge bg="secondary fs-6 fw-medium" pill>
-                                        {submit.task.difficulty.value} xp
-                                    </Badge>
-                                </ListGroup.Item>
-                            )
-                        }
-                    </ListGroup>
+                    <LastTasks taskStats={taskStats} />
                 </Col>
             </Row>
         </>

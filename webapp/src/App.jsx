@@ -89,7 +89,7 @@ function App() {
                         </Modal>
                         <BrowserRouter>
                             <TopBar user={userHook.user} />
-                            <Container>
+                            <Container className="maincontainer py-2">
                                 <Routes>
                                     <Route path='/' element={<Home />} />
                                     {(!userHook.loggedIn) &&

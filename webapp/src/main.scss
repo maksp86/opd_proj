@@ -27,17 +27,17 @@
 // $progress-bar-color: $body-color;
 
 $custom-colors: (
-  "primary":#aac7ff,
+  "primary": #aac7ff,
   "primary-light": #dae2f9,
   "primary-dark": #415f91,
 
   "secondary": #6c7588,
   "secondary-dark": #3a4354,
 
-  "accent": #FFCC80,
-  "accent-light": #FFE0B2,
+  "accent": #ffcc80,
+  "accent-light": #ffe0b2,
 
-  "background": #F5F5F5,
+  "background": #f5f5f5,
 
   "text-primary": #001b3e,
 
@@ -72,9 +72,10 @@ $enable-reduced-motion: false;
 
 @import "./components/CategoryCard.scss";
 
+@import "./components/Navigation.scss";
+@import "./components/TopBar.scss";
 
-#topbar
-{
-  border-radius: 0 0 30px 30px;
-  background-color: $card-bg;
+.maincontainer {
+  height: calc(100vh - 87px - 79px);
+  overflow: auto;
 }

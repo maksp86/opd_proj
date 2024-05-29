@@ -17,13 +17,13 @@ function ShowForPath(props) {
 
 function UserProgressBar(props) {
     return (
-        <Col>
-            <Row className="align-items-center">
+        <Col xs="11" md="5" lg="6">
+            <Row className="align-items-center my-2">
                 <Col>
                     <ProgressBar variant="secondary" min={0} max={1000} now={props.userContext.computedXp % 1000} />
                 </Col>
                 <Col xs="auto">
-                    <h5 className="m-0 text-end">{props.userContext.computedXp} xp</h5>
+                    <h6 className="m-0 text-end">{props.userContext.computedXp} xp</h6>
                 </Col>
             </Row>
         </Col>
@@ -43,13 +43,13 @@ function TopBar(props) {
     }
 
     function onTaskBack() {
-        const pathBase = "/" + breadCrumbscontext.lastTask.parent.isLearning ? "learning" : "tasks"
+        const pathBase = "/" + (breadCrumbscontext.lastTask.parent.isLearning ? "learning" : "tasks")
         navigate(pathBase + "/" + breadCrumbscontext.lastTask.parent.shortname,
             { state: { item: breadCrumbscontext.lastTask.parent } })
     }
 
     function onCategoryBack() {
-        const pathBase = "/" + breadCrumbscontext.lastCategory.isLearning ? "learning" : "tasks"
+        const pathBase = "/" + (breadCrumbscontext.lastCategory.isLearning ? "learning" : "tasks")
         navigate(pathBase)
     }
 
@@ -72,12 +72,12 @@ function TopBar(props) {
     }
 
     return (
-        <Container id="topbar" fluid="sm" className="py-4 px-3 mb-3 user-select-none">
-            <Row className="align-items-center">
+        <Container id="topbar" fluid="lg" className="py-4 px-3">
+            <Row className="align-items-center justify-content-center">
                 <OnlyLogined>
                     <ShowForPath path={"/"}>
                         <Col md="6" className="align-items-left">
-                            <h2 className="m-0 text-truncate">hello, {userContext.user.username}</h2>
+                            <h2 className="m-0 text-truncate">Hello, {userContext.user.username}</h2>
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
