@@ -85,7 +85,7 @@ async function processSubmitList(req, res) {
     if (await canUserDoInUsers(req.user, ["read"]))
         return res.status(200).json({
             status: "no_error",
-            value: submits
+            value: submits.filter((item) => !!item.task)
         })
     else
         return res.status(403).json({ status: "error_no_permission" })

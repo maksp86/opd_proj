@@ -1,5 +1,5 @@
 import { Row, Col, Button, Image, InputGroup, Form, ListGroup } from "react-bootstrap"
-import { Check, Download, PencilFill } from "react-bootstrap-icons"
+import { Check, Download, PencilFill, Trash2Fill, TrashFill } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import { ApiContext } from "../context/api.context"
 import { useNavigate, useParams } from "react-router-dom"
@@ -9,16 +9,20 @@ import CommentsComponent from "../components/CommentsComponent"
 import { BreadcrumbsContext } from "../context/breadcrumbs.context"
 import IsAdmin from "../components/IsAdmin"
 import AnswersCard from "../components/AnswersCard"
+import { ModalContext } from "../context/modal.context"
+import DialogModal from "./modals/DialogModal"
 
 function TaskPage() {
     const breadCrumbscontext = useContext(BreadcrumbsContext)
     const api = useContext(ApiContext)
+    const modal = useContext(ModalContext)
     const pageTitle = usePageTitle()
     const navigate = useNavigate()
     const { id } = useParams()
     const [task, setTask] = useState({})
 
     const [isSubmitted, setIsSubmitted] = useState(undefined)
+
 
     async function isAlreadySubmitted() {
         const result = await api.request("/submit/get?id=" + id)
@@ -40,6 +44,17 @@ function TaskPage() {
         }
     }
 
+    async function removeTask() {
+        const result = await api.request("/task/remove", "POST", { id })
+
+        if (result) {
+            modal.close()
+            const pathBase = "/" + (task.parent.isLearning ? "learning" : "tasks")
+            navigate(pathBase + "/" + task.parent.shortname,
+                { state: { item: task.parent }, replace: true })
+        }
+    }
+
 
     useEffect(() => {
         if (!id) { navigate("..") }
@@ -54,14 +69,23 @@ function TaskPage() {
                     <h1>{task.title}</h1>
                 </Col>
                 <IsAdmin>
-                    <Col>
-                        <Button style={{
-                            backgroundColor: "unset",
-                            border: "unset"
-                        }}
-                            variant="light"
+                    <Col xs="auto">
+                        <Button
+                            variant=""
                             onClick={() => navigate("/task/edit", { state: { item: task, parent: task.parent } })}>
-                            <PencilFill className="category-card-edit-icon" size={20} />
+                            <PencilFill size={20} />
+                        </Button>
+                    </Col>
+                    <Col xs="auto">
+                        <Button
+                            variant=""
+                            onClick={() => modal.show(<DialogModal
+                                title="Are you sure?"
+                                text={`You're deleting task ${task.title}. This action is irreversible!`}
+                                actionOk={removeTask}
+                                actionCancel={() => modal.close()}
+                            />)}>
+                            <TrashFill size={20} />
                         </Button>
                     </Col>
                 </IsAdmin>

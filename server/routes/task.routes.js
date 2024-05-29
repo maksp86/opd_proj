@@ -228,7 +228,7 @@ async function processTaskRemove(req, res) {
     const { id } = req.body
     req.user = await req.user.populate("role");
 
-    if (await canUserDoInGroup(req.users, ["write", "execute"])) {
+    if (await canUserDoInGroup(req.user, ["write", "execute"])) {
         let foundTask = await Task.findById(id)
 
         if (!foundTask)

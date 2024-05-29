@@ -18,11 +18,10 @@ function Home() {
 
     return (
         <>
-            <Row className="mt-5" />
-            <Row className="justify-content-end align-items-center">
+            <Row className="justify-content-evenly align-items-center my-2">
                 {!userContext.loggedIn &&
-                    <Col xs="auto">
-                        <Card style={{ width: '44rem', borderRadius: "20px", overflow: "hidden" }}>
+                    <Col xs="12" md="6">
+                        <Card style={{ borderRadius: "20px", overflow: "hidden" }}>
                             <Card.Body>
                                 <Card.Title>Introduction</Card.Title>
                                 <Card.Text>
@@ -33,8 +32,8 @@ function Home() {
                     </Col>
                 }
 
-                {!!breadCrumbscontext.lastTask && <Col xs="auto">
-                    <Card style={{ width: '22rem', borderRadius: "20px", overflow: "hidden" }}>
+                {!!breadCrumbscontext.lastTask && <Col xs="6" md="4">
+                    <Card style={{ borderRadius: "20px", overflow: "hidden" }}>
                         <Card.Body>
                             <Card.Title>Long time no see</Card.Title>
                             <Card.Text>
@@ -46,9 +45,6 @@ function Home() {
                 </Col>}
             </Row>
             <NewsComponent />
-            <Row className="mt-5" />
-            <Row className="mt-5" />
-            <Row className="mt-5" />
         </>
     )
 }

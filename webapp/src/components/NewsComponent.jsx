@@ -39,7 +39,7 @@ function NewsCard(props) {
                             <Card.Text
                                 className=""
                                 style={{
-                                    maxHeight: "10vh",
+                                    maxHeight: "15vh",
                                     wordBreak: "break-word",
                                     textOverflow: "ellipsis",
                                     overflow: "hidden",
