@@ -55,7 +55,7 @@ admin_router.post("/user/edit",
         check("id").isMongoId(),
         check('bio', "field_empty").isString().isLength({ max: 255 }).withMessage("length_too_big"),
         check('name', "field_empty").isString().isLength({ min: 5, max: 100 }).withMessage("invalid_length"),
-        check('role', "field_empty").isMongoId(),
+        check('role', "field_empty").isMongoId().optional(),
         processValidaion
     ], processUserEdit)
 
@@ -66,6 +66,12 @@ admin_router.post("/user/setrole",
         check("role", "field_empty").isMongoId(),
         processValidaion
     ], processUserSetRole)
+
+admin_router.get("/user/list",
+    [
+        rejectIfNotLogined
+    ], processUserList
+)
 
 async function processRoleEdit(req, res) {
     const { id, permissions } = req.body;
@@ -160,12 +166,25 @@ async function processUserRemove(req, res) {
 }
 
 async function processUserEdit(req, res) {
-    const { id, bio, name } = req.body;
+    const { id, bio, name, role } = req.body;
     const selectedUser = await User.findById(id, { passwordHash: 0 }).populate("role")
     req.user = await req.user.populate("role");
 
     if (!selectedUser)
         return res.status(404).json({ status: "error_not_found" });
+
+    let selectedRole = await UserRole.findById(role)
+    if (role && !selectedRole)
+        return res.status(404).json({
+            status: "validation_failed",
+            errors: [{ msg: "error_not_found", path: "role" }]
+        });
+
+    if (role && selectedRole
+        && Array.from(req.user.role.permissions).some(
+            (item, ind) => selectedRole.permissions[ind] > item)) {
+        res.status(403).json({ status: "error_no_permission" })
+    }
 
     let isSameUser = req.user._id.equals(selectedUser._id)
     let isSameRole = req.user.role._id.equals(selectedUser.role._id)
@@ -178,6 +197,8 @@ async function processUserEdit(req, res) {
     else {
         selectedUser.bio = bio;
         selectedUser.name = name;
+        if (role) selectedUser.role = selectedRole._id
+
         await selectedUser.save()
         res.status(200).json({ status: "no_error", value: selectedUser.toJSON() })
     }
@@ -187,10 +208,10 @@ async function processUserSetRole(req, res) {
     const { id, role } = req.body;
     const selectedUser = await User.findById(id, { passwordHash: 0 }).populate("role")
 
-    req.user = await req.user.populate("role");
-
     if (!selectedUser)
         return res.status(404).json({ status: "error_not_found" });
+
+    req.user = await req.user.populate("role");
 
     if (!await UserRole.exists(role))
         return res.status(404).json({
@@ -207,6 +228,17 @@ async function processUserSetRole(req, res) {
         await selectedUser.save()
         res.status(200).json({ status: "no_error", value: selectedUser.toJSON() })
     }
+}
+
+async function processUserList(req, res) {
+    req.user = await req.user.populate("role");
+
+    if (!(await canUserDoInUsers(req.user, ["read"])))
+        res.status(403).json({ status: "error_no_permission" })
+
+    const users = await User.find({}, { passwordHash: 0 }).lean()
+    res.status(200).json({ status: "no_error", value: users })
+
 }
 
 module.exports = admin_router;
