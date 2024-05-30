@@ -1,5 +1,5 @@
-import { Row, Col, Button, Image, InputGroup, Form, ListGroup } from "react-bootstrap"
-import { Check, Download, PencilFill, Trash2Fill, TrashFill } from "react-bootstrap-icons"
+import { Row, Col, Button, Image, ListGroup } from "react-bootstrap"
+import { Download, PencilFill, TrashFill } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import { ApiContext } from "../context/api.context"
 import { useNavigate, useParams } from "react-router-dom"
@@ -36,7 +36,6 @@ function TaskPage() {
         const result = await api.request("/task/get?id=" + id)
 
         if (result) {
-            console.log(result.data.value)
             pageTitle.set(result.data.value.title)
             setTask(result.data.value)
             isAlreadySubmitted()

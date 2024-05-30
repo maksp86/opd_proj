@@ -8,8 +8,8 @@
 
 @include media-breakpoint-up(md) {
     .navigation {
-        min-width: 768px;
-        max-width: 70%;
+        min-width: 550px;
+        max-width: 60%;
         margin-bottom: 10px;
         border-radius: 35px;
     }
@@ -34,6 +34,12 @@
     border-radius: 0;
     background-color: transparent;
     margin-left: 0;
+}
+
+.navigation-button:hover
+{
+    color: var(--bs-btn-hover-color) !important;
+    background-color: var(--bs-btn-hover-bg) !important;
 }
 
 .navigation-button-active

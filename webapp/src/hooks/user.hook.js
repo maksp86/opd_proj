@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useState } from "react"
 
 export const useUser = () => {
     const [user, setUser] = useState({});

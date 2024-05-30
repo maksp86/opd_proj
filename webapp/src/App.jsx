@@ -1,5 +1,5 @@
 import Home from './pages/Home.jsx'
-import { BrowserRouter, Route, Routes, Navigate, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 import { Container, Modal } from 'react-bootstrap'
 
 import Navigation from "./components/Navigation"

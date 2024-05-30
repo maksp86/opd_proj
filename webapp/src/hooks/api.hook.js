@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 function ApiError(status, httpcode, errors = undefined) {
     this.name = 'ApiError';
@@ -27,7 +27,6 @@ export const useApi = () => {
                 }
 
                 const response = await fetch("/api" + endpoint, { method, body, headers })
-                console.log(response)
                 const data = await response.json();
 
                 if (!response.ok) {

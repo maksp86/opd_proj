@@ -1,5 +1,5 @@
-import { Container, Row, Col, ProgressBar, Navbar, ButtonGroup, Button, Image, FloatingLabel, Form, Overlay, Tooltip } from "react-bootstrap"
-import { ArrowLeft, ArrowRight, CaretRightFill, Copy, Download, HouseDoor, Person } from "react-bootstrap-icons"
+import { Row, Col, Button, FloatingLabel, Form, Overlay, Tooltip } from "react-bootstrap"
+import { Copy } from "react-bootstrap-icons"
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useContext, useEffect, useRef, useState } from "react"
 import MDEditor from "@uiw/react-md-editor"
@@ -14,7 +14,7 @@ import AttachmentUploadModal from "./modals/AttachmentUploadModal";
 import AnswerEditForm from "../components/AnswerEditForm";
 
 
-function TaskEditPage(props) {
+function TaskEditPage() {
     const api = useContext(ApiContext)
     const location = useLocation()
     const pageTitle = usePageTitle()
@@ -83,10 +83,8 @@ function TaskEditPage(props) {
         const method = isEdit ? "edit" : "create"
         const result = await api.request("/task/" + method, "POST", { ...formData, answerFields: answers, attachments: attachments.map(item => item._id) })
 
-        if (result) {
-            console.log(result.data.value)
+        if (result)
             navigate("/task/" + result.data.value._id)
-        }
     }
 
     useEffect(() => {
@@ -104,7 +102,6 @@ function TaskEditPage(props) {
     }, [api.error])
 
     async function RemoveAttachment(id) {
-        console.log("RemoveAttachment", id)
         const result = await api.request("/attachments/remove", "POST", { id })
         if (result)
             setAttachments(attachments.filter((item) => item._id != id))

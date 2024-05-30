@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, ProgressBar, Button, Image, FloatingLabel, Form, Modal } from "react-bootstrap"
+import { Container, Row, Col, Button, Image, FloatingLabel, Form, Modal } from "react-bootstrap"
 import Cropper from 'react-easy-crop'
 import { ApiContext } from "../../context/api.context";
 import { UserContext } from "../../context/user.context";
@@ -220,6 +220,6 @@ function UserEditModal() {
             </Container>
         </>
     )
-};
+}
 
 export default UserEditModal;

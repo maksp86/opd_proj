@@ -1,5 +1,4 @@
-import { Container, Row, Col, ProgressBar, Navbar, ButtonGroup, Button, Image, FloatingLabel, Form } from "react-bootstrap"
-import { ArrowLeft, ArrowRight, CaretRightFill, HouseDoor, Person } from "react-bootstrap-icons"
+import { Row, Col, Button, FloatingLabel, Form } from "react-bootstrap"
 import { useContext, useEffect, useState } from "react"
 import { ApiContext } from "../context/api.context"
 import { useLocation, useNavigate } from "react-router-dom"

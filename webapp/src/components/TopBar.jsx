@@ -31,7 +31,7 @@ function UserProgressBar(props) {
     )
 }
 
-function TopBar(props) {
+function TopBar() {
     const navigate = useNavigate()
     const userContext = useContext(UserContext)
     const breadCrumbscontext = useContext(BreadcrumbsContext)
@@ -54,7 +54,7 @@ function TopBar(props) {
         navigate(pathBase)
     }
 
-    function ForCategoriesPage(props) {
+    function ForCategoriesPage() {
         return (
             <>
                 <Col md="6" className="align-items-left">
@@ -72,7 +72,7 @@ function TopBar(props) {
         )
     }
 
-    function LogoAndName(props) {
+    function LogoAndName() {
         return (
             <>
                 <Col xs="auto" className="align-items-left">
