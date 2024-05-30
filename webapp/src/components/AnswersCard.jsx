@@ -1,5 +1,5 @@
-import { Row, Col, Button, Image, InputGroup, Form, ListGroup } from "react-bootstrap"
-import { Check, Download, PencilFill } from "react-bootstrap-icons"
+import { Row, Col, Button, InputGroup, Form } from "react-bootstrap"
+import { Check } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import { ApiContext } from "../context/api.context"
 

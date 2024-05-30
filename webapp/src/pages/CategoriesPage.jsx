@@ -1,9 +1,9 @@
-import { Container, Row, Col, ProgressBar, Navbar, ButtonGroup, Button, Image, Spinner } from "react-bootstrap"
-import { ArrowLeft, ArrowRight, CaretRightFill, HouseDoor, Person, Plus } from "react-bootstrap-icons"
+import { Row, Col, Button, Spinner } from "react-bootstrap"
+import { Plus } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import CategoryCard from "../components/CategoryCard"
 import { ApiContext } from "../context/api.context"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { usePageTitle } from "../hooks/pageTitle.hook"
 import IsAdmin from "../components/IsAdmin"
 
@@ -14,15 +14,22 @@ function CategoriesPage(props) {
     const navigate = useNavigate()
 
     const [categories, setCategories] = useState([])
+    const [categoriesStats, setCategoriesStats] = useState({})
 
-    useEffect(() => {
-        async function LoadCategories() {
-            let result = await api.request("/category/list?isLearning=" + props.isLearning)
-            if (result && Array.isArray(result.data.value)) {
-                setCategories(result.data.value)
+    async function LoadData() {
+        let gotCategories = await api.request("/category/list?isLearning=" + props.isLearning)
+        if (gotCategories && Array.isArray(gotCategories.data.value)) {
+
+            let gotStats = await api.request("/stats/progress?isLearning=" + props.isLearning)
+            if (gotStats) {
+                setCategories(gotCategories.data.value)
+                setCategoriesStats(gotStats.data.value)
             }
         }
-        LoadCategories()
+    }
+
+    useEffect(() => {
+        LoadData()
         pageTitle.set((props.isLearning ? "Learning" : "Task") + " categories")
     }, [])
     return (
@@ -43,8 +50,8 @@ function CategoriesPage(props) {
                 <CategoryCard item={{title: "Research of hackers", color: "#FFD74A"}} progress="33" /> */}
                 {
                     categories.length > 0 ? categories.map(
-                        (value) => <CategoryCard key={value.shortname} item={value} progress="33" />
-                    ) : (api.busy ? <Spinner /> : <h3>Nothing here</h3>) 
+                        (value) => <CategoryCard key={value._id} item={value} progress={categoriesStats[value._id]} />
+                    ) : (api.busy ? <Spinner /> : <h3>Nothing here</h3>)
                 }
             </Row>
         </>

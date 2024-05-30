@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Container, Row, Col, ProgressBar, Button, Image, ListGroup, Badge } from "react-bootstrap"
+import { Row, Col, ProgressBar, Button, Image, ListGroup, Badge } from "react-bootstrap"
 import TimeAgo from "react-timeago"
 import { usePageTitle } from "../hooks/pageTitle.hook"
 import { UserContext } from "../context/user.context";
@@ -8,7 +8,7 @@ import { ApiContext } from "../context/api.context";
 import { ModalContext } from "../context/modal.context";
 import UserEditModal from "./modals/UserEditModal";
 
-function Account(props) {
+function Account() {
     const pageTitle = usePageTitle();
     const userContext = useContext(UserContext)
     const api = useContext(ApiContext)

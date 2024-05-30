@@ -1,16 +1,15 @@
-import { Container, Row, Col, ProgressBar, Navbar, ButtonGroup, Button, Image, Spinner } from "react-bootstrap"
-import { ArrowLeft, ArrowRight, CaretRightFill, HouseDoor, PencilFill, Person, Plus } from "react-bootstrap-icons"
+import { Row, Col, Button, Spinner } from "react-bootstrap"
+import { PencilFill, Plus } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
-import CategoryCard from "../components/CategoryCard"
 import { ApiContext } from "../context/api.context"
-import { useNavigate, useParams, useLocation } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { usePageTitle } from "../hooks/pageTitle.hook"
 import TaskCard from "../components/TaskCard"
 import { BreadcrumbsContext } from "../context/breadcrumbs.context"
 import IsAdmin from "../components/IsAdmin"
 
 
-function TasksPage(props) {
+function TasksPage() {
     const api = useContext(ApiContext)
     const breadCrumbscontext = useContext(BreadcrumbsContext)
     const pageTitle = usePageTitle()
@@ -18,7 +17,17 @@ function TasksPage(props) {
     const location = useLocation()
 
     const [tasks, setTasks] = useState({})
+    const [tasksStats, setTasksStats] = useState({})
     const [difficulties, setDifficulties] = useState([])
+
+
+    async function LoadTaskStats() {
+        let gotStats = await api.request("/stats/category/progress?id=" + location.state.item._id)
+
+        if (gotStats)
+            setTasksStats(gotStats.data.value)
+    }
+
 
     async function LoadTasks() {
         let result = await api.request("/task/list?parent=" + location.state.item._id)
@@ -46,6 +55,7 @@ function TasksPage(props) {
             navigate("/")
         else {
             LoadTasks()
+            LoadTaskStats()
             pageTitle.set(location.state.item.title)
             breadCrumbscontext.setLastCategory(location.state.item)
         }
@@ -62,7 +72,7 @@ function TasksPage(props) {
                 </Col>
                 {
                     tasks[props.difficulty._id].map((item =>
-                        <TaskCard key={item._id} item={item} parent={location.state.item} />))
+                        <TaskCard key={item._id} item={item} parent={location.state.item} solved={tasksStats[item._id] || false} />))
                 }
             </>
         )

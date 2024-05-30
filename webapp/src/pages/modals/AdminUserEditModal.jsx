@@ -53,11 +53,10 @@ function AdminUserEditModal(props) {
 
         const result = await api.request("/admin/user/edit", "POST", { id: props.user._id, ...formData })
 
-        if (result)
-            {
-                props.onUserEdited(props.user._id, formData)
-                modalContext.close()
-            }
+        if (result) {
+            props.onUserEdited(props.user._id, formData)
+            modalContext.close()
+        }
     }
 
     return (
@@ -134,6 +133,6 @@ function AdminUserEditModal(props) {
             </Container>
         </>
     )
-};
+}
 
 export default AdminUserEditModal;

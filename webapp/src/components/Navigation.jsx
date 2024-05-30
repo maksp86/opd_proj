@@ -1,6 +1,6 @@
 import { Navbar, ButtonGroup, Button } from "react-bootstrap"
-import { HouseDoor, Person, Map, Grid, Wrench } from "react-bootstrap-icons"
-import { useContext, useState } from "react"
+import { HouseDoor, Person, Map, Grid } from "react-bootstrap-icons"
+import { useContext } from "react"
 import { useMatch, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/user.context"
 
@@ -33,25 +33,21 @@ function Navigation() {
 
             <ButtonGroup className="navigation-selectors">
                 <NavButton path="/" match="" exact={true} text="Home">
-                    <HouseDoor size={30} />
+                    <HouseDoor size={25} />
                 </NavButton>
 
                 {userContext.loggedIn &&
                     <>
                         <NavButton path="/tasks" match="/*" text="Tasks">
-                            <Grid size={30} />
+                            <Grid size={25} />
                         </NavButton>
 
                         <NavButton path="/learning" match="/*" text="Learning">
-                            <Map size={30} />
+                            <Map size={25} />
                         </NavButton>
 
-                        {/* <NavButton path="/admin" match="*" text="Administration">
-                            <Wrench size={30} />
-                        </NavButton> */}
-
                         <NavButton path="/account" match="" text="Account">
-                            <Person size={30} />
+                            <Person size={25} />
                         </NavButton>
                     </>
                 }

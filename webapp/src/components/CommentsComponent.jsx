@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react"
-import { Container, Row, Col, ProgressBar, Navbar, ButtonGroup, Button, Image, InputGroup, Form, ListGroup } from "react-bootstrap"
-import { ArrowLeft, ArrowRight, CaretRightFill, Check, Crosshair, Download, HouseDoor, PencilFill, Person, Reply, Send, SendFill, TrashFill, X } from "react-bootstrap-icons"
+import { Row, Col, Button, Image, InputGroup, Form } from "react-bootstrap"
+import { Reply, SendFill, TrashFill, X } from "react-bootstrap-icons"
 import TimeAgo from "react-timeago"
 import { UserContext } from "../context/user.context"
 import { ApiContext } from "../context/api.context"
@@ -14,11 +14,7 @@ function CommentsComponent(props) {
 
     const [replyingComment, setReplyingComment] = useState(undefined)
 
-
     const [errors, setErrors] = useState({})
-
-
-
 
     useEffect(() => {
         if (api.error) {
@@ -37,7 +33,6 @@ function CommentsComponent(props) {
     async function GetComments() {
         const result = await api.request("/task/comment/get?id=" + props.item._id)
         if (result) {
-            console.log("GetComments", result)
             setComments(result.data.value)
         }
     }
@@ -116,7 +111,6 @@ function CommentsComponent(props) {
                 parent: replyingComment ? replyingComment._id : undefined
             })
             if (result) {
-                console.log("SendComment", result)
                 GetComments()
                 setFormData({})
                 setReplyingComment(undefined)
@@ -135,13 +129,10 @@ function CommentsComponent(props) {
                     <Row className="align-items-center">
                         <Col xs="auto">
                             <p className="m-0 mb-1 fw-semibold">
-                                {!!props.replyingComment ? (`Reply to ${props.replyingComment.author.name}'s comment`) : "Leave a comment"}
+                                {props.replyingComment ? (`Reply to ${props.replyingComment.author.name}'s comment`) : "Leave a comment"}
                                 {!!props.replyingComment && <a onClick={() => props.setReplyingComment(undefined)} href="javascript:;"><X /></a>}
                             </p>
                         </Col>
-                        {/* <Col xs="auto" className="p-0">
-                        <Button className="ms-1" variant=""><X /></Button>
-                    </Col> */}
                     </Row>
                     <Form.Group className="mb-3">
                         <InputGroup className="mb-2">

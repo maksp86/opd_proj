@@ -124,7 +124,7 @@ function RolesList(props) {
         )
 }
 
-function ManagementPage(props) {
+function ManagementPage() {
     const api = useContext(ApiContext)
     const modal = useContext(ModalContext)
     const pageTitle = usePageTitle()
@@ -164,7 +164,7 @@ function ManagementPage(props) {
     function onRoleEdited(data) {
         if (roles.some(role => role._id == data._id))
             setRoles(roles.map((item) => {
-                if (item._id == id)
+                if (item._id == data._id)
                     return { ...item, ...data }
                 else
                     return item

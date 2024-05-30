@@ -4,6 +4,6 @@ export const BreadcrumbsContext = createContext(
     {
         lastTask: undefined,
         lastCategory: undefined,
-        setLastTask: (task) => {},
-        setLastCategory: (category) => {} 
+        setLastTask: (task) => { },
+        setLastCategory: (category) => { }
     })

@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, ProgressBar, Button, Image, FloatingLabel, Form, Modal } from "react-bootstrap"
+import { Container, Row, Col, Button, FloatingLabel, Form, Modal } from "react-bootstrap"
 import { ApiContext } from "../../context/api.context";
-import { UserContext } from "../../context/user.context";
 import getErrorMessage from "../../extras/getErrorMessage";
 import { ModalContext } from "../../context/modal.context";
 
@@ -107,6 +106,6 @@ function AttachmentUploadModal(props) {
             </Container>
         </>
     )
-};
+}
 
 export default AttachmentUploadModal;

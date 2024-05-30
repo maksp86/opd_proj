@@ -1,13 +1,10 @@
-import { useContext } from "react";
-import { Row, Col, ProgressBar, Button } from "react-bootstrap"
+import { Row, Col, Button } from "react-bootstrap"
 import { CaretRightFill, PencilFill } from "react-bootstrap-icons"
-import { useLocation, useNavigate } from "react-router-dom";
-import { UserContext } from "../context/user.context";
+import { useNavigate } from "react-router-dom";
 import IsAdmin from "./IsAdmin";
 
 function CategoryCard(props) {
     const navigate = useNavigate()
-    const user = useContext(UserContext)
     return (
         <Col xs="11" md="11" lg="5" className="category-card mx-2 my-4">
             <Row>
@@ -24,11 +21,6 @@ function CategoryCard(props) {
                 <Col xs className="align-items-center my-3 d-flex">
                     <div className="w-100 my-auto mx-0">
                         <h3 className="m-0 text-start">{props.item.title || "Name"}</h3>
-                        {/* <ProgressBar
-                            variant="primary"
-                            now={props.progress || 0}
-                            className="mt-2"
-                        /> */}
                         <div className="progress mt-2">
                             <div className="progress-bar" role="progressbar" style={{ width: (props.progress || 0) + "%", backgroundColor: props.item.color }} aria-valuenow={props.progress || 0} aria-valuemin="0" aria-valuemax="100"></div>
                         </div>

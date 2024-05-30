@@ -1,4 +1,4 @@
-import { Row, Col, Button, Image, Card, Spinner, Badge } from "react-bootstrap"
+import { Row, Col, Button, Card, Spinner, Badge } from "react-bootstrap"
 import { Globe } from "react-bootstrap-icons"
 import { ApiContext } from "../context/api.context"
 import TimeAgo from "react-timeago"
@@ -11,7 +11,6 @@ function NewsCard(props) {
             <Card className="mb-3" style={{ borderRadius: "20px", overflow: "hidden" }}>
                 <Row className="g-0">
                     <Col className="d-grid" md="5">
-                        {/* <Image fluid rounded className="my-auto bg-black" src={props.item.img || ""} /> */}
                         <div
                             className="h-100 w-100"
                             style={{
@@ -62,7 +61,7 @@ function NewsCard(props) {
     )
 }
 
-function NewsComponent(props) {
+function NewsComponent() {
     const api = useContext(ApiContext)
     const userContext = useContext(UserContext)
     const [news, setNews] = useState([])

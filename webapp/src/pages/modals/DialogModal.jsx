@@ -1,4 +1,4 @@
-import { Container, Row, Col, ProgressBar, Button, Image, FloatingLabel, Form, Modal } from "react-bootstrap"
+import { Button, Modal } from "react-bootstrap"
 
 function DialogModal(props) {
     return (

@@ -115,6 +115,6 @@ function AdminRoleEditModal(props) {
             </Container>
         </>
     )
-};
+}
 
 export default AdminRoleEditModal;
