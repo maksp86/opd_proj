@@ -39,10 +39,13 @@ async function start() {
         app.set('trust proxy', 1);
         app.use(express.json({ extended: true }));
 
+        const noLimiterPaths = ["/api/attachments/get"]
+
         const limiter = rateLimit({
             windowMs: 2000,
-            limit: (process.env.NODE_ENV === "dev" ? 100 : 5),
-            message: { status: "error_too_many_requests" }
+            limit: (process.env.NODE_ENV === "dev" ? 100 : 15),
+            message: { status: "error_too_many_requests" },
+            skip: (req, res) => req.session.userid && req.session.loginTime && noLimiterPaths.includes(req.originalUrl.split("?").shift())
         })
         app.use(limiter)
 

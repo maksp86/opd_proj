@@ -35,7 +35,7 @@ user_router.post("/edit",
         rejectIfNotLogined,
         check('bio', "field_empty").isString().isLength({ max: 255 }).withMessage("length_too_big"),
         check('name', "field_empty").isString().isLength({ min: 5, max: 100 }).withMessage("invalid_length"),
-        check('image', "field_empty").isMongoId(),
+        check('image', "field_empty").isMongoId().optional(),
         processValidaion
     ],
     processEditInfo
@@ -68,7 +68,7 @@ async function processEditPassword(req, res) {
 
 async function processEditInfo(req, res) {
     const { bio, name, image } = req.body;
-    if (Attachment.exists({ _id: image })) {
+    if (!image ||Attachment.exists({ _id: image })) {
         await req.user.updateOne({ bio, name, image })
         res.status(200).json({ status: "no_error" });
     }

@@ -20,6 +20,10 @@ async function rejectIfAlreadyLogined(req, res, next) {
 async function rejectIfNotLogined(req, res, next) {
     if (req.session.userid && req.session.loginTime) {
         req.user = await User.findOne({ _id: new mongoose.Types.ObjectId(req.session.userid) });
+        if (!req.user) {
+            req.session.destroy();
+            return res.status(403).json({ status: "error_not_logined" });
+        }
         next()
     }
     else
