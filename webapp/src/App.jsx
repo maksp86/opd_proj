@@ -26,7 +26,7 @@ import TaskEditPage from './pages/TaskEditPage.jsx'
 import TaskPage from './pages/TaskPage.jsx'
 import { BreadcrumbsContext } from './context/breadcrumbs.context.js'
 import { useBreadcrumbs } from './hooks/breadcrumbs.hook.js'
-import UsersEditPage from './pages/UsersEditPage.jsx'
+import ManagementPage from './pages/UsersEditPage.jsx'
 
 
 function App() {
@@ -110,7 +110,7 @@ function App() {
                                             <Route path='/tasks/:category' element={<TasksPage key="tasks" />} />
                                             <Route path='/category/edit/' element={<CategoryEditPage />} />
                                             <Route path='/task/edit/' element={<TaskEditPage />} />
-                                            <Route path='/users' element={<UsersEditPage />} />
+                                            <Route path='/manage' element={<ManagementPage />} />
                                             <Route path='*' key="notfound" element={<NotFound />} />
                                         </>
                                     }

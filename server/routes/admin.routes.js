@@ -16,23 +16,24 @@ const admin_router = Router()
 admin_router.post("/role/edit",
     [
         rejectIfNotLogined,
-        check("id").isMongoId(),
-        check("permissions").isNumeric(),
+        check("id", "field_empty").isMongoId(),
+        check("permissions", "field_empty").isNumeric(),
+        check("name", "field_empty").isString(),
         processValidaion
     ], processRoleEdit)
 
 admin_router.post("/role/add",
     [
         rejectIfNotLogined,
-        check("name").isString(),
-        check("permissions").isNumeric(),
+        check("name", "field_empty").isString(),
+        check("permissions", "field_empty").isNumeric(),
         processValidaion
     ], processRoleAdd)
 
 admin_router.post("/role/remove",
     [
         rejectIfNotLogined,
-        check("id").isMongoId(),
+        check("id", "field_empty").isMongoId(),
         processValidaion
     ], processRoleRemove)
 
@@ -45,14 +46,14 @@ admin_router.get("/role/list",
 admin_router.post("/user/remove",
     [
         rejectIfNotLogined,
-        check("id").isMongoId(),
+        check("id", "field_empty").isMongoId(),
         processValidaion
     ], processUserRemove)
 
 admin_router.post("/user/edit",
     [
         rejectIfNotLogined,
-        check("id").isMongoId(),
+        check("id", "field_empty").isMongoId(),
         check('bio', "field_empty").isString().isLength({ max: 255 }).withMessage("length_too_big"),
         check('name', "field_empty").isString().isLength({ min: 5, max: 100 }).withMessage("invalid_length"),
         check('role', "field_empty").isMongoId().optional(),

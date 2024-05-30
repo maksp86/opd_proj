@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "",
   "main": "main.js",
   "scripts": {
@@ -9,8 +9,8 @@
     "serve": "nodemon main.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "maksp86",
+  "license": "GPL",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "connect-mongo": "^5.1.0",

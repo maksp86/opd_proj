@@ -1,26 +1,25 @@
-import { Container, Row, Col, ProgressBar, Navbar, ButtonGroup, Button, Image, FloatingLabel, Form, Overlay, Tooltip, ListGroup, Badge, Spinner } from "react-bootstrap"
-import { ArrowClockwise, ArrowLeft, ArrowRight, CaretRightFill, Copy, Download, HouseDoor, PencilFill, Person, Trash } from "react-bootstrap-icons"
-import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { useContext, useEffect, useRef, useState } from "react"
-import MDEditor from "@uiw/react-md-editor"
-import rehypeSanitize from "rehype-sanitize";
+import { Row, Col, Button, Image, Form, ListGroup, Badge, Spinner } from "react-bootstrap"
+import { ArrowClockwise, PencilFill, Plus, Trash } from "react-bootstrap-icons"
+import { useContext, useEffect, useState } from "react"
 import { ApiContext } from "../context/api.context"
-import { useLocation, useNavigate } from "react-router-dom"
 import { usePageTitle } from "../hooks/pageTitle.hook"
-import getErrorMessage from "../extras/getErrorMessage"
 import { ModalContext } from "../context/modal.context";
-import DifficultyEditModal from "./modals/DifficultyEditModal";
-import AttachmentUploadModal from "./modals/AttachmentUploadModal";
-import AnswerEditForm from "../components/AnswerEditForm";
 import IsAdmin from "../components/IsAdmin"
 import DialogModal from "./modals/DialogModal"
 import AdminUserEditModal from "./modals/AdminUserEditModal"
+import AdminRoleEditModal from "./modals/AdminRoleEditModal"
 
 function UsersList(props) {
-    if (props.users && props.users.length > 0)
+    if (props.users && props.users.length > 0) {
         return (
             <Col>
-                <ListGroup as="ol" style={{ borderRadius: "20px" }}>
+                <ListGroup
+                    as="ol"
+                    style={{
+                        borderRadius: "20px",
+                        maxHeight: "50vh",
+                        overflow: "auto"
+                    }}>
                     {
                         props.users.filter((user) => user.name.startsWith(props.filter || "")
                             || user.username.startsWith(props.filter || "")).map((user) =>
@@ -43,7 +42,7 @@ function UsersList(props) {
                                         {user.username}
                                     </div>
                                     <Badge bg="secondary fs-6 fw-normal" pill>
-                                        {props.roles[user.role].name}
+                                        {props.roles.find(role => role._id == user.role).name}
                                     </Badge>
 
                                     <IsAdmin>
@@ -65,6 +64,7 @@ function UsersList(props) {
                 </ListGroup>
             </Col>
         )
+    }
     else
         return (
             <Col xs="auto" className="text-center">
@@ -74,14 +74,65 @@ function UsersList(props) {
         )
 }
 
-function UsersEditPage(props) {
+function RolesList(props) {
+    if (props.roles && props.roles.length > 0)
+        return (
+            <Col>
+                <ListGroup
+                    as="ol"
+                    style={{
+                        borderRadius: "20px",
+                        maxHeight: "50vh",
+                        overflow: "auto"
+                    }}>
+                    {
+                        props.roles.filter((role) => role.name.startsWith(props.filter || "")
+                            || role._id.startsWith(props.filter || "")).map((role) =>
+                                <ListGroup.Item
+                                    key={role._id}
+                                    as="li"
+                                    className="d-flex justify-content-between align-items-center user-select-none">
+                                    <div className="ms-2 me-auto">
+                                        <div className="fw-semibold fs-5">{role.name} <small className="fs-6 fw-light">{role._id}</small></div>
+                                        Permissions: {role.permissions}
+                                    </div>
+
+                                    <IsAdmin>
+                                        <Button
+                                            onClick={() => props.onRoleEdit(role)}
+                                            variant="">
+                                            <PencilFill />
+                                        </Button>
+                                        <Button
+                                            onClick={() => props.onRoleRemove(role)}
+                                            variant="">
+                                            <Trash />
+                                        </Button>
+                                    </IsAdmin>
+                                </ListGroup.Item>
+                            )
+                    }
+                </ListGroup>
+            </Col>
+        )
+    else
+        return (
+            <Col xs="auto" className="text-center">
+                <h5 className="my-4">Loading...</h5>
+                <Spinner />
+            </Col>
+        )
+}
+
+function ManagementPage(props) {
     const api = useContext(ApiContext)
     const modal = useContext(ModalContext)
     const pageTitle = usePageTitle()
 
     const [users, setUsers] = useState([])
     const [roles, setRoles] = useState([])
-    const [filter, setFilter] = useState("")
+    const [usersFilter, setUsersFilter] = useState("")
+    const [rolesFilter, setRolesFilter] = useState("")
 
 
     async function LoadInfo() {
@@ -90,7 +141,7 @@ function UsersEditPage(props) {
             const gotRoles = await api.request("/admin/role/list")
 
             if (gotRoles) {
-                setRoles(gotRoles.data.value.reduce((obj, item) => (obj[item._id] = { ...item, _id: undefined }, obj), {}))
+                setRoles(gotRoles.data.value)
                 setUsers(gotUsers.data.value)
             }
         }
@@ -98,7 +149,7 @@ function UsersEditPage(props) {
 
     useEffect(() => {
         LoadInfo();
-        pageTitle.set("Users")
+        pageTitle.set("Management")
     }, [])
 
     function onUserEdited(id, data) {
@@ -110,6 +161,18 @@ function UsersEditPage(props) {
         }))
     }
 
+    function onRoleEdited(data) {
+        if (roles.some(role => role._id == data._id))
+            setRoles(roles.map((item) => {
+                if (item._id == id)
+                    return { ...item, ...data }
+                else
+                    return item
+            }))
+        else
+            setRoles([...roles, data])
+    }
+
     async function removeUser(id) {
         const result = await api.request("/admin/user/remove", "POST", { id })
 
@@ -119,20 +182,29 @@ function UsersEditPage(props) {
         }
     }
 
+    async function removeRole(id) {
+        const result = await api.request("/admin/role/remove", "POST", { id })
+
+        if (result) {
+            setRoles(roles.filter(item => item._id != id))
+            modal.close();
+        }
+    }
+
     return (
         <>
-            <Row className="mb-2">
+            <Row className="my-2">
                 <Col xs="auto">
                     <h3>Users</h3>
                 </Col>
-                <Col xs="6">
+                <Col>
                     <Form.Control
-                        value={filter}
-                        onChange={(e) => setFilter(e.target.value)}
+                        value={usersFilter}
+                        onChange={(e) => setUsersFilter(e.target.value)}
                         placeholder="Filter"
                     />
                 </Col>
-                <Col>
+                <Col xs="auto">
                     <Button
                         onClick={LoadInfo}
                         variant="">
@@ -159,10 +231,60 @@ function UsersEditPage(props) {
                     }}
                     users={users}
                     roles={roles}
-                    filter={filter} />
+                    filter={usersFilter} />
+            </Row>
+
+            <Row className="mt-4 mb-2">
+                <Col xs="auto">
+                    <h3>Roles</h3>
+                </Col>
+                <Col xs="auto" className="p-0">
+                    <Button
+                        onClick={() => {
+                            modal.show(<AdminRoleEditModal
+                                onComplete={onRoleEdited}
+                            />)
+                        }}
+                        variant="">
+                        <Plus />
+                    </Button>
+                </Col>
+                <Col>
+                    <Form.Control
+                        value={usersFilter}
+                        onChange={(e) => setRolesFilter(e.target.value)}
+                        placeholder="Filter"
+                    />
+                </Col>
+                <Col xs="auto">
+                    <Button
+                        onClick={LoadInfo}
+                        variant="">
+                        <ArrowClockwise />
+                    </Button>
+                </Col>
+            </Row>
+            <Row className="justify-content-center">
+                <RolesList
+                    onRoleRemove={(role) => {
+                        modal.show(<DialogModal
+                            title="Are you sure?"
+                            text={`You're deleting role ${role.name}. This action is irreversible!`}
+                            actionOk={() => { removeRole(role._id) }}
+                            actionCancel={() => modal.close()}
+                        />)
+                    }}
+                    onRoleEdit={(role) => {
+                        modal.show(<AdminRoleEditModal
+                            role={role}
+                            onComplete={onRoleEdited}
+                        />)
+                    }}
+                    roles={roles}
+                    filter={rolesFilter} />
             </Row>
         </>
     )
 }
 
-export default UsersEditPage
+export default ManagementPage

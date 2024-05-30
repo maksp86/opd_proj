@@ -1,5 +1,5 @@
 import { Container, Row, Col, ProgressBar, Button } from "react-bootstrap"
-import { ArrowLeft, CaretLeftFill, CursorFill } from "react-bootstrap-icons"
+import { CaretLeftFill, CursorFill, WrenchAdjustable } from "react-bootstrap-icons"
 
 import { useMatch, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/user.context"
@@ -7,6 +7,7 @@ import { useContext } from "react"
 import OnlyLogined from "./OnlyLogined"
 import { ApiContext } from "../context/api.context"
 import { BreadcrumbsContext } from "../context/breadcrumbs.context"
+import IsAdmin from "../components/IsAdmin"
 
 function ShowForPath(props) {
     const isMatch = useMatch(props.path)
@@ -71,6 +72,19 @@ function TopBar(props) {
         )
     }
 
+    function LogoAndName(props) {
+        return (
+            <>
+                <Col xs="auto" className="align-items-left">
+                    <CursorFill className="logoicon" size={30} />
+                </Col>
+                <Col className="align-items-left">
+                    <h2 className="m-0">CTF Navigator</h2>
+                </Col>
+            </>
+        )
+    }
+
     return (
         <Container id="topbar" fluid="lg" className="py-4 px-3">
             <Row className="align-items-center justify-content-center">
@@ -83,12 +97,16 @@ function TopBar(props) {
                     </ShowForPath>
 
                     <ShowForPath path={"/account"}>
-                        <Col xs="auto" className="align-items-left">
-                            <CursorFill size={30} />
-                        </Col>
-                        <Col className="align-items-left">
-                            <h2 className="m-0">CTF Navigator</h2>
-                        </Col>
+                        <LogoAndName />
+                        <IsAdmin>
+                            <Col xs="auto">
+                                <Button
+                                    variant=""
+                                    onClick={() => navigate("/manage")}>
+                                    <WrenchAdjustable />
+                                </Button>
+                            </Col>
+                        </IsAdmin>
                         <Col xs="auto">
                             <Row className="justify-content-end">
                                 <Col xs="auto">
@@ -136,15 +154,14 @@ function TopBar(props) {
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
+
+                    <ShowForPath path={"/manage"}>
+                        <LogoAndName />
+                    </ShowForPath>
                 </OnlyLogined>
                 <OnlyLogined inverse>
                     <ShowForPath path={"/"}>
-                        <Col xs="auto" className="align-items-left">
-                            <CursorFill size={30} />
-                        </Col>
-                        <Col className="align-items-left">
-                            <h2 className="m-0">CTF Navigator</h2>
-                        </Col>
+                        <LogoAndName />
                     </ShowForPath>
                 </OnlyLogined>
             </Row>

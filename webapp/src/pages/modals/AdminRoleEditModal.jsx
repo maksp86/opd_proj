@@ -4,12 +4,14 @@ import { ApiContext } from "../../context/api.context";
 import getErrorMessage from "../../extras/getErrorMessage";
 import { ModalContext } from "../../context/modal.context";
 
-function AdminUserEditModal(props) {
+function AdminRoleEditModal(props) {
     const modalContext = useContext(ModalContext)
     const api = useContext(ApiContext);
 
     const [formData, setFormData] = useState({})
     const [errors, setErrors] = useState({})
+
+    const isEdit = !!props.role
 
     const setField = (field, value) => {
         setFormData({
@@ -25,7 +27,7 @@ function AdminUserEditModal(props) {
 
     useEffect(() => {
         if (api.error) {
-            console.log("UserEditModal error", api.error);
+            console.log("RoleEditModal error", api.error);
             let errors = {}
             if (api.error.status === "validation_failed" && api.error.errors) {
                 api.error.errors.forEach((error) => errors[error.path] = getErrorMessage(error.msg))
@@ -38,11 +40,12 @@ function AdminUserEditModal(props) {
     }, [api.error])
 
     useEffect(() => {
-        setFormData({
-            name: props.user.name,
-            bio: props.user.bio,
-            role: props.user.role
-        })
+        if (isEdit)
+            setFormData({
+                name: props.role.name,
+                permissions: props.role.permissions,
+                id: props.role._id
+            })
     }, [])
 
     async function processEdit() {
@@ -51,19 +54,18 @@ function AdminUserEditModal(props) {
             summary: null
         })
 
-        const result = await api.request("/admin/user/edit", "POST", { id: props.user._id, ...formData })
+        const result = await api.request("/admin/role/" + (isEdit ? "edit" : "add"), "POST", { ...formData })
 
-        if (result)
-            {
-                props.onUserEdited(props.user._id, formData)
-                modalContext.close()
-            }
+        if (result) {
+            props.onComplete(result.data.value)
+            modalContext.close()
+        }
     }
 
     return (
         <>
             <Modal.Header closeButton>
-                <Modal.Title>{"Edit user " + props.user.name}</Modal.Title>
+                <Modal.Title>{isEdit ? ("Edit role " + props.role.name) : "Create role"}</Modal.Title>
             </Modal.Header>
             <Container>
                 <Row className="text-center">
@@ -74,7 +76,7 @@ function AdminUserEditModal(props) {
                             className="mb-3">
                             <Form.Control
                                 disabled={api.busy}
-                                type="name"
+                                type="text"
                                 placeholder="user"
                                 value={formData.name || ""}
                                 onChange={(e) => setField("name", e.target.value)}
@@ -84,44 +86,23 @@ function AdminUserEditModal(props) {
                             </Form.Control.Feedback>
                         </FloatingLabel>
 
-                        <FloatingLabel controlId="floatingTextarea2" label="Bio">
-                            <Form.Control
-                                as="textarea"
-                                placeholder="Enter something cool"
-                                style={{ minHeight: '150px', maxHeight: '300px' }}
-                                rows={2}
-                                maxLength={255}
-                                className="mb-3"
-                                disabled={api.busy}
-                                value={formData.bio || ""}
-                                onChange={(e) => setField("bio", e.target.value)}
-                                isInvalid={!!errors.bio} />
-                            <Form.Control.Feedback type='invalid'>
-                                {errors.bio}
-                            </Form.Control.Feedback>
-                        </FloatingLabel>
                         <FloatingLabel
-                            className="mb-3"
-                            controlId="roleSelect"
-                            label="Role">
-                            <Form.Select
-                                isInvalid={!!errors.role}
+                            controlId="permissionsInput"
+                            label="Permissions"
+                            className="mb-3">
+                            <Form.Control
                                 disabled={api.busy}
-                                value={formData.role}
-                                onChange={(e) => setField("role", e.target.value)}>
-                                {
-                                    props.roles.map((role) =>
-                                        <option
-                                            key={role._id}
-                                            value={role._id}>
-                                            {role.name}
-                                        </option>)
-                                }
-                            </Form.Select>
+                                type="text"
+                                min={0}
+                                placeholder="user"
+                                value={formData.permissions || ""}
+                                onChange={(e) => setField("permissions", e.target.value)}
+                                isInvalid={!!errors.permissions} />
                             <Form.Control.Feedback type='invalid'>
-                                {errors.role}
+                                {errors.permissions}
                             </Form.Control.Feedback>
                         </FloatingLabel>
+
                         <h6 className="text-danger text-center">{errors.summary}</h6>
                     </Col>
                 </Row>
@@ -136,4 +117,4 @@ function AdminUserEditModal(props) {
     )
 };
 
-export default AdminUserEditModal;
+export default AdminRoleEditModal;
