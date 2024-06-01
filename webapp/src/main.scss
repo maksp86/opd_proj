@@ -26,49 +26,38 @@
 
 // $progress-bar-color: $body-color;
 
-$custom-colors: (
-  "primary": #aac7ff,
-  "primary-light": #dae2f9,
-  "primary-dark": #415f91,
-
-  "secondary": #6c7588,
-  "secondary-dark": #3a4354,
-
-  "accent": #ffcc80,
-  "accent-light": #ffe0b2,
-
-  "background": #f5f5f5,
-
-  "text-primary": #001b3e,
-
-  "danger": #ba1a1a
-);
-
-// Override Bootstrap theme colors
-$theme-colors: (
-  "primary": map-get($custom-colors, "primary"),
-  "secondary": map-get($custom-colors, "secondary"),
-  "success": map-get($custom-colors, "secondary-dark"),
-  "info": map-get($custom-colors, "accent"),
-  "warning": map-get($custom-colors, "accent-light"),
-  "danger": map-get($custom-colors, "danger"),
-  "light": map-get($custom-colors, "primary-light"),
-  "dark": map-get($custom-colors, "primary-dark")
-);
-
-// Override body background and text color
-$body-bg: map-get($custom-colors, "background");
-$body-color: map-get($custom-colors, "text-primary");
-
-$card-border-width: 0;
-$card-bg: #ededf4;
-
-$body-tertiary-color: #705575;
-$body-tertiary-bg: #f9f9ff;
-
 $enable-reduced-motion: false;
+$card-border-width: 0;
+
+@import "./scss/light-mode.scss";
 
 @import "bootstrap/scss/bootstrap";
+
+[data-bs-theme="dark"] {
+  --bs-body-bg: #000;
+  --bs-body-color: #d6e3ff;
+
+  .card {
+    --bs-card-bg: #1e2024;
+  }
+  --bs-card-bg: #1e2024;
+
+  --bs-body-tertiary-color: #ddbce0;
+  --bs-body-tertiary-bg: #111318;
+}
+
+[data-bs-theme="light"] {
+  --bs-body-bg: #{map-get($custom-colors, "background")};
+  --bs-body-color: #{map-get($custom-colors, "text-primary")};
+
+  .card {
+    --bs-card-bg: #ededf4;
+  }
+  --bs-card-bg: #ededf4;
+
+  --bs-body-tertiary-color: #705575;
+  --bs-body-tertiary-bg: #f9f9ff;
+}
 
 @import "./components/CategoryCard.scss";
 
@@ -82,5 +71,5 @@ $enable-reduced-motion: false;
 
 .fallbackPersonAvatar {
   color: map-get($custom-colors, "secondary");
-  background-color: $card-bg;
+  background-color: var(--bs-card-bg);
 }

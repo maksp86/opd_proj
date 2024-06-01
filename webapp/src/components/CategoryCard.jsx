@@ -38,20 +38,15 @@ function CategoryCard(props) {
                 </Col>
                 <Col xs="auto" className="d-flex p-0">
                     <IsAdmin>
-                        <Button style={{
-                            backgroundColor: "unset",
-                            border: "unset"
-                        }}
-                            variant="light"
+                        <Button
+                            variant=""
                             onClick={() => navigate("/category/edit", { state: { item: props.item, isLearning: props.item.isLearning } })}>
                             <PencilFill className="category-card-edit-icon" size={20} />
                         </Button>
                     </IsAdmin>
-                    <Button style={{
-                        backgroundColor: "unset",
-                        border: "unset"
-                    }}
-                        variant="light"
+                    <Button
+                        
+                        variant=""
                         onClick={() => navigate("./" + props.item.shortname, { state: { item: props.item } })}>
                         <CaretRightFill className="category-card-go-icon" size={20} />
                     </Button>

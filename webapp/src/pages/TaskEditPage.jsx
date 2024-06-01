@@ -12,6 +12,7 @@ import { ModalContext } from "../context/modal.context";
 import DifficultyEditModal from "./modals/DifficultyEditModal";
 import AttachmentUploadModal from "./modals/AttachmentUploadModal";
 import AnswerEditForm from "../components/AnswerEditForm";
+import { ThemeContext } from "../context/theme.context"
 
 
 function TaskEditPage() {
@@ -20,6 +21,7 @@ function TaskEditPage() {
     const pageTitle = usePageTitle()
     const navigate = useNavigate()
     const modal = useContext(ModalContext)
+    const themeContext = useContext(ThemeContext)
 
     const isEdit = location.state && location.state.item
 
@@ -236,7 +238,7 @@ function TaskEditPage() {
                         <Row>
                             <Col>
                                 <MDEditor
-                                    data-color-mode="light"
+                                    data-color-mode={themeContext.currentTheme}
                                     aria-disabled={api.busy}
                                     value={formData.text}
                                     onChange={(e) => setField("text", e)}

@@ -1,6 +1,6 @@
 .category-card {
     border-radius: 20px;
-    background-color: $card-bg;    
+    background-color: var(--bs-card-bg);    
     overflow: hidden;
     max-height: 200px;
     user-select: none;
@@ -8,10 +8,5 @@
 }
 
 .category-card:hover {
-    background-color: $body-tertiary-bg
-}
-
-.category-card-go-icon
-{
-    color: $body-color;
+    background-color: var(--bs-body-tertiary-bg)
 }
