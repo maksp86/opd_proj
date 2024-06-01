@@ -8,6 +8,7 @@ import IsAdmin from "../components/IsAdmin"
 import DialogModal from "./modals/DialogModal"
 import AdminUserEditModal from "./modals/AdminUserEditModal"
 import AdminRoleEditModal from "./modals/AdminRoleEditModal"
+import AvatarImage from "../components/AvatarImage"
 
 function UsersList(props) {
     if (props.users && props.users.length > 0) {
@@ -27,15 +28,12 @@ function UsersList(props) {
                                     key={user._id}
                                     as="li"
                                     className="d-flex justify-content-between align-items-center user-select-none">
-                                    <Image
+                                    <AvatarImage
                                         style={{
-                                            backgroundColor: "#000",
                                             width: "5vh",
                                             height: "5vh",
                                         }}
-                                        src={user.image && ("/api/attachments/get?id=" + user.image)}
-                                        roundedCircle
-                                        fluid
+                                        avatar={user.image}
                                     />
                                     <div className="ms-2 me-auto">
                                         <div className="fw-semibold fs-5">{user.name}</div>

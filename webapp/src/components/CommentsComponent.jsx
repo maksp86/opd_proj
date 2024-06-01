@@ -5,6 +5,7 @@ import TimeAgo from "react-timeago"
 import { UserContext } from "../context/user.context"
 import { ApiContext } from "../context/api.context"
 import getErrorMessage from "../extras/getErrorMessage"
+import AvatarImage from "./AvatarImage"
 
 
 function CommentsComponent(props) {
@@ -53,10 +54,10 @@ function CommentsComponent(props) {
                 className={"mt-3 align-items-center border bg-light user-select-none " + props.className}
                 style={{ borderRadius: "20px" }}>
                 <Col xs="auto">
-                    <Image
-                        roundedCircle
-                        style={{ backgroundColor: "#000", width: "5vh", height: "5vh" }}
-                        src={"/api/attachments/get?id=" + props.item.author.image} />
+                    <AvatarImage
+                        style={{ width: "5vh", height: "5vh" }}
+                        avatar={props.item.author.image}
+                    />
                 </Col>
                 <Col>
                     <h5 className="m-0">{props.item.author.name} &#183; <i className="fs-6 fw-normal"><TimeAgo date={props.item.createdAt} /></i></h5>
@@ -120,10 +121,10 @@ function CommentsComponent(props) {
         return (
             <Row className="align-items-center px-3">
                 <Col xs="auto">
-                    <Image
-                        roundedCircle
-                        style={{ backgroundColor: "#000", width: "6vh", height: "6vh" }}
-                        src={props.userContext.user.image && ("/api/attachments/get?id=" + props.userContext.user.image)} />
+                    <AvatarImage
+                        style={{ width: "6vh", height: "6vh" }}
+                        avatar={props.userContext.user.image}
+                    />
                 </Col>
                 <Col>
                     <Row className="align-items-center">

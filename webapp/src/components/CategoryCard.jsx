@@ -21,7 +21,12 @@ function CategoryCard(props) {
                 <Col xs className="align-items-center my-3 d-flex">
                     <div className="w-100 my-auto mx-0">
                         <h3 className="m-0 text-start">{props.item.title || "Name"}</h3>
-                        <div className="progress mt-2">
+                        <div
+                            className="progress mt-2"
+                            style={{
+                                backgroundColor: `color-mix(in srgb, ${props.item.color} 50%, white)`
+                            }}
+                        >
                             <div className="progress-bar" role="progressbar" style={{ width: (props.progress || 0) + "%", backgroundColor: props.item.color }} aria-valuenow={props.progress || 0} aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         {props.lastTask &&

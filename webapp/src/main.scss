@@ -79,3 +79,8 @@ $enable-reduced-motion: false;
   height: calc(100vh - 87px - 79px);
   overflow: auto;
 }
+
+.fallbackPersonAvatar {
+  color: map-get($custom-colors, "secondary");
+  background-color: $card-bg;
+}

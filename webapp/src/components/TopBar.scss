@@ -19,5 +19,5 @@
 
 .logoicon
 {
-  color: $primary;
+  color: map-get($custom-colors, "primary");
 }
