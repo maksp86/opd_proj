@@ -76,7 +76,7 @@ async function processSubmitList(req, res) {
     const { id } = req.query
     req.user = await req.user.populate("role")
 
-    let submits = await Submit.find({ user: id || req.user._id, isValid: true }).populate({
+    let submits = await Submit.find({ user: id || req.user._id, isValid: true, value: { $exists: true, $ne: [] } }).populate({
         path: "task",
         select: "difficulty title",
         populate: { path: "difficulty", select: "value" }
