@@ -9,6 +9,7 @@ const { rateLimit } = require("express-rate-limit");
 
 const logger = require("./logger");
 const dbConnect = require("./db");
+const { CleanUpTask, ScheduleCleanUp } = require('./cleanUpTask');
 
 const app = express();
 
@@ -62,6 +63,9 @@ async function start() {
         app.get('/api/healthcheck', (req, res) => { res.status(200).json({ status: "no_error" }) })
 
         app.use(require('./middleware/errorHandler.middleware'))
+
+        await CleanUpTask()
+        ScheduleCleanUp(600)
 
         app.listen(process.env.PORT, () => { logger.info("Server listening on %s", process.env.PORT) })
     }

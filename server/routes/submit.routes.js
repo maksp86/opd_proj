@@ -96,12 +96,6 @@ async function processSubmitAnswer(req, res) {
 
     req.user = await req.user.populate("role")
 
-    if (!checkIsAnswerFields(answers)) {
-        return res.status(400).json({
-            status: "validation_failed",
-            errors: [{ msg: "field_invalid", path: "answers" }]
-        })
-    }
     let foundTask = await Task.findById(task)
 
     if (!foundTask)
@@ -109,13 +103,24 @@ async function processSubmitAnswer(req, res) {
 
     await foundTask.populate("parent difficulty")
 
-    if (foundTask.parent.isLearning || !await canUserDoIn(req.user, ["read"], foundTask.parent))
+    if (!foundTask.parent.isLearning && !checkIsAnswerFields(answers)) {
+        return res.status(400).json({
+            status: "validation_failed",
+            errors: [{ msg: "field_invalid", path: "answers" }]
+        })
+    }
+
+    if (!await canUserDoIn(req.user, ["read"], foundTask.parent))
         return res.status(403).json({ status: "error_no_permission" })
 
     let submits = await Submit.find({ user: req.user._id, task: foundTask._id })
 
-    if (submits.some(item => item.isValid))
-        return res.status(400).json({ status: "error_already_exists" })
+    if (submits.some(item => item.isValid)) {
+        if (foundTask.parent.isLearning)
+            return res.status(200).json({ status: "no_error" })
+        else
+            return res.status(400).json({ status: "error_already_exists" })
+    }
 
     if (submits.length >= foundTask.maxTries)
         return res.status(400).json({ status: "error_limit_reached" })

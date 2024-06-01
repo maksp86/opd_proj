@@ -76,7 +76,14 @@ function TopBar() {
         return (
             <>
                 <Col xs="auto" className="align-items-left">
-                    <CursorFill className="logoicon" size={30} />
+                    <CursorFill
+                        className="logoicon"
+                        style={{
+                            height: "calc(1.325rem + 0.9vw)",
+                            width: "calc(1.325rem + 0.9vw)",
+                            minHeight: "30px",
+                            minWidth: "30px",
+                        }} />
                 </Col>
                 <Col className="align-items-left">
                     <h2 className="m-0">CTF Navigator</h2>

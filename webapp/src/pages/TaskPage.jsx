@@ -29,6 +29,8 @@ function TaskPage() {
         if (result && result.data.value) {
             setIsSubmitted(result.data.value)
         }
+        else
+            setIsSubmitted(false)
 
     }
 
@@ -43,6 +45,12 @@ function TaskPage() {
         }
     }
 
+    async function TrySetAsRead() {
+        if (isSubmitted === false && task && task.parent && task.parent.isLearning) {
+            const result = await api.request("/submit/", "POST", { task: task._id, answers: [] })
+        }
+    }
+
     async function removeTask() {
         const result = await api.request("/task/remove", "POST", { id })
 
@@ -54,6 +62,9 @@ function TaskPage() {
         }
     }
 
+    useEffect(() => {
+        TrySetAsRead()
+    }, [task, isSubmitted])
 
     useEffect(() => {
         if (!id) { navigate("..") }
