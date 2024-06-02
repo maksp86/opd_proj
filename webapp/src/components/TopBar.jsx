@@ -1,5 +1,5 @@
 import { Container, Row, Col, ProgressBar, Button } from "react-bootstrap"
-import { CaretLeftFill, CursorFill, WrenchAdjustable } from "react-bootstrap-icons"
+import { CaretLeftFill, CursorFill, MoonFill, SunFill, WrenchAdjustable } from "react-bootstrap-icons"
 
 import { useMatch, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/user.context"
@@ -8,6 +8,7 @@ import OnlyLogined from "./OnlyLogined"
 import { ApiContext } from "../context/api.context"
 import { BreadcrumbsContext } from "../context/breadcrumbs.context"
 import IsAdmin from "../components/IsAdmin"
+import { ThemeContext } from "../context/theme.context"
 
 function ShowForPath(props) {
     const isMatch = useMatch(props.path)
@@ -29,6 +30,20 @@ function UserProgressBar(props) {
             </Row>
         </Col>
     )
+}
+
+function ThemeSwitchButton(props)
+{
+const themeContext = useContext(ThemeContext)
+return (
+    <Button
+    variant=""
+    onClick={() => {
+        themeContext.set(themeContext.currentTheme == "light" ? "dark" : "light")
+    }}>
+        {themeContext.currentTheme == "light" ? <SunFill /> : <MoonFill />}
+    </Button>
+)
 }
 
 function TopBar() {
@@ -105,6 +120,9 @@ function TopBar() {
 
                     <ShowForPath path={"/account"}>
                         <LogoAndName />
+                        <Col xs="auto">
+                            <ThemeSwitchButton />
+                        </Col>
                         <IsAdmin>
                             <Col xs="auto">
                                 <Button

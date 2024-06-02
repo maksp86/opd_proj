@@ -3,6 +3,7 @@ import { HouseDoor, Person, Map, Grid } from "react-bootstrap-icons"
 import { useContext } from "react"
 import { useMatch, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/user.context"
+import { ThemeContext } from "../context/theme.context"
 
 
 function NavButton(props) {
@@ -10,7 +11,7 @@ function NavButton(props) {
 
     return (
         <Button
-            variant="light"
+            variant={props.variant || "light"}
             className={"navigation-button " + (useMatch(props.path + props.match) ? "navigation-button-active " : "")}
             onClick={() => navigate(props.path)
             }>
@@ -24,29 +25,30 @@ function NavButton(props) {
 
 function Navigation() {
     const userContext = useContext(UserContext)
+    const themeContext = useContext(ThemeContext)
     return (
         <Navbar
-            bg="light"
-            variant="light"
+            bg={themeContext.currentTheme}
+            variant={themeContext.currentTheme}
             fixed="bottom"
             className="navigation p-0 mx-auto">
 
             <ButtonGroup className="navigation-selectors">
-                <NavButton path="/" match="" exact={true} text="Home">
+                <NavButton variant={themeContext.currentTheme} path="/" match="" exact={true} text="Home">
                     <HouseDoor size={25} />
                 </NavButton>
 
                 {userContext.loggedIn &&
                     <>
-                        <NavButton path="/tasks" match="/*" text="Tasks">
+                        <NavButton variant={themeContext.currentTheme} path="/tasks" match="/*" text="Tasks">
                             <Grid size={25} />
                         </NavButton>
 
-                        <NavButton path="/learning" match="/*" text="Learning">
+                        <NavButton variant={themeContext.currentTheme} path="/learning" match="/*" text="Learning">
                             <Map size={25} />
                         </NavButton>
 
-                        <NavButton path="/account" match="" text="Account">
+                        <NavButton variant={themeContext.currentTheme} path="/account" match="" text="Account">
                             <Person size={25} />
                         </NavButton>
                     </>

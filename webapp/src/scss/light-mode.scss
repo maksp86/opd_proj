@@ -1,0 +1,48 @@
+$custom-colors: (
+    "primary": #aac7ff,
+    "primary-light": #dae2f9,
+    "primary-dark": #415f91,
+
+    "secondary": #6c7588,
+    "secondary-dark": #3a4354,
+
+    "accent": #ffcc80,
+    "accent-light": #ffe0b2,
+
+    "background": #f5f5f5,
+
+    "text-primary": #001b3e,
+
+    "danger": #ba1a1a
+);
+
+// Override Bootstrap theme colors
+$theme-colors: (
+    "primary": map-get($custom-colors, "primary"),
+    "secondary": map-get($custom-colors, "secondary"),
+    "success": map-get($custom-colors, "secondary-dark"),
+    "info": map-get($custom-colors, "accent"),
+    "warning": map-get($custom-colors, "accent-light"),
+    "danger": map-get($custom-colors, "danger"),
+    "light": map-get($custom-colors, "primary-light"),
+    "dark": map-get($custom-colors, "primary-dark")
+);
+
+$primary: map-get($custom-colors, "primary");
+$secondary: map-get($custom-colors, "secondary");
+$success: map-get($custom-colors, "secondary-dark");
+$info: map-get($custom-colors, "accent");
+$warning: map-get($custom-colors, "accent-light");
+$danger: map-get($custom-colors, "danger");
+$light: map-get($custom-colors, "primary-light");
+$dark: map-get($custom-colors, "primary-dark");
+
+
+// yyOverride body background and text color
+// $body-bg: map-get($custom-colors, "background");
+// $body-color: map-get($custom-colors, "text-primary");
+
+// $card-bg: #ededf4;
+
+// $body-tertiary-color: #705575;
+// $body-tertiary-bg: #f9f9ff;
