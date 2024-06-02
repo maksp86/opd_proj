@@ -32,7 +32,7 @@ function UserEditModal() {
     }
 
     useEffect(() => {
-        if (api.error) {
+        if (api.error && !api.error.preventNext) {
             console.log("UserEditModal error", api.error);
             let errors = {}
             if (api.error.status === "validation_failed" && api.error.errors) {
