@@ -21,21 +21,15 @@ function TaskCard(props) {
                 </Col>
                 <Col xs="auto" className="d-flex p-0">
                     <IsAdmin>
-                        <Button style={{
-                            backgroundColor: "unset",
-                            border: "unset"
-                        }}
-                            variant="light"
+                        <Button
+                            variant=""
                             onClick={() => navigate("/task/edit", { state: { item: props.item, parent: props.parent } })}>
                             <PencilFill className="category-card-edit-icon" size={20} />
                         </Button>
                     </IsAdmin>
 
-                    <Button style={{
-                        backgroundColor: "unset",
-                        border: "unset"
-                    }}
-                        variant="light"
+                    <Button
+                        variant=""
                         onClick={() => navigate("/task/" + props.item._id)}>
                         <CaretRightFill className="category-card-go-icon" size={20} />
                     </Button>

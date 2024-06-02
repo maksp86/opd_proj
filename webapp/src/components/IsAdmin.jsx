@@ -39,7 +39,7 @@ export default function IsAdmin(props) {
 
     if (userContext.loggedIn && userContext.user.role.permissions) {
         const permissionsStruct = getPermissionsStruct(userContext.user.role.permissions)
-        if (permissionsStruct.group.write)
+        if (permissionsStruct.group.write || !!props.altStatement)
             return props.children
     }
     return <></>

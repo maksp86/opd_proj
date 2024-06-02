@@ -4,8 +4,10 @@ import { Reply, SendFill, TrashFill, X } from "react-bootstrap-icons"
 import TimeAgo from "react-timeago"
 import { UserContext } from "../context/user.context"
 import { ApiContext } from "../context/api.context"
+import { ThemeContext } from "../context/theme.context"
 import getErrorMessage from "../extras/getErrorMessage"
 import AvatarImage from "./AvatarImage"
+import IsAdmin from "./IsAdmin"
 
 
 function CommentsComponent(props) {
@@ -17,8 +19,10 @@ function CommentsComponent(props) {
 
     const [errors, setErrors] = useState({})
 
+    const themeContext = useContext(ThemeContext)
+
     useEffect(() => {
-        if (api.error) {
+        if (api.error && !api.error.preventNext) {
             console.log("Task error", api.error);
             let errors = {}
             if (api.error.status === "validation_failed") {
@@ -51,7 +55,7 @@ function CommentsComponent(props) {
     function CommentInstance(props) {
         return (
             <Row
-                className={"mt-3 align-items-center border bg-light user-select-none " + props.className}
+                className={`mt-3 align-items-center border bg-${themeContext.currentTheme} user-select-none ` + props.className}
                 style={{ borderRadius: "20px" }}>
                 <Col xs="auto">
                     <AvatarImage
@@ -70,13 +74,13 @@ function CommentsComponent(props) {
                         <Reply></Reply>
                     </Button>
                 </Col>
-                {
-                    (props.item.author._id == userContext.user._id) &&
+                <IsAdmin altStatement={props.item.author._id == userContext.user._id}>
                     <Col xs="auto" className="p-0">
                         <Button onClick={() => RemoveComment(props.item._id)} variant="">
                             <TrashFill />
                         </Button>
-                    </Col>}
+                    </Col>
+                </IsAdmin>
                 {props.item.children &&
                     <Row className="justify-content-center">
                         <Col xs="auto" className="d-grid">

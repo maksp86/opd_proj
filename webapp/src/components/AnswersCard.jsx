@@ -2,10 +2,12 @@ import { Row, Col, Button, InputGroup, Form } from "react-bootstrap"
 import { Check } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import { ApiContext } from "../context/api.context"
+import getErrorMessage from "../extras/getErrorMessage";
 
 function AnswersCard(props) {
     const [invalidFields, setInvalidFields] = useState([]);
     const [formData, setFormData] = useState({})
+    const [errors, setErrors] = useState([])
     const api = useContext(ApiContext)
 
     useEffect(() => {
@@ -20,6 +22,20 @@ function AnswersCard(props) {
         })
         setInvalidFields([])
     }
+
+    useEffect(() => {
+        if (api.error && !api.error.preventNext) {
+            console.log("Answers error", api.error);
+            let errors = {}
+            if (api.error.status === "validation_failed") {
+                api.error.errors.forEach((error) => errors[error.path] = getErrorMessage(error.msg))
+            }
+            api.error.preventNext = true;
+            api.clearError();
+            errors.summary = getErrorMessage(api.error.status)
+            setErrors(errors)
+        }
+    }, [api.error])
 
     async function submitTask() {
         setInvalidFields([])
@@ -53,6 +69,12 @@ function AnswersCard(props) {
                         </InputGroup>
                     </Row>
                 )}
+
+                <Row>
+                    <Col>
+                        <h6 className="text-danger text-center">{errors.summary}</h6>
+                    </Col>
+                </Row>
 
                 {props.task.answerFields.length > 1 &&
                     <Row className="align-items-center justify-content-center my-3">
