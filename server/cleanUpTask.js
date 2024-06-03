@@ -6,13 +6,15 @@ const Difficulty = require("./model/difficulty.model")
 const Submit = require("./model/submit.model")
 const Attachment = require("./model/attachment.model")
 const User = require("./model/user.model")
+const Comment = require("./model/comment.model")
+
 const fs = require("fs")
 const path = require("path")
 
 const uploadsPath = path.join(__dirname, "..", "uploads");
 
 async function DeleteUnusedAttachments() {
-    logger.info("[cleanup] Finding unused attachments...")
+    logger.debug("[cleanup] Finding unused attachments...")
 
     const attachments = await Attachment.find().lean()
 
@@ -54,7 +56,7 @@ async function DeleteUnusedAttachments() {
 }
 
 async function DeleteUnusedTasks() {
-    logger.info("[cleanup] Finding unused tasks/submits...")
+    logger.debug("[cleanup] Finding unused tasks/submits...")
 
     const categories = await Category.find().lean()
     const categoriesIDs = categories.map(category => category._id.toString())
@@ -63,6 +65,8 @@ async function DeleteUnusedTasks() {
     const tasksIDs = tasks.map(task => task._id.toString())
 
     const submits = await Submit.find({ task: { $exists: true } }, { task: 1 })
+
+    const comments = await Comment.find()
 
     let removedTaskIDs = []
     for (let i = 0; i < tasks.length; i++) {
@@ -83,11 +87,29 @@ async function DeleteUnusedTasks() {
             await submit.deleteOne()
         }
     }
+
+    for (let i = 0; i < comments.length; i++) {
+        const comment = comments[i]
+        const parentid = comment.subject.toString()
+        if (!tasksIDs.includes(parentid)
+            || removedTaskIDs.includes(parentid)
+            || (comment.parent && !comments.some((item) => item._id.equals(comment.parent)))) {
+            logger.info("[cleanup] Found comment without parent or deleted task %s", comment._id.toString())
+            await comment.deleteOne()
+        }
+    }
 }
 
 async function CleanUpTask() {
-    await DeleteUnusedTasks()
-    await DeleteUnusedAttachments()
+    try
+    {
+        await DeleteUnusedTasks()
+        await DeleteUnusedAttachments()
+    }
+    catch (e)
+    {
+        logger.error("[cleanup] Error on cleanup: %s", err);   
+    }
 }
 
 let intervalId = undefined

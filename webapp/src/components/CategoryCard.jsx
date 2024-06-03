@@ -2,9 +2,12 @@ import { Row, Col, Button } from "react-bootstrap"
 import { CaretRightFill, PencilFill } from "react-bootstrap-icons"
 import { useNavigate } from "react-router-dom";
 import IsAdmin from "./IsAdmin";
+import { useContext } from "react";
+import { ThemeContext } from "../context/theme.context";
 
 function CategoryCard(props) {
     const navigate = useNavigate()
+    const themeContext = useContext(ThemeContext)
     return (
         <Col xs="11" md="11" lg="5" className="category-card mx-2 my-4">
             <Row>
@@ -14,7 +17,8 @@ function CategoryCard(props) {
                             width: "2vw",
                             minWidth: "20px",
                             height: "100%",
-                            backgroundColor: props.item.color || "red"
+                            backgroundColor: props.item.color || "red",
+                            filter: themeContext.currentTheme === "dark" && "brightness(60%)"
                         }}>
                     </div>
                 </Col>
@@ -24,10 +28,21 @@ function CategoryCard(props) {
                         <div
                             className="progress mt-2"
                             style={{
-                                backgroundColor: `color-mix(in srgb, ${props.item.color} 50%, white)`
+                                backgroundColor: `color-mix(in srgb, ${props.item.color} 50%, white)`,
+                                filter: themeContext.currentTheme === "dark" && "brightness(60%)"
                             }}
                         >
-                            <div className="progress-bar" role="progressbar" style={{ width: (props.progress || 0) + "%", backgroundColor: props.item.color }} aria-valuenow={props.progress || 0} aria-valuemin="0" aria-valuemax="100"></div>
+                            <div
+                                className="progress-bar"
+                                role="progressbar"
+                                style={{
+                                    width: (props.progress || 0) + "%",
+                                    backgroundColor: props.item.color
+                                }}
+                                aria-valuenow={props.progress || 0}
+                                aria-valuemin="0"
+                                aria-valuemax="100">
+                            </div>
                         </div>
                         {props.lastTask &&
                             <p className="fw-medium mt-2 mb-1">
@@ -45,7 +60,7 @@ function CategoryCard(props) {
                         </Button>
                     </IsAdmin>
                     <Button
-                        
+
                         variant=""
                         onClick={() => navigate("./" + props.item.shortname, { state: { item: props.item } })}>
                         <CaretRightFill className="category-card-go-icon" size={20} />
