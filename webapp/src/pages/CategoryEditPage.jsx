@@ -1,9 +1,10 @@
-import { Row, Col, Button, FloatingLabel, Form } from "react-bootstrap"
+import { Row, Col, Button, FloatingLabel, Form, InputGroup } from "react-bootstrap"
 import { useContext, useEffect, useState } from "react"
 import { ApiContext } from "../context/api.context"
 import { useLocation, useNavigate } from "react-router-dom"
 import { usePageTitle } from "../hooks/pageTitle.hook"
 import getErrorMessage from "../extras/getErrorMessage"
+import PermissionsSelector from "../components/PermissionsSelector"
 
 
 function CategoryEditPage(props) {
@@ -14,7 +15,7 @@ function CategoryEditPage(props) {
 
     const isEdit = location.state && location.state.item
 
-    const [formData, setFormData] = useState({ isLearning: location.state && location.state.isLearning })
+    const [formData, setFormData] = useState({ isLearning: location.state && location.state.isLearning, permissions: "744" })
     const [errors, setErrors] = useState({})
 
     const setField = (field, value) => {
@@ -121,41 +122,29 @@ function CategoryEditPage(props) {
                             </Form.Control.Feedback>
                         </FloatingLabel>
 
-                        <Row className="mb-3 mx-1 align-items-center">
-                            <Col sm="auto"><p className="m-0">Color</p></Col>
-                            <Col>
-                                <Form.Group>
-                                    <Form.Control
-                                        type="color"
-                                        disabled={api.busy}
-                                        value={formData.color || "#FFFFFF"}
-                                        onChange={(e) => setField("color", e.target.value)}
-                                        title="Choose your color"
-                                        isInvalid={!!errors.color}
-                                    />
-                                    <Form.Control.Feedback type='invalid'>
-                                        {errors.color}
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-                            </Col>
+                        <Row className="mb-3 align-items-center">
+                            <InputGroup hasValidation>
+                                <InputGroup.Text>Color</InputGroup.Text>
+                                <Form.Control
+                                    type="color"
+                                    disabled={api.busy}
+                                    value={formData.color || "#FFFFFF"}
+                                    onChange={(e) => setField("color", e.target.value)}
+                                    title="Choose your color"
+                                    isInvalid={!!errors.color}
+                                />
+                                <Form.Control.Feedback type='invalid'>
+                                    {errors.color}
+                                </Form.Control.Feedback>
+                            </InputGroup>
                         </Row>
 
-                        <FloatingLabel
-                            controlId="permissionsInput"
-                            label="Permissions"
-                            className="mb-3">
-                            <Form.Control
-                                maxLength={3}
-                                disabled={api.busy}
-                                type="permissions"
-                                placeholder="permissions"
-                                value={formData.permissions || ""}
-                                onChange={(e) => setField("permissions", e.target.value)}
-                                isInvalid={!!errors.permissions} />
-                            <Form.Control.Feedback type='invalid'>
-                                {errors.permissions}
-                            </Form.Control.Feedback>
-                        </FloatingLabel>
+                        <PermissionsSelector
+                            value={formData.permissions}
+                            isInvalid={!!errors.permissions}
+                            error={errors.permissions}
+                            onChange={(e) => setField("permissions", e)}
+                        />
 
                         <Row className="text-center">
                             <h6 className="text-danger">{errors.summary}</h6>

@@ -3,12 +3,13 @@ import { Container, Row, Col, Button, FloatingLabel, Form, Modal } from "react-b
 import { ApiContext } from "../../context/api.context";
 import getErrorMessage from "../../extras/getErrorMessage";
 import { ModalContext } from "../../context/modal.context";
+import PermissionsSelector from "../../components/PermissionsSelector";
 
 function AttachmentUploadModal(props) {
     const modalContext = useContext(ModalContext)
     const api = useContext(ApiContext);
 
-    const [formData, setFormData] = useState({})
+    const [formData, setFormData] = useState({ permissions: "744" })
     const [errors, setErrors] = useState({})
 
     const setField = (field, value) => {
@@ -76,7 +77,7 @@ function AttachmentUploadModal(props) {
                             </Form.Control.Feedback>
                         </Form.Group>
 
-                        <FloatingLabel
+                        {/* <FloatingLabel
                             controlId="permissionsInput"
                             label="Permissions"
                             className="mb-3">
@@ -90,7 +91,15 @@ function AttachmentUploadModal(props) {
                             <Form.Control.Feedback type='invalid'>
                                 {errors.permissions}
                             </Form.Control.Feedback>
-                        </FloatingLabel>
+                        </FloatingLabel> */}
+
+                        <PermissionsSelector
+                            disabled={api.busy}
+                            value={formData.permissions}
+                            onChange={(e) => setField("permissions", e)}
+                            isInvalid={!!errors.permissions}
+                            error={errors.permissions}
+                        />
 
                         <Row className="text-center">
                             <h6 className="text-danger">{errors.summary}</h6>

@@ -4,6 +4,7 @@ const logger = require("winston")
 
 const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
 const { getPermissionsStruct, canUserDoIn, canUserDoInGroup } = require("../lib/user.functions")
+const { checkPermissions } = require("../lib/validation.functions")
 const Category = require("../model/category.model");
 
 const category_router = Router()
@@ -15,7 +16,10 @@ category_router.post("/create",
         check("shortname", "field_empty").isString().isLength({ max: 20 }).withMessage("invalid_length"),
         check("color", "field_empty").isHexColor(),
         check("isLearning", "field_empty").isBoolean(),
-        check("permissions", "field_empty").isString().isLength({ min: 3, max: 3 }).withMessage("invalid_length"),
+        check("permissions", "field_empty")
+            .isString().isLength({ min: 3, max: 3 })
+            .withMessage("invalid_length")
+            .custom(checkPermissions).withMessage("field_invalid"),
         processValidaion
     ],
     processCategoryCreate
@@ -28,7 +32,10 @@ category_router.post("/edit",
         check("shortname", "field_empty").isString().isLength({ max: 20 }).withMessage("invalid_length"),
         check("color", "field_empty").isHexColor(),
         check("isLearning", "field_empty").isBoolean(),
-        check("permissions", "field_empty").isString().isLength({ min: 3, max: 3 }).withMessage("invalid_length"),
+        check("permissions", "field_empty")
+            .isString().isLength({ min: 3, max: 3 })
+            .withMessage("invalid_length")
+            .custom(checkPermissions).withMessage("field_invalid"),
         processValidaion
     ],
     processCategoryCreate
@@ -53,6 +60,7 @@ category_router.get("/list",
 
 async function processCategoryCreate(req, res) {
     const { title, shortname, color, isLearning, permissions } = req.body
+
     req.user = await req.user.populate("role");
 
     if (await canUserDoInGroup(req.user, ["write"])) {
