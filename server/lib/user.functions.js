@@ -122,7 +122,7 @@ async function canUserDoInOther(user, doWhat) {
  * @param {User} user 
  */
 async function calculateRating(user) {
-    const userSubmits = await Submit.find({ user: user._id, isValid: true }).populate({
+    const userSubmits = await Submit.find({ user: user._id, isValid: true, value: { $exists: true, $ne: [] } }).populate({
         path: "task",
         select: "difficulty",
         populate: { path: "difficulty", select: "value" }

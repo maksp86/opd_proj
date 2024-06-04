@@ -7,17 +7,21 @@ const User = require("../model/user.model");
 
 const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require("../middleware/user.middleware")
 const { getPermissionsStruct, canUserDoInUsers, canUserDoInOther } = require("../lib/user.functions");
+const { checkPermissions } = require("../lib/validation.functions")
+
 const { Types } = require("mongoose");
 
 
 const admin_router = Router()
 
-
 admin_router.post("/role/edit",
     [
         rejectIfNotLogined,
         check("id", "field_empty").isMongoId(),
-        check("permissions", "field_empty").isNumeric(),
+        check("permissions", "field_empty")
+            .isString().isLength({ min: 3, max: 3 })
+            .withMessage("invalid_length")
+            .custom(checkPermissions).withMessage("field_invalid"),
         check("name", "field_empty").isString(),
         processValidaion
     ], processRoleEdit)
@@ -26,7 +30,10 @@ admin_router.post("/role/add",
     [
         rejectIfNotLogined,
         check("name", "field_empty").isString(),
-        check("permissions", "field_empty").isNumeric(),
+        check("permissions", "field_empty")
+            .isString().isLength({ min: 3, max: 3 })
+            .withMessage("invalid_length")
+            .custom(checkPermissions).withMessage("field_invalid"),
         processValidaion
     ], processRoleAdd)
 

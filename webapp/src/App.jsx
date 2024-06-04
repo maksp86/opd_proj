@@ -98,14 +98,14 @@ function App() {
                                 <Container className="maincontainer py-2">
                                     <Routes>
                                         <Route path='/' element={<Home />} />
-                                        {(!userHook.loggedIn) &&
+                                        {(userHook.loggedIn === false) &&
                                             <>
                                                 <Route path='/login' element={<LoginPage />} />
                                                 <Route path='*' element={<Navigate replace to="/login" />} />
                                             </>
                                         }
 
-                                        {userHook.loggedIn &&
+                                        {(userHook.loggedIn === true) &&
                                             <>
                                                 <Route path='/account' element={<Account />} />
                                                 <Route path='/learning' key="learningCategories" element={<CategoriesPage isLearning={true} />} />
