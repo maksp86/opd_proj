@@ -1,0 +1,10 @@
+.account-bio-container {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+@media (max-width: 576px) {
+    .account-bio-container {
+        margin-top: 0.5rem !important;
+    }
+}

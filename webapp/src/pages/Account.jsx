@@ -85,7 +85,7 @@ function Account() {
                         avatar={userContext.user.image} />
                 </Col>
                 <Col xs="9" sm="8" className="d-grid">
-                    <div className="my-auto">
+                    <div className="my-auto account-bio-container">
                         <Row>
                             <h2>{userContext.user.name}</h2>
                         </Row>
