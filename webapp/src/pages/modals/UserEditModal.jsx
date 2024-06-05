@@ -1,20 +1,24 @@
-import { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, Button, Image, FloatingLabel, Form, Modal } from "react-bootstrap"
+import { useState, useEffect, useContext, useRef } from "react";
+import { Container, Row, Col, Button, Image, FloatingLabel, Form, Modal, Stack } from "react-bootstrap"
 import Cropper from 'react-easy-crop'
 import { ApiContext } from "../../context/api.context";
 import { UserContext } from "../../context/user.context";
 import getErrorMessage from "../../extras/getErrorMessage";
 import { ModalContext } from "../../context/modal.context";
+import { X } from "react-bootstrap-icons";
 
 function UserEditModal() {
     const modalContext = useContext(ModalContext)
     const userContext = useContext(UserContext)
     const api = useContext(ApiContext);
 
+    const fileInputRef = useRef(null);
+
     const [formData, setFormData] = useState({ name: userContext.user.name, bio: userContext.user.bio })
     const [errors, setErrors] = useState({})
 
     const [isImageCrop, setIsImageCrop] = useState(false)
+    const [image, setImage] = useState(null)
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
@@ -151,27 +155,45 @@ function UserEditModal() {
                                 </FloatingLabel>
                             </Col>
                         </Row>
-                        <Row className="mb-3">
-                            <Col sm="auto">
+                        <Row className="mb-3 justify-content-center align-items-center">
+                            <Col xs="auto">
                                 <Image roundedCircle
                                     style={{ backgroundColor: "#000", width: "10vh", height: "10vh" }}
                                     src={formData.image ? URL.createObjectURL(formData.image) : (userContext.user.image && ("/api/attachments/get?id=" + userContext.user.image))} />
                             </Col>
-                            <Col>
-                                <Form.Group controlId="formFile" className="mb-3">
-                                    <Form.Label>Upload your photo</Form.Label>
+                            <Col xs="8">
+                                <Form.Group controlId="formFile">
+                                    <Stack direction="horizontal">
+                                        <Button
+                                            variant="outline-secondary"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            disabled={api.busy || !!formData.image}>
+                                            Upload photo
+                                        </Button>
+                                        {
+                                            !!formData.image &&
+                                            <Button
+                                                onClick={() => setField("image", undefined)}
+                                                variant="">
+                                                <X />
+                                            </Button>
+                                        }
+                                    </Stack>
+
                                     <Form.Control
+                                        ref={fileInputRef}
+                                        className="d-none"
+                                        id="usereditmodal-fileinput"
                                         type="file"
                                         accept="image/png, image/jpeg, image/webp"
-                                        disabled={api.busy}
                                         onChange={(e) => {
                                             if (e.target.files && e.target.files.length > 0) {
                                                 setField("image", e.target.files[0])
+                                                setImage(URL.createObjectURL(e.target.files[0]))
                                                 setIsImageCrop(true)
                                             }
                                         }}
-                                        isInvalid={!!errors.image}
-                                    />
+                                        isInvalid={!!errors.image} />
                                     <Form.Control.Feedback type='invalid'>
                                         {errors.image}
                                     </Form.Control.Feedback>
@@ -198,7 +220,7 @@ function UserEditModal() {
                                         overflow: "hidden"
                                     }}>
                                     <Cropper
-                                        image={URL.createObjectURL(formData.image)}
+                                        image={image}
                                         crop={crop}
                                         zoom={zoom}
                                         aspect={1 / 1}

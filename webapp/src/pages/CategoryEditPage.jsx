@@ -66,10 +66,10 @@ function CategoryEditPage(props) {
 
     return (
         <Row className="justify-content-center">
-            <Col md="6" style={{ borderRadius: "25px" }} className="card p-3">
+            <Col sm="12" md="10" lg="8" style={{ borderRadius: "25px" }} className="card p-3">
                 <Row>
                     <Col>
-                        <h2 className="mx-2 mb-4">{isEdit ? ("Edit category \"" + location.state.item.title + "\"") : "Create category"}</h2>
+                        <h3 className="mx-2 mb-4">{isEdit ? ("Edit category \"" + location.state.item.title + "\"") : "Create category"}</h3>
                     </Col>
                 </Row>
                 <Row>
@@ -127,6 +127,7 @@ function CategoryEditPage(props) {
                                 <InputGroup.Text>Color</InputGroup.Text>
                                 <Form.Control
                                     type="color"
+                                    className="my-1"
                                     disabled={api.busy}
                                     value={formData.color || "#FFFFFF"}
                                     onChange={(e) => setField("color", e.target.value)}

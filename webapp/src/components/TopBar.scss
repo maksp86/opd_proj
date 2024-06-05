@@ -17,7 +17,58 @@
   }
 }
 
-.logoicon
-{
+@media (min-width: 576px) {
+  .topbar-xs-dropdown,
+  .topbar-accountactions button > span {
+    display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .topbar-logo-text {
+    font-size: calc(1.325rem + 0.7vw);
+  }
+
+  .topbar-accountactions-col {
+    display: none;
+  }
+
+  .topbar-accountactions button > span {
+    margin-left: 0.5rem;
+  }
+
+  #topbar .dropdown-toggle:after {
+    display: none;
+  }
+
+  #topbar {
+    padding: 2vh 1rem !important;
+  }
+
+  .topbar-progressbar {
+    display: none;
+  }
+
+  .topbar-pxtext {
+    padding: 5px;
+    max-width: max-content;
+  }
+
+  .topbar-pxtext-borderbox {
+    max-width: max-content;
+    border: double 5px transparent;
+    border-radius: 30px;
+    background-image: linear-gradient(var(--bs-card-bg), var(--bs-card-bg)),
+      conic-gradient(
+        var(--bs-success),
+        var(--bs-success) var(--props-computed-xp),
+        transparent var(--props-computed-xp)
+      );
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+  }
+}
+
+.topbar-logo-icon {
   color: map-get($custom-colors, "primary");
 }
