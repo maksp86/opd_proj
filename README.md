@@ -5,6 +5,7 @@ Response format:
 So status is included in every response, error and value fields are not mandatory
 ```
 Status codes:  
+-  200 - just ok
 -  201 - created smth
 -  400 - user input error 
 -  404 - not found 
@@ -22,10 +23,22 @@ Status codes:
 - [x] Logic and routes for submitting tasks, calculating user rating
 - [x] Ability to upload files as attachments
 - [x] Comments for tasks (30% done)
-- [ ] Server self-cleaning from unused files/tasks/categories
+- [x] Server self-cleaning from unused files/tasks/categories/comments
 - [x] Global error handler
+- [x] News scrapping
 
 ### Current progress (frontend)
-- [ ] Login and registration pages
+- [x] Login and registration
+- [x] Categories pages
+- [x] Profile page
+- [x] Home page with news
+- [x] Adaptation for mobiles
+- [x] Task view page
+- [x] Comments section for tasks
+- [x] Task edit page
+- [x] Category edit page
+- [x] Various helping modals
+- [x] Image cropping for profile picture
+- [x] Dark and Light theme
 
-Prod server will be located at https://edplatform.maksp.gsqd.ru (80, 443)
+### Production server is already located at https://edplatform.maksp.gsqd.ru (https only)
