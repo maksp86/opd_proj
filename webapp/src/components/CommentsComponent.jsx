@@ -83,7 +83,7 @@ function CommentsComponent(props) {
                 </IsAdmin>
                 {props.item.children &&
                     <Row className="justify-content-center">
-                        <Col xs="auto" className="d-grid">
+                        <Col xs="auto" className="d-none d-sm-grid">
                             <div className="vr m-auto" style={{ height: "80%" }}></div>
                         </Col>
                         <Col>
@@ -163,6 +163,9 @@ function CommentsComponent(props) {
 
                 {
                     comments.map((item) => <CommentInstance className="p-2 mx-2" key={item._id} item={item} />)
+                }
+                {
+                    comments.length == 0 && <p className="text-center mt-4 mb-2">Nobody sent a comment</p>
                 }
 
                 <hr className="hr hr-blurry mx-4 mt-3" />

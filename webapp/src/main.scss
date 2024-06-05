@@ -64,8 +64,14 @@ $card-border-width: 0;
 @import "./components/Navigation.scss";
 @import "./components/TopBar.scss";
 
+@media (max-width: 576px) {
+  .maincontainer {
+    height: calc(100vh - 73px - 57px) !important;
+  }
+}
+
 .maincontainer {
-  height: calc(100vh - 87px - 79px);
+  height: calc(100vh - 87px - 74px);
   overflow: auto;
 }
 

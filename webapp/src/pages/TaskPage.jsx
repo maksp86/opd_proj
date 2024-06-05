@@ -101,7 +101,7 @@ function TaskPage() {
                 </IsAdmin>
             </Row>
             <Row className="justify-content-center">
-                <Col md={7}>
+                <Col sm="12" md="7">
                     <Markdown options={{
                         forceBlock: true,
                         overrides: {

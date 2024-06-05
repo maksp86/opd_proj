@@ -1,5 +1,5 @@
-import { Container, Row, Col, ProgressBar, Button } from "react-bootstrap"
-import { CaretLeftFill, CursorFill, MoonFill, SunFill, WrenchAdjustable } from "react-bootstrap-icons"
+import { Container, Row, Col, ProgressBar, Button, Dropdown } from "react-bootstrap"
+import { CaretLeftFill, CursorFill, DoorOpenFill, MoonFill, SunFill, ThreeDotsVertical, WrenchAdjustable } from "react-bootstrap-icons"
 
 import { useMatch, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/user.context"
@@ -19,31 +19,60 @@ function ShowForPath(props) {
 
 function UserProgressBar(props) {
     return (
-        <Col xs="11" md="5" lg="6">
-            <Row className="align-items-center my-2">
-                <Col>
-                    <ProgressBar variant="secondary" min={0} max={1000} now={props.userContext.computedXp % 1000} />
+        <Col xs="4" sm="6" lg="6">
+            <Row className="align-items-center">
+                <Col className="topbar-progressbar">
+                    <div
+                        style={{
+                            backgroundColor: "var(--bs-success-bg-subtle)"
+                        }}
+                        className="progress">
+                        <div
+                            className="progress-bar"
+                            role="progressbar"
+                            style={{
+                                backgroundColor: "var(--bs-success)",
+                                width: (props.userContext.computedXp % 1000 / 10 || 0) + "%",
+                            }}
+                            aria-valuenow={props.userContext.computedXp % 1000 / 10 || 0}
+                            aria-valuemin="0"
+                            aria-valuemax="100">
+                        </div>
+                    </div>
                 </Col>
-                <Col xs="auto">
-                    <h6 className="m-0 text-end">{props.userContext.computedXp} xp</h6>
+                <Col xs="12" sm="auto" className="d-grid justify-content-end">
+                    <div
+                        className="topbar-pxtext-borderbox"
+                        style={{
+                            "--props-computed-xp": (props.userContext.computedXp % 1000 / 1000 * 360) + "deg"
+                        }}>
+                        <h6 className="topbar-pxtext m-0">{props.userContext.computedXp} xp</h6>
+                    </div>
                 </Col>
-            </Row>
-        </Col>
+            </Row >
+        </Col >
     )
 }
 
-function ThemeSwitchButton(props)
-{
-const themeContext = useContext(ThemeContext)
-return (
-    <Button
-    variant=""
-    onClick={() => {
-        themeContext.set(themeContext.currentTheme == "light" ? "dark" : "light")
-    }}>
-        {themeContext.currentTheme == "light" ? <SunFill /> : <MoonFill />}
-    </Button>
-)
+function ThemeSwitchButton(props) {
+    const themeContext = useContext(ThemeContext)
+    return (
+        <Button
+            variant=""
+            onClick={() => {
+                themeContext.set(themeContext.currentTheme == "light" ? "dark" : "light")
+            }}>
+            {themeContext.currentTheme == "light" ?
+                <>
+                    <MoonFill />
+                    <span>Switch to dark</span>
+                </>
+                : <>
+                    <SunFill />
+                    <span>Switch to light</span>
+                </>}
+        </Button>
+    )
 }
 
 function TopBar() {
@@ -92,7 +121,7 @@ function TopBar() {
             <>
                 <Col xs="auto" className="align-items-left">
                     <CursorFill
-                        className="logoicon"
+                        className="topbar-logo-icon"
                         style={{
                             height: "calc(1.325rem + 0.9vw)",
                             width: "calc(1.325rem + 0.9vw)",
@@ -100,19 +129,48 @@ function TopBar() {
                             minWidth: "30px",
                         }} />
                 </Col>
-                <Col className="align-items-left">
-                    <h2 className="m-0">CTF Navigator</h2>
+                <Col xs="auto" sm className="align-items-left">
+                    <h2 className="m-0 topbar-logo-text">CTF Navigator</h2>
                 </Col>
             </>
         )
     }
 
+    function AccountActions() {
+        return (
+            <Row className="justify-content-center topbar-accountactions">
+                <Col xs="12" sm="auto">
+                    <ThemeSwitchButton />
+                </Col>
+                <IsAdmin>
+                    <Col xs="12" sm="auto">
+                        <Button
+                            variant=""
+                            onClick={() => navigate("/manage")}>
+                            <WrenchAdjustable />
+                            <span>Manage</span>
+                        </Button>
+                    </Col>
+                </IsAdmin>
+                <Col xs="12" sm="auto">
+                    <Button
+                        variant=""
+                        type="button"
+                        onClick={processLogout}>
+                        <DoorOpenFill />
+                        <span>Logout</span>
+                    </Button>
+                </Col>
+            </Row>
+        )
+    }
+
     return (
         <Container id="topbar" fluid="lg" className="py-4 px-3">
-            <Row className="align-items-center justify-content-center">
+            <Row className="align-items-center justify-content-between">
                 <OnlyLogined>
                     <ShowForPath path={"/"}>
-                        <Col md="6" className="align-items-left">
+                        <Col xs="8" sm="6" className="align-items-left">
                             <h2 className="m-0 text-truncate">Hello, {userContext.user.username}</h2>
                         </Col>
                         <UserProgressBar userContext={userContext} />
@@ -120,39 +178,31 @@ function TopBar() {
 
                     <ShowForPath path={"/account"}>
                         <LogoAndName />
-                        <Col xs="auto">
-                            <ThemeSwitchButton />
+                        <Col className="topbar-xs-dropdown p-0" xs="auto">
+                            <Dropdown as={Container}>
+                                <Dropdown.Toggle variant="" className="py-0 px-1">
+                                    <ThreeDotsVertical size={25} />
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <AccountActions />
+                                </Dropdown.Menu>
+                            </Dropdown>
                         </Col>
-                        <IsAdmin>
-                            <Col xs="auto">
-                                <Button
-                                    variant=""
-                                    onClick={() => navigate("/manage")}>
-                                    <WrenchAdjustable />
-                                </Button>
-                            </Col>
-                        </IsAdmin>
-                        <Col xs="auto">
-                            <Row className="justify-content-end">
-                                <Col xs="auto">
-                                    <Button
-                                        variant="secondary"
-                                        type="button"
-                                        onClick={processLogout}>Logout</Button>
-                                </Col>
-                            </Row>
+
+                        <Col className="topbar-accountactions-col" xs="auto">
+                            <AccountActions />
                         </Col>
                     </ShowForPath>
 
                     <ShowForPath path={"/tasks"}>
-                        <Col md="6" className="align-items-left">
+                        <Col xs="8" sm="6" className="align-items-left">
                             <h2 className="m-0">Task categories</h2>
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
 
                     <ShowForPath path={"/learning"}>
-                        <Col md="6" className="align-items-left">
+                        <Col xs="8" sm="6" className="align-items-left">
                             <h2 className="m-0">Learning categories</h2>
                         </Col>
                         <UserProgressBar userContext={userContext} />
@@ -167,8 +217,8 @@ function TopBar() {
                     </ShowForPath>
 
                     <ShowForPath path={"/task/:id"}>
-                        <Col md="6" className="align-items-left">
-                            <Row>
+                        <Col xs="8" sm="6" className="align-items-left">
+                            <Row className="align-items-center">
                                 <Col xs="auto">
                                     <Button variant="" onClick={() => onTaskBack()}><CaretLeftFill /></Button>
                                 </Col>

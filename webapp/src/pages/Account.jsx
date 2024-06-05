@@ -104,7 +104,21 @@ function Account() {
                 <Row><h4>Progress</h4></Row>
                 <Row className="align-items-center">
                     <Col>
-                        <ProgressBar variant="success" now={userContext.computedXp % 1000} min={0} max={1000} />
+                        <div
+                            style={{ backgroundColor: "var(--bs-success-bg-subtle)" }}
+                            className="progress">
+                            <div
+                                className="progress-bar"
+                                role="progressbar"
+                                style={{
+                                    backgroundColor: "var(--bs-success)",
+                                    width: (userContext.computedXp % 1000 / 10 || 0) + "%",
+                                }}
+                                aria-valuenow={userContext.computedXp % 1000 / 10 || 0}
+                                aria-valuemin="0"
+                                aria-valuemax="100">
+                            </div>
+                        </div>
                     </Col>
                     <Col xs="auto">
                         <h5 className="m-0 text-end">{userContext.computedXp}xp</h5>

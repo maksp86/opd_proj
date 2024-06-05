@@ -39,7 +39,7 @@ function UsersList(props) {
                                         <div className="fw-semibold fs-5">{user.name}</div>
                                         {user.username}
                                     </div>
-                                    <Badge bg="secondary fs-6 fw-normal" pill>
+                                    <Badge bg="secondary fw-normal" pill>
                                         {props.roles.find(role => role._id == user.role).name}
                                     </Badge>
 

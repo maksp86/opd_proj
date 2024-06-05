@@ -157,10 +157,10 @@ function TaskEditPage() {
 
     return (
         <Row className="justify-content-center">
-            <Col md="6" style={{ borderRadius: "25px" }} className="card p-3">
+            <Col sm="12" md="10" lg="8" style={{ borderRadius: "25px" }} className="card p-3">
                 <Row>
                     <Col>
-                        <h2 className="mx-2 mb-4">{isEdit ? ("Edit task \"" + location.state.item.title + "\"") : ("Create task in \"" + location.state.parent.title + "\"")}</h2>
+                        <h3 className="mx-2 mb-4">{isEdit ? ("Edit task \"" + location.state.item.title + "\"") : ("Create task in \"" + location.state.parent.title + "\"")}</h3>
                     </Col>
                 </Row>
                 <Row>
@@ -335,8 +335,6 @@ function TaskEditPage() {
                     </Col>
                 </Row>
             </Col>
-            <Row className="mt-5" />
-            <Row className="mt-5" />
         </Row>
     )
 }
