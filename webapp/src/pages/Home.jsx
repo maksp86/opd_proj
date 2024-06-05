@@ -20,7 +20,7 @@ function Home() {
         <>
             <Row className="justify-content-evenly align-items-center my-2">
                 {!userContext.loggedIn &&
-                    <Col xs="12" md="6">
+                    <Col xs="12" lg="6">
                         <Card style={{ borderRadius: "20px", overflow: "hidden" }}>
                             <Card.Body>
                                 <Card.Title>Introduction</Card.Title>

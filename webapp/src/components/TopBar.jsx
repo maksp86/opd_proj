@@ -19,7 +19,7 @@ function ShowForPath(props) {
 
 function UserProgressBar(props) {
     return (
-        <Col xs="4" sm="6" lg="6">
+        <Col xs="3" sm="6" lg="6">
             <Row className="align-items-center">
                 <Col className="topbar-progressbar">
                     <div
@@ -101,15 +101,11 @@ function TopBar() {
     function ForCategoriesPage() {
         return (
             <>
-                <Col md="6" className="align-items-left">
-                    <Row>
-                        <Col xs="auto">
-                            <Button variant="" onClick={() => onCategoryBack()}><CaretLeftFill /></Button>
-                        </Col>
-                        <Col>
-                            <h2 className="m-0 text-truncate">{breadCrumbscontext.lastCategory && breadCrumbscontext.lastCategory.title}</h2>
-                        </Col>
-                    </Row>
+                <Col xs="1" sm="1" lg="auto">
+                    <Button variant="" onClick={() => onCategoryBack()}><CaretLeftFill /></Button>
+                </Col>
+                <Col xs="7" sm="5">
+                    <h2 className="m-0 text-truncate">{breadCrumbscontext.lastCategory && breadCrumbscontext.lastCategory.title}</h2>
                 </Col>
                 <UserProgressBar userContext={userContext} />
             </>
@@ -237,6 +233,12 @@ function TopBar() {
                 <OnlyLogined inverse>
                     <ShowForPath path={"/"}>
                         <LogoAndName />
+                        <Col />
+                    </ShowForPath>
+
+                    <ShowForPath path={"/login"}>
+                        <LogoAndName />
+                        <Col />
                     </ShowForPath>
                 </OnlyLogined>
             </Row>
