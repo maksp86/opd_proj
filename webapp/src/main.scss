@@ -63,7 +63,7 @@ $card-border-width: 0;
 
 @import "./components/Navigation.scss";
 @import "./components/TopBar.scss";
-@import "./components/Account.scss";
+@import "./pages/Account.scss";
 
 @media (max-width: 576px) {
   .maincontainer {
