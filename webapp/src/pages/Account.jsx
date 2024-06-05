@@ -72,20 +72,12 @@ function Account() {
     return (
         <>
             <Row className="justify-content-center">
-                <Col xs="auto" sm="auto" className="align-self-center">
-                    <AvatarImage roundedCircle
-                        style={{
-                            maxHeight: "120px",
-                            maxWidth: "120px",
-                            width: "8vw",
-                            height: "8vw",
-                            minHeight: "80px",
-                            minWidth: "80px"
-                        }}
+                <Col xs="12" sm="auto" className="align-self-center d-grid">
+                    <AvatarImage className="account-avatar-image mx-auto"
                         avatar={userContext.user.image} />
                 </Col>
-                <Col xs="9" sm="8" className="d-grid">
-                    <div className="my-auto">
+                <Col xs="12" sm="8" className="d-grid">
+                    <div className="my-auto account-bio-container">
                         <Row>
                             <h2>{userContext.user.name}</h2>
                         </Row>

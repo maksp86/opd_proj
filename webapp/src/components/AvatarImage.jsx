@@ -5,6 +5,7 @@ function AvatarImage(props) {
     if (props.avatar)
         return (
             <Image
+                className={"" + props.className}
                 roundedCircle
                 src={"/api/attachments/get?id=" + props.avatar}
                 style={{ backgroundColor: "#000", ...props.style }} />
@@ -12,7 +13,7 @@ function AvatarImage(props) {
     else
         return (
             <PersonFill
-                className="p-2 rounded-circle fallbackPersonAvatar"
+                className={`p-2 rounded-circle fallbackPersonAvatar ${props.className}`}
                 style={{ ...props.style }} />
         )
 }
