@@ -248,7 +248,7 @@ function TaskEditPage() {
                                     }}
                                     textareaProps={{
                                         placeholder: 'Task text in markdown',
-                                        maxLength: 2000
+                                        maxLength: 10000
                                     }}
                                     className="mb-3"
                                 />
