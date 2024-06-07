@@ -20,7 +20,7 @@ function Home() {
         <>
             <Row className="justify-content-evenly align-items-center my-2">
                 {!userContext.loggedIn &&
-                    <Col xs="12" md="6">
+                    <Col xs="12" lg="6">
                         <Card style={{ borderRadius: "20px", overflow: "hidden" }}>
                             <Card.Body>
                                 <Card.Title>Introduction</Card.Title>
@@ -32,7 +32,7 @@ function Home() {
                     </Col>
                 }
 
-                {!!breadCrumbscontext.lastTask && <Col xs="6" md="4">
+                {!!breadCrumbscontext.lastTask && <Col xs="10" md="6" lg="4">
                     <Card style={{ borderRadius: "20px", overflow: "hidden" }}>
                         <Card.Body>
                             <Card.Title>Long time no see</Card.Title>

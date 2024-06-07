@@ -15,7 +15,7 @@ function CategoryEditPage(props) {
 
     const isEdit = location.state && location.state.item
 
-    const [formData, setFormData] = useState({ isLearning: location.state && location.state.isLearning, permissions: "744" })
+    const [formData, setFormData] = useState({ isLearning: location.state && location.state.isLearning, permissions: "764" })
     const [errors, setErrors] = useState({})
 
     const setField = (field, value) => {

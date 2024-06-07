@@ -9,13 +9,13 @@ function TaskCard(props) {
     const navigate = useNavigate()
 
     return (
-        <Col xs="11" md="11" lg="4" className="category-card my-2 mx-2">
+        <Col xs="11" md="11" lg="5" className="category-card my-2 mx-2">
             <Row>
                 <Col xs className="align-items-center my-3">
                     <div className="w-100 my-auto mx-2">
-                        <h3 className={"m-0 text-start " + (props.solved && "text-decoration-line-through")}>
-                            {props.item.title || "Name"} {props.solved && <Check />}
-                        </h3>
+                        <h4 className={"m-0 text-start " + (props.solved && "text-decoration-line-through")}>
+                            {props.item.title || "Name"}{props.solved && <Check />}
+                        </h4>
                         <p className="m-0 text-start">{props.item.summary || "Summary"}</p>
                     </div>
                 </Col>

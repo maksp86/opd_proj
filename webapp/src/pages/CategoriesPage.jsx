@@ -34,7 +34,7 @@ function CategoriesPage(props) {
     }, [])
     return (
         <>
-            <Row>
+            <Row className="justify-content-between">
                 <IsAdmin>
                     <Col>
                         <Button variant="outline-secondary" onClick={() => { navigate("/category/edit", { state: { isLearning: props.isLearning } }) }}><Plus /></Button>
