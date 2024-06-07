@@ -1,4 +1,4 @@
-import { Row, Col, Button, Image, ListGroup } from "react-bootstrap"
+import { Row, Col, Button, Image, ListGroup, Table } from "react-bootstrap"
 import { Download, PencilFill, TrashFill } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import { ApiContext } from "../context/api.context"
@@ -105,9 +105,18 @@ function TaskPage() {
                     <Markdown options={{
                         forceBlock: true,
                         overrides: {
+                            table: {
+                                component: Table,
+                                props: {
+                                    className: "table-bordered"
+                                }
+                            },
                             img: {
                                 component: Image,
                                 props: {
+                                    style: {
+                                        backgroundColor: "white"
+                                    },
                                     fluid: true,
                                 },
                             },
@@ -158,9 +167,6 @@ function TaskPage() {
             {
                 task._id && task.commentable && <CommentsComponent item={task} />
             }
-            <Row className="mb-5" />
-            <Row className="mb-5" />
-            <Row className="mb-5" />
         </>
     )
 }

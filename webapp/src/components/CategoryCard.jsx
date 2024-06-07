@@ -24,7 +24,7 @@ function CategoryCard(props) {
                 </Col>
                 <Col xs className="align-items-center my-3 d-flex">
                     <div className="w-100 my-auto mx-0">
-                        <h3 className="m-0 text-start">{props.item.title || "Name"}</h3>
+                        <h4 className="m-0 text-start">{props.item.title || "Name"}</h4>
                         <div
                             className="progress mt-2"
                             style={{

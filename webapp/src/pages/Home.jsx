@@ -32,7 +32,7 @@ function Home() {
                     </Col>
                 }
 
-                {!!breadCrumbscontext.lastTask && <Col xs="6" md="4">
+                {!!breadCrumbscontext.lastTask && <Col xs="10" md="6" lg="4">
                     <Card style={{ borderRadius: "20px", overflow: "hidden" }}>
                         <Card.Body>
                             <Card.Title>Long time no see</Card.Title>

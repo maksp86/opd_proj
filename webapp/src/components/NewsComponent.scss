@@ -1,0 +1,7 @@
+@include media-breakpoint-down(md) {
+    .news-image {
+        height: 50vw !important;
+        max-height: 200px !important;
+        background-size: cover;
+    }
+}

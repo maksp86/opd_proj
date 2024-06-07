@@ -24,9 +24,10 @@ function TaskEditPage() {
     const themeContext = useContext(ThemeContext)
 
     const isEdit = location.state && location.state.item
+    const isLearning = location.state && location.state.parent.isLearning
 
     const [formData, setFormData] = useState({
-        isLearning: location.state && location.state.parent.isLearning,
+        isLearning: isLearning,
         difficulty: "-",
         commentable: false
     })
@@ -216,7 +217,7 @@ function TaskEditPage() {
                             </Form.Control.Feedback>
                         </FloatingLabel>
 
-                        {!formData.isLearning &&
+                        {!isLearning &&
                             <FloatingLabel
                                 controlId="maxTriesInput"
                                 label="Max tries"
@@ -317,7 +318,7 @@ function TaskEditPage() {
                             </Row>
                         </Col>
 
-                        {!formData.isLearning && <Row>
+                        {!isLearning && <Row>
                             <AnswerEditForm answers={answers} setAnswers={setAnswers} />
                         </Row>}
 

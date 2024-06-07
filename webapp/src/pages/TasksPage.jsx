@@ -92,7 +92,7 @@ function TasksPage() {
 
     return (
         <>
-            <Row>
+            <Row className="justify-content-between">
                 <IsAdmin>
                     <Col xs="auto">
                         <Button variant="outline-secondary" onClick={() => { navigate("/task/edit", { state: { parent: location.state.item } }) }}><Plus /></Button>

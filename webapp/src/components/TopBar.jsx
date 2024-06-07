@@ -84,6 +84,8 @@ function TopBar() {
     async function processLogout() {
         await api.request("/user/logout")
         userContext.logout();
+        breadCrumbscontext.setLastCategory(undefined)
+        breadCrumbscontext.setLastTask(undefined)
         navigate("/login")
     }
 
@@ -104,8 +106,8 @@ function TopBar() {
                 <Col xs="1" sm="1" lg="auto">
                     <Button variant="" onClick={() => onCategoryBack()}><CaretLeftFill /></Button>
                 </Col>
-                <Col xs="7" sm="5">
-                    <h2 className="m-0 text-truncate">{breadCrumbscontext.lastCategory && breadCrumbscontext.lastCategory.title}</h2>
+                <Col xs="7" sm="5" md>
+                    <h3 className="m-0 text-truncate">{breadCrumbscontext.lastCategory && breadCrumbscontext.lastCategory.title}</h3>
                 </Col>
                 <UserProgressBar userContext={userContext} />
             </>
@@ -126,7 +128,7 @@ function TopBar() {
                         }} />
                 </Col>
                 <Col xs="auto" sm className="align-items-left">
-                    <h2 className="m-0 topbar-logo-text">CTF Navigator</h2>
+                    <h3 className="m-0 topbar-logo-text">CTF Navigator</h3>
                 </Col>
             </>
         )
@@ -167,7 +169,7 @@ function TopBar() {
                 <OnlyLogined>
                     <ShowForPath path={"/"}>
                         <Col xs="8" sm="6" className="align-items-left">
-                            <h2 className="m-0 text-truncate">Hello, {userContext.user.username}</h2>
+                            <h3 className="m-0 text-truncate">Hello, {userContext.user.username}</h3>
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
@@ -192,14 +194,14 @@ function TopBar() {
 
                     <ShowForPath path={"/tasks"}>
                         <Col xs="8" sm="6" className="align-items-left">
-                            <h2 className="m-0">Task categories</h2>
+                            <h3 className="m-0">Task categories</h3>
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
 
                     <ShowForPath path={"/learning"}>
                         <Col xs="8" sm="6" className="align-items-left">
-                            <h2 className="m-0">Learning categories</h2>
+                            <h3 className="m-0">Learning categories</h3>
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
@@ -213,15 +215,12 @@ function TopBar() {
                     </ShowForPath>
 
                     <ShowForPath path={"/task/:id"}>
-                        <Col xs="8" sm="6" className="align-items-left">
-                            <Row className="align-items-center">
-                                <Col xs="auto">
-                                    <Button variant="" onClick={() => onTaskBack()}><CaretLeftFill /></Button>
-                                </Col>
-                                <Col>
-                                    <h2 className="m-0">Task</h2>
-                                </Col>
-                            </Row>
+                        <Col xs="1" sm="1" lg="auto">
+                            <Button variant="" onClick={() => onTaskBack()}><CaretLeftFill /></Button>
+                        </Col>
+
+                        <Col xs="7" sm="5" md>
+                            <h3 className="m-0">Task</h3>
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
@@ -242,7 +241,7 @@ function TopBar() {
                     </ShowForPath>
                 </OnlyLogined>
             </Row>
-        </Container>
+        </Container >
     )
 }
 

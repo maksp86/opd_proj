@@ -12,7 +12,7 @@ function NewsCard(props) {
                 <Row className="g-0">
                     <Col className="d-grid" md="5">
                         <div
-                            className="h-100 w-100"
+                            className="h-100 w-100 news-image"
                             style={{
                                 backgroundImage: `url("${props.item.img || ''}")`,
                                 backgroundPosition: "center",
@@ -20,7 +20,7 @@ function NewsCard(props) {
                             }}
                         ></div>
                     </Col>
-                    <Col md="7">
+                    <Col md="7" style={{ zIndex: 1 }}>
                         <Card.Body>
                             <Card.Title className="fs-5">
                                 {props.item.title}
