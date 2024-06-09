@@ -95,7 +95,7 @@ function App() {
                             </Modal>
                             <BrowserRouter>
                                 <TopBar user={userHook.user} />
-                                <Container className="maincontainer py-2">
+                                <Container className="maincontainer py-4">
                                     <Routes>
                                         <Route path='/' element={<Home />} />
                                         {(userHook.loggedIn === false) &&

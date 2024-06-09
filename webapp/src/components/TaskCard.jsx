@@ -16,7 +16,7 @@ function TaskCard(props) {
                         <h4 className={"m-0 text-start " + (props.solved && "text-decoration-line-through")}>
                             {props.item.title || "Name"}{props.solved && <Check />}
                         </h4>
-                        <p className="m-0 text-start">{props.item.summary || "Summary"}</p>
+                        <p className="m-0 text-start">{props.item.summary}</p>
                     </div>
                 </Col>
                 <Col xs="auto" className="d-flex p-0">

@@ -67,13 +67,15 @@ $card-border-width: 0;
 
 @media (max-width: 576px) {
   .maincontainer {
-    height: calc(100vh - 73px - 57px) !important;
+    height: calc(100vh - 73px - 57px - (100vh - 100%)) !important;
   }
 }
 
 .maincontainer {
   height: calc(100vh - 87px - 74px);
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100% !important;
 }
 
 .fallbackPersonAvatar {

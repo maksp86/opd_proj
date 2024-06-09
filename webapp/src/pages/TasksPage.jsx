@@ -16,7 +16,7 @@ function TasksPage() {
     const navigate = useNavigate()
     const location = useLocation()
 
-    const [tasks, setTasks] = useState({})
+    const [tasks, setTasks] = useState([])
     const [tasksStats, setTasksStats] = useState({})
     const [difficulties, setDifficulties] = useState([])
 
@@ -37,15 +37,7 @@ function TasksPage() {
 
             if (difficultiesList) {
                 setDifficulties(difficultiesList.data.value)
-
-                const groupedByDifficulty = {};
-
-                result.data.value.forEach((task) => {
-                    const difficulty = task.difficulty;
-                    groupedByDifficulty[difficulty] = groupedByDifficulty[difficulty] || [];
-                    groupedByDifficulty[difficulty].push(task);
-                });
-                setTasks(groupedByDifficulty)
+                setTasks(result.data.value)
             }
         }
     }
@@ -61,7 +53,8 @@ function TasksPage() {
         }
     }, [])
 
-    function DrawTask(props) {
+    function DrawTaskRow(props) {
+        if (props.tasks.length == 0) return undefined
         const xpText = location.state.item.isLearning ? "" : `${props.difficulty.value} xp`
         return (
             <>
@@ -71,23 +64,23 @@ function TasksPage() {
                     </h3>
                 </Col>
                 {
-                    tasks[props.difficulty._id].map((item =>
-                        <TaskCard key={item._id} item={item} parent={location.state.item} solved={tasksStats[item._id] || false} />))
+                    props.tasks.map(item => <TaskCard key={item._id} item={item} parent={location.state.item} solved={tasksStats[item._id] || false} />)
                 }
             </>
         )
     }
 
     function DrawTasks() {
-        const keys = Object.keys(tasks)
-        if (keys.length > 0) {
-            return keys.map(key => {
-                const difficulty = difficulties.find((item) => item._id == key);
-                return (<DrawTask key={difficulty._id} difficulty={difficulty} />)
-            }
-            )
+        if (tasks.length > 0) {
+            return difficulties.sort((prev, item) => (prev.value > item.value ? 1 : -1)).map(item => <DrawTaskRow
+                difficulty={item}
+                tasks={tasks.filter(task => task.difficulty == item._id)}
+            />)
         }
-        return undefined
+        else if (api.busy)
+            return <Spinner />
+        else
+            return <h3>No tasks there</h3>
     }
 
     return (
@@ -103,9 +96,7 @@ function TasksPage() {
                 </IsAdmin>
             </Row>
             <Row className="justify-content-evenly text-center g-2">
-                {
-                    <DrawTasks /> || (api.busy ? <Spinner /> : <h3>Nothing here</h3>)
-                }
+                <DrawTasks />
             </Row>
         </>
     )
