@@ -1,4 +1,4 @@
-import { Row, Col, Button, Image, Form, ListGroup, Badge, Spinner } from "react-bootstrap"
+import { Row, Col, Button, Form, ListGroup, Badge, Spinner } from "react-bootstrap"
 import { ArrowClockwise, PencilFill, Plus, Trash } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import { ApiContext } from "../context/api.context"
@@ -9,8 +9,10 @@ import DialogModal from "./modals/DialogModal"
 import AdminUserEditModal from "./modals/AdminUserEditModal"
 import AdminRoleEditModal from "./modals/AdminRoleEditModal"
 import AvatarImage from "../components/AvatarImage"
+import { useNavigate } from "react-router-dom"
 
 function UsersList(props) {
+    const navigate = useNavigate()
     if (props.users && props.users.length > 0) {
         return (
             <Col>
@@ -25,6 +27,8 @@ function UsersList(props) {
                         props.users.filter((user) => user.name.startsWith(props.filter || "")
                             || user.username.startsWith(props.filter || "")).map((user) =>
                                 <ListGroup.Item
+                                    action
+                                    onClick={() => navigate("/user/" + user._id)}
                                     key={user._id}
                                     as="li"
                                     className="d-flex justify-content-between align-items-center user-select-none">

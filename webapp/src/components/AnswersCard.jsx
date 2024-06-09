@@ -2,6 +2,7 @@ import { Row, Col, Button, InputGroup, Form } from "react-bootstrap"
 import { Check } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import { ApiContext } from "../context/api.context"
+import { UserContext } from "../context/user.context"
 import getErrorMessage from "../extras/getErrorMessage";
 
 function AnswersCard(props) {
@@ -9,6 +10,7 @@ function AnswersCard(props) {
     const [formData, setFormData] = useState({})
     const [errors, setErrors] = useState([])
     const api = useContext(ApiContext)
+    const user = useContext(UserContext)
 
     useEffect(() => {
         if (props.task.answerFields)
@@ -45,6 +47,7 @@ function AnswersCard(props) {
         if (result) {
             if (result.data.value.isValid) {
                 props.setIsSubmitted(result.data.value)
+                user.setComputedXp(user.computedXp + props.task.difficulty.value)
             }
             else
                 setInvalidFields(result.data.value.wrongFields)

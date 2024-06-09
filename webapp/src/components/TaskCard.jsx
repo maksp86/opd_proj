@@ -1,8 +1,6 @@
-import { useContext } from "react";
 import { Row, Col, Button } from "react-bootstrap"
 import { CaretRightFill, Check, PencilFill } from "react-bootstrap-icons"
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../context/user.context";
 import IsAdmin from "./IsAdmin";
 
 function TaskCard(props) {

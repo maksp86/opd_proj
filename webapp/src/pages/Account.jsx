@@ -1,20 +1,18 @@
 import { useContext, useEffect, useState } from "react";
-import { Row, Col, ProgressBar, Button, Image, ListGroup, Badge } from "react-bootstrap"
-import TimeAgo from "react-timeago"
+import { Row, Col, Button } from "react-bootstrap"
 import { usePageTitle } from "../hooks/pageTitle.hook"
 import { UserContext } from "../context/user.context";
-import { useNavigate } from "react-router-dom";
 import { ApiContext } from "../context/api.context";
 import { ModalContext } from "../context/modal.context";
 import UserEditModal from "./modals/UserEditModal";
 import AvatarImage from "../components/AvatarImage";
+import LastTasks from "../components/LastTasks";
 
 function Account() {
     const pageTitle = usePageTitle();
     const userContext = useContext(UserContext)
     const api = useContext(ApiContext)
     const modal = useContext(ModalContext)
-    const navigate = useNavigate();
 
     const [taskStats, setTasksStats] = useState([]);
 
@@ -34,40 +32,6 @@ function Account() {
             userContext.setUpdateRequest(true)
         }
     }, [modal.isOpen])
-
-    function LastTasks(props) {
-        if (props.taskStats && props.taskStats.length > 0)
-            return (
-                <ListGroup as="ol">
-                    {
-                        props.taskStats.map((submit) =>
-                            <ListGroup.Item
-                                action
-                                key={submit._id}
-                                as="li"
-                                onClick={() => navigate("/task/" + submit.task._id)}
-                                className="d-flex justify-content-between align-items-center user-select-none">
-                                <div className="ms-2 me-auto">
-                                    <div className="fw-semibold fs-5">{submit.task.title}</div>
-                                    <TimeAgo date={submit.createdAt} />
-                                </div>
-                                <Badge bg="secondary fs-6 fw-medium" pill>
-                                    {submit.task.difficulty.value} xp
-                                </Badge>
-                            </ListGroup.Item>
-                        )
-                    }
-                </ListGroup>
-            )
-        else
-            return (
-                <ListGroup as="ol">
-                    <ListGroup.Item className="text-center">
-                        <h6 className="my-2">No solved tasks</h6>
-                    </ListGroup.Item>
-                </ListGroup>
-            )
-    }
 
     return (
         <>

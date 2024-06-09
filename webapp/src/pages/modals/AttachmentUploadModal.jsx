@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, Button, FloatingLabel, Form, Modal } from "react-bootstrap"
+import { Container, Row, Col, Button, Form, Modal } from "react-bootstrap"
 import { ApiContext } from "../../context/api.context";
 import getErrorMessage from "../../extras/getErrorMessage";
 import { ModalContext } from "../../context/modal.context";
