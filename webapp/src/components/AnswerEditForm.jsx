@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Row, Col, Button, Form, InputGroup, ListGroup } from "react-bootstrap"
 
 function AnswerEditForm(props) {
-    const [formData, setFormData] = useState({})
+    const [formData, setFormData] = useState({ text: "Flag" })
     const [textError, setTextError] = useState(false)
 
     const setField = (field, value) => {
@@ -49,31 +49,33 @@ function AnswerEditForm(props) {
                 </ListGroup>
 
                 <Row className="mt-2 justify-content-center align-items-center">
-                    <Form.Group>
-                        <Form.Text>
-                            New question
-                        </Form.Text>
-                        <InputGroup className="mb-3">
-                            <Form.Control
-                                placeholder="Text"
-                                value={formData.text || ""}
-                                isInvalid={textError}
-                                onChange={(e) => setField("text", e.target.value)} />
-                            <Form.Control
-                                placeholder="Hint"
-                                isInvalid={textError}
-                                value={formData.hint || ""}
-                                onChange={(e) => setField("hint", e.target.value)} />
-                        </InputGroup>
+                    <Col>
+                        <Form.Group>
+                            <Form.Text>
+                                New question
+                            </Form.Text>
+                            <InputGroup className="mb-3">
+                                <Form.Control
+                                    placeholder="Text"
+                                    value={formData.text || ""}
+                                    isInvalid={textError}
+                                    onChange={(e) => setField("text", e.target.value)} />
+                                <Form.Control
+                                    placeholder="Hint"
+                                    isInvalid={textError}
+                                    value={formData.hint || ""}
+                                    onChange={(e) => setField("hint", e.target.value)} />
+                            </InputGroup>
 
-                        <InputGroup>
-                            <Form.Control
-                                placeholder="Answer"
-                                isInvalid={textError}
-                                value={formData.answer || ""}
-                                onChange={(e) => setField("answer", e.target.value)} />
-                        </InputGroup>
-                    </Form.Group>
+                            <InputGroup>
+                                <Form.Control
+                                    placeholder="Answer"
+                                    isInvalid={textError}
+                                    value={formData.answer || ""}
+                                    onChange={(e) => setField("answer", e.target.value)} />
+                            </InputGroup>
+                        </Form.Group>
+                    </Col>
                 </Row>
 
                 <Row className="mt-2 justify-content-center align-items-center">
