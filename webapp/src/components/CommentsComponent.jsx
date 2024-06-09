@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { Row, Col, Button, Image, InputGroup, Form } from "react-bootstrap"
+import { Row, Col, Button, InputGroup, Form } from "react-bootstrap"
 import { Reply, SendFill, TrashFill, X } from "react-bootstrap-icons"
 import TimeAgo from "react-timeago"
 import { UserContext } from "../context/user.context"

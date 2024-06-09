@@ -1,4 +1,4 @@
-import { Container, Row, Col, ProgressBar, Button, Dropdown } from "react-bootstrap"
+import { Container, Row, Col, Button, Dropdown } from "react-bootstrap"
 import { CaretLeftFill, CursorFill, DoorOpenFill, MoonFill, SunFill, ThreeDotsVertical, WrenchAdjustable } from "react-bootstrap-icons"
 
 import { useMatch, useNavigate } from "react-router-dom"
@@ -228,7 +228,15 @@ function TopBar() {
                     <ShowForPath path={"/manage"}>
                         <LogoAndName />
                     </ShowForPath>
+                    <ShowForPath path={"/user/:id"}>
+                        <Col xs="1" sm="1" lg="auto">
+                            <Button variant="" onClick={() => navigate(-1)}><CaretLeftFill /></Button>
+                        </Col>
+                        <LogoAndName />
+                        <Col />
+                    </ShowForPath>
                 </OnlyLogined>
+
                 <OnlyLogined inverse>
                     <ShowForPath path={"/"}>
                         <LogoAndName />
