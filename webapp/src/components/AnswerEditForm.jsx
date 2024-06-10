@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Row, Col, Button, Form, InputGroup, ListGroup } from "react-bootstrap"
+import { TrashFill } from "react-bootstrap-icons"
 
 function AnswerEditForm(props) {
     const [formData, setFormData] = useState({ text: "Flag" })
@@ -42,7 +43,7 @@ function AnswerEditForm(props) {
                                     <div className="fw-bold">{item.text} <i className="fw-light">{item.hint}</i></div>
                                     Answer: {item.answer}
                                 </div>
-                                <Button variant="outline-primary" onClick={() => removeAnswer(item.text)}>Remove</Button>
+                                <Button variant="" onClick={() => removeAnswer(item.text)}><TrashFill /></Button>
                             </ListGroup.Item>
                         )
                     }
