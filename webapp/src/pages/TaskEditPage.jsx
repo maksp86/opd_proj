@@ -1,5 +1,5 @@
 import { Row, Col, Button, FloatingLabel, Form, Overlay, Tooltip } from "react-bootstrap"
-import { Copy } from "react-bootstrap-icons"
+import { Copy, TrashFill } from "react-bootstrap-icons"
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useContext, useEffect, useRef, useState } from "react"
 import MDEditor from "@uiw/react-md-editor"
@@ -120,7 +120,7 @@ function TaskEditPage() {
         return (
             <Row
                 className="p-2 my-2 align-items-center"
-                style={{ backgroundColor: "white", borderRadius: "5px" }}>
+                style={{ backgroundColor: "var(--bs-body-bg)", borderRadius: "5px" }}>
                 <Col>
                     <p className="fw-semibold m-0">{props.item.name}</p>
                 </Col>
@@ -133,8 +133,10 @@ function TaskEditPage() {
                                 setCopied(false)
                             }, 1000);
                         }}>
-                        <Button ref={target}
-                            variant="outline-primary me-2">
+                        <Button
+                            ref={target}
+                            variant=""
+                            className="me-2">
                             <Copy />
                         </Button>
                     </CopyToClipboard>
@@ -148,8 +150,8 @@ function TaskEditPage() {
 
                     <Button
                         onClick={() => RemoveAttachment(props.item._id)}
-                        variant="outline-primary">
-                        Remove
+                        variant="">
+                        <TrashFill />
                     </Button>
                 </Col>
             </Row>

@@ -9,7 +9,7 @@ function CategoryCard(props) {
     const navigate = useNavigate()
     const themeContext = useContext(ThemeContext)
     return (
-        <Col xs="11" md="11" lg="5" className="category-card mx-2 my-4">
+        <Col xs="11" md="11" lg="5" className="category-card mx-2 my-2">
             <Row>
                 <Col xs="auto" className="p-0">
                     <div

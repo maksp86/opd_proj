@@ -42,12 +42,6 @@ function CategoriesPage(props) {
                 </IsAdmin>
             </Row>
             <Row className="justify-content-evenly text-center">
-                {/* <CategoryCard item={{title: "Cryptography", color: "#D04AFF"}} progress="33" />
-                <CategoryCard item={{title: "Web technologies", color: "#FF4A4A"}} progress="33" />
-                <CategoryCard item={{title: "Reverse-engineering", color: "#FF4ACC"}} progress="33" />
-                <CategoryCard item={{title: "Steganography", color: "#39ACFF"}} progress="33" />
-                <CategoryCard item={{title: "Programming", color: "#C5FF4A"}} progress="33" />
-                <CategoryCard item={{title: "Research of hackers", color: "#FFD74A"}} progress="33" /> */}
                 {
                     categories.length > 0 ? categories.map(
                         (value) => <CategoryCard key={value._id} item={value} progress={categoriesStats[value._id]} />
