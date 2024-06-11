@@ -22,6 +22,10 @@
   .topbar-accountactions button > span {
     display: none;
   }
+  .topbar-pxtext-borderbox {
+    padding-right: calc(var(--bs-gutter-x) * 0.5);
+    padding-left: calc(var(--bs-gutter-x) * 0.5);
+  }
 }
 
 @media (max-width: 576px) {

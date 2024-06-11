@@ -7,7 +7,7 @@ export const UserContext = createContext(
         logout: () => { },
         user: {},
         updateUser: () => {},
-        computedXp: 0,
+        computedXp: undefined,
         setComputedXp: () => { },
         loggedIn: false,
         updateRequest: false, 

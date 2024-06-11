@@ -73,6 +73,7 @@ function TasksPage() {
     function DrawTasks() {
         if (tasks.length > 0) {
             return difficulties.sort((prev, item) => (prev.value > item.value ? 1 : -1)).map(item => <DrawTaskRow
+                key={item._id}
                 difficulty={item}
                 tasks={tasks.filter(task => task.difficulty == item._id)}
             />)

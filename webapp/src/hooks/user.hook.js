@@ -2,7 +2,7 @@ import { useCallback, useState } from "react"
 
 export const useUser = () => {
     const [user, setUser] = useState({});
-    const [computedXp, setComputedXp] = useState(0);
+    const [computedXp, setComputedXp] = useState(undefined);
     const [loggedIn, setLoggedIn] = useState(false);
     const [updateRequest, setUpdateRequest] = useState(true)
 
