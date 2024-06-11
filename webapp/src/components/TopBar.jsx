@@ -1,14 +1,15 @@
-import { Container, Row, Col, Button, Dropdown } from "react-bootstrap"
+import { Container, Row, Col, Button, Dropdown, Overlay, Tooltip } from "react-bootstrap"
 import { CaretLeftFill, CursorFill, DoorOpenFill, MoonFill, SunFill, ThreeDotsVertical, WrenchAdjustable } from "react-bootstrap-icons"
 
 import { useMatch, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/user.context"
-import { useContext } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import OnlyLogined from "./OnlyLogined"
 import { ApiContext } from "../context/api.context"
 import { BreadcrumbsContext } from "../context/breadcrumbs.context"
 import IsAdmin from "../components/IsAdmin"
 import { ThemeContext } from "../context/theme.context"
+import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
 
 function ShowForPath(props) {
     const isMatch = useMatch(props.path)
@@ -18,15 +19,40 @@ function ShowForPath(props) {
 }
 
 function UserProgressBar(props) {
+    const oldComputedXp = useRef(undefined)
+    const tooltipElementRef = useRef()
+    const popoverRef = useRef()
+    const [showPopover, setShowPopover] = useState({ open: false, text: undefined })
+
+    useEffect(() => {
+        if (props.userContext.loggedIn) {
+            if (props.userContext.computedXp > oldComputedXp.current) {
+                console.log(`UserProgressBar computedXp changed from ${oldComputedXp.current} to ${props.userContext.computedXp}`)
+                setShowPopover({ open: true, text: props.userContext.computedXp - oldComputedXp.current })
+            }
+            oldComputedXp.current = props.userContext.computedXp;
+        }
+    }, [props.userContext.computedXp])
+
+    const confettiInstance = useRef();
+
+    const onInitHandler = (confetti) => {
+        (confettiInstance.current = confetti);
+        confettiInstance.current.confetti({ spread: 360, startVelocity: 15, particleCount: 100 });
+    }
+
     return (
         <Col xs="3" sm="6" lg="6">
             <Row className="align-items-center">
-                <Col className="topbar-progressbar">
+                <Col className="topbar-progressbar align-items-center">
                     <div
+                        // onClick={() => { props.userContext.setComputedXp(props.userContext.computedXp + 500); }}
                         style={{
                             backgroundColor: "var(--bs-success-bg-subtle)"
                         }}
+                        ref={tooltipElementRef}
                         className="progress">
+
                         <div
                             className="progress-bar"
                             role="progressbar"
@@ -39,8 +65,27 @@ function UserProgressBar(props) {
                             aria-valuemax="100">
                         </div>
                     </div>
+
+                    <Overlay
+                        ref={popoverRef}
+                        show={showPopover.open}
+                        target={tooltipElementRef.current}
+                        placement="bottom"
+                        onEntering={() => { }}
+                        onEntered={() => setTimeout(() => { setShowPopover({ ...showPopover, open: false }) }, 2000)}
+                    >
+                        <Tooltip>
+                            <Fireworks
+                                width={300}
+                                height={150}
+                                style={{ position: "absolute", zIndex: 10001, right: "50%", left: "50%", margin: "auto", transform: "translate(-50%, -50%)" }}
+                                globalOptions={{ useWorker: true, resize: true }}
+                                onInit={onInitHandler} />
+                            +{showPopover.text} xp
+                        </Tooltip>
+                    </Overlay>
                 </Col>
-                <Col xs="12" sm="auto" className="d-grid justify-content-end">
+                <Col xs="12" sm="auto" className="d-grid justify-content-end p-0">
                     <div
                         className="topbar-pxtext-borderbox"
                         style={{
@@ -49,8 +94,8 @@ function UserProgressBar(props) {
                         <h6 className="topbar-pxtext m-0">{props.userContext.computedXp} xp</h6>
                     </div>
                 </Col>
-            </Row >
-        </Col >
+            </Row>
+        </Col>
     )
 }
 
@@ -103,10 +148,10 @@ function TopBar() {
     function ForCategoriesPage() {
         return (
             <>
-                <Col xs="1" sm="1" lg="auto">
+                <Col xs="1" sm="auto" lg="auto" className="p-0">
                     <Button variant="" onClick={() => onCategoryBack()}><CaretLeftFill /></Button>
                 </Col>
-                <Col xs="7" sm="5" md>
+                <Col xs="8" sm="5" md>
                     <h3 className="m-0 text-truncate">{breadCrumbscontext.lastCategory && breadCrumbscontext.lastCategory.title}</h3>
                 </Col>
                 <UserProgressBar userContext={userContext} />
@@ -117,18 +162,22 @@ function TopBar() {
     function LogoAndName() {
         return (
             <>
-                <Col xs="auto" className="align-items-left">
-                    <CursorFill
-                        className="topbar-logo-icon"
-                        style={{
-                            height: "calc(1.325rem + 0.9vw)",
-                            width: "calc(1.325rem + 0.9vw)",
-                            minHeight: "30px",
-                            minWidth: "30px",
-                        }} />
-                </Col>
-                <Col xs="auto" sm className="align-items-left">
-                    <h3 className="m-0 topbar-logo-text">CTF Navigator</h3>
+                <Col xs="auto">
+                    <Row>
+                        <Col xs="auto" className="align-items-left">
+                            <CursorFill
+                                className="topbar-logo-icon"
+                                style={{
+                                    height: "calc(1.325rem + 0.9vw)",
+                                    width: "calc(1.325rem + 0.9vw)",
+                                    minHeight: "30px",
+                                    minWidth: "30px",
+                                }} />
+                        </Col>
+                        <Col xs="auto" sm className="align-items-left">
+                            <h3 className="m-0 topbar-logo-text">CTF Navigator</h3>
+                        </Col>
+                    </Row>
                 </Col>
             </>
         )
@@ -215,11 +264,11 @@ function TopBar() {
                     </ShowForPath>
 
                     <ShowForPath path={"/task/:id"}>
-                        <Col xs="1" sm="1" lg="auto">
+                        <Col xs="1" sm="auto" lg="auto" className="p-0">
                             <Button variant="" onClick={() => onTaskBack()}><CaretLeftFill /></Button>
                         </Col>
 
-                        <Col xs="7" sm="5" md>
+                        <Col xs="8" sm="5" md>
                             <h3 className="m-0">Task</h3>
                         </Col>
                         <UserProgressBar userContext={userContext} />
@@ -229,7 +278,7 @@ function TopBar() {
                         <LogoAndName />
                     </ShowForPath>
                     <ShowForPath path={"/user/:id"}>
-                        <Col xs="1" sm="1" lg="auto">
+                        <Col xs="1" sm="auto" lg="auto" className="p-0">
                             <Button variant="" onClick={() => navigate(-1)}><CaretLeftFill /></Button>
                         </Col>
                         <LogoAndName />
