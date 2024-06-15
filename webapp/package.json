@@ -14,6 +14,8 @@
   "dependencies": {
     "@uiw/react-md-editor": "^4.0.4",
     "bootstrap": "^5.3.3",
+    "braces": ">=3.0.3",
+    "check-password-strength": "^2.0.10",
     "localforage": "^1.10.0",
     "markdown-to-jsx": "^7.4.7",
     "react": "^18.2.0",
@@ -27,8 +29,7 @@
     "react-timeago": "^7.2.0",
     "rehype-sanitize": "^6.0.0",
     "sass": "^1.77.1",
-    "sass-loader": "^14.2.1",
-    "braces": ">=3.0.3"
+    "sass-loader": "^14.2.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

@@ -3,6 +3,7 @@ const apiErrorMessages = {
     
     "user_wrong_password": "Wrong password",
     "user_not_exist": "User not exist",
+    "user_same_password": "Same as old",
 
     "validation_failed": "Validation failed",
     "field_empty": "Field empty",

@@ -6,6 +6,7 @@ import { usePageTitle } from "../hooks/pageTitle.hook"
 import { ApiContext } from "../context/api.context";
 import Switch from "../components/Switch";
 import getErrorMessage from "../extras/getErrorMessage";
+import checkPasswordStrength from "../extras/checkPasswordStrength";
 
 
 
@@ -49,6 +50,22 @@ function LoginPage() {
             userContext.login(result.data.value);
             navigate('/')
         }
+    }
+
+    function onPassswordFieldChange(password) {
+        let passwordError = undefined
+        if (registerMode) {
+            passwordError = checkPasswordStrength(password, "register")
+        }
+        setFormData({
+            ...formData,
+            password
+        })
+
+        setErrors({
+            ...errors,
+            password: passwordError
+        })
     }
 
     useEffect(() => {
@@ -119,7 +136,7 @@ function LoginPage() {
                                     type={showPassword ? "text" : "password"}
                                     placeholder="Password"
                                     value={formData.password || ""}
-                                    onChange={(e) => setField("password", e.target.value)}
+                                    onChange={(e) => onPassswordFieldChange(e.target.value)}
                                     isInvalid={!!errors.password} />
                                 <Form.Control.Feedback type='invalid'>
                                     {errors.password}

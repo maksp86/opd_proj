@@ -1,13 +1,18 @@
 .category-card {
     display: grid;
     border-radius: 20px;
-    background-color: var(--bs-card-bg);    
+    background-color: var(--bs-card-bg);
     overflow: hidden;
     max-height: 200px;
     user-select: none;
-    transition: all .2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+    box-sizing: border-box;
 }
 
 .category-card:hover {
-    background-color: var(--bs-body-tertiary-bg)
+    background-color: var(--bs-body-tertiary-bg);
+}
+
+.category-card:active {
+    outline: $btn-border-width solid $border-color !important;
 }

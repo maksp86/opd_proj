@@ -7,7 +7,7 @@ function LastTasks(props) {
     const navigate = useNavigate()
     if (props.taskStats && props.taskStats.length > 0)
         return (
-            <ListGroup as="ol">
+            <ListGroup as="ol" style={{ borderRadius: "15px" }}>
                 {
                     props.taskStats.map((submit) =>
                         <ListGroup.Item
@@ -31,7 +31,7 @@ function LastTasks(props) {
     else
         return (
             <ListGroup as="ol">
-                <ListGroup.Item className="text-center">
+                <ListGroup.Item className="text-center" style={{ borderRadius: "15px" }}>
                     <h6 className="my-2">No solved tasks</h6>
                 </ListGroup.Item>
             </ListGroup>

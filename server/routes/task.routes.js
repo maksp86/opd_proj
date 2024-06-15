@@ -6,6 +6,7 @@ const { processValidaion, rejectIfAlreadyLogined, rejectIfNotLogined } = require
 const { getPermissionsStruct, canUserDoIn, canUserDoInGroup } = require("../lib/user.functions")
 const Task = require("../model/task.model");
 const Category = require("../model/category.model");
+const Submit = require("../model/submit.model");
 const Difficulty = require("../model/difficulty.model");
 const Comment = require("../model/comment.model")
 const { getSubComments } = require("../lib/comment.functions")
@@ -202,6 +203,17 @@ async function processTaskCreate(req, res) {
                 })
             }
             else if (req.url === "/edit") {
+                let answersChanged = foundTask.answerFields.length !== answerFields.length ||
+                    foundTask.answerFields.some(
+                        newfield =>
+                            !answerFields.some(field => field.text === newfield.text
+                                && field.answer === newfield.answer))
+
+                if (answersChanged) {
+                    logger.debug("[task] processTaskEdit answersChanged")
+                    await Submit.deleteMany({ task: foundTask._id })
+                }
+
                 await foundTask.updateOne({
                     title,
                     summary,

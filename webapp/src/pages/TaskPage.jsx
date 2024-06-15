@@ -39,7 +39,11 @@ function TaskPage() {
 
         if (result) {
             pageTitle.set(result.data.value.title)
-            setTask(result.data.value)
+            let loadedTask = result.data.value
+            setTask({
+                ...loadedTask,
+                attachments: loadedTask.attachments.filter(item => !loadedTask.text.includes(`${item._id})`))
+            })
             isAlreadySubmitted()
             breadCrumbscontext.setLastTask(result.data.value)
         }
@@ -154,7 +158,7 @@ function TaskPage() {
                                                 <div className="ms-2 me-auto">
                                                     <div className="fw-medium">{item.name}</div>
                                                 </div>
-                                                <Button variant="outline-primary" onClick={() => window.open("/api/attachments/get?id=" + item._id, "_blank")}><Download size={20} /></Button>
+                                                <Button variant="" onClick={() => window.open("/api/attachments/get?id=" + item._id, "_blank")}><Download /></Button>
                                             </ListGroup.Item>
                                         )
                                     }

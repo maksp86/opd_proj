@@ -65,7 +65,7 @@ function AnswersCard(props) {
                             <Form.Control
                                 onChange={(e) => setField(field._id, e.target.value)}
                                 value={formData[field._id] || ""}
-                                placeholder={"Hint: " + field.hint}
+                                placeholder={"Hint: " + (field.hint || "")}
                                 isInvalid={invalidFields.includes(field._id)}>
                             </Form.Control>
                             {props.task.answerFields.length == 1 && <Button onClick={submitTask}>Submit</Button>}
