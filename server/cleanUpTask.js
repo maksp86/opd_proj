@@ -10,6 +10,7 @@ const Comment = require("./model/comment.model")
 
 const fs = require("fs")
 const path = require("path")
+const ServerInfo = require("./model/serverinfo.model")
 
 const uploadsPath = path.join(__dirname, "..", "uploads");
 
@@ -21,7 +22,9 @@ async function DeleteUnusedAttachments() {
     const users = await User.find({ image: { $exists: true } }, { image: 1 })
     const tasks = await Task.find({ attachments: { $exists: true, $ne: [] } }, { attachments: 1 })
 
-    const usedAttachments = [...users.map(user => user.image), ...tasks.map(task => task.attachments).flat()].map(item => item.toString())
+    const serverinfo = await ServerInfo.findOne();
+
+    const usedAttachments = [...users.map(user => user.image), ...tasks.map(task => task.attachments).flat()].map(item => item.toString(), ...serverinfo.attachments)
 
     let removedIDs = []
     for (let i = 0; i < attachments.length; i++) {
@@ -101,14 +104,12 @@ async function DeleteUnusedTasks() {
 }
 
 async function CleanUpTask() {
-    try
-    {
+    try {
         await DeleteUnusedTasks()
         await DeleteUnusedAttachments()
     }
-    catch (e)
-    {
-        logger.error("[cleanup] Error on cleanup: %s", err);   
+    catch (e) {
+        logger.error("[cleanup] Error on cleanup: %s", err);
     }
 }
 

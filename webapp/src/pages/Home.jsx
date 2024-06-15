@@ -5,10 +5,12 @@ import { usePageTitle } from "../hooks/pageTitle.hook"
 import { useNavigate } from "react-router-dom"
 import { BreadcrumbsContext } from "../context/breadcrumbs.context"
 import NewsComponent from "../components/NewsComponent"
+import { ServerInfoContext } from "../context/serverinfo.context"
 
 function Home() {
     const navigate = useNavigate()
     const breadCrumbscontext = useContext(BreadcrumbsContext)
+    const serverinfo = useContext(ServerInfoContext)
     const userContext = useContext(UserContext)
     const pageTitle = usePageTitle()
 
@@ -24,8 +26,8 @@ function Home() {
                         <Card style={{ borderRadius: "20px", overflow: "hidden" }}>
                             <Card.Body>
                                 <Card.Title>Introduction</Card.Title>
-                                <Card.Text>
-                                    Welcome to the site where you can learn both basic and more sophisticated information about information security.<br />You will also be provided with videos, after watching them you can try to fix the vulnerability yourself, or you will be asked a couple of questions so that you can verify the information received.
+                                <Card.Text style={{ whiteSpace: "pre-wrap" }}>
+                                    {serverinfo.serverInfo.introduction}
                                 </Card.Text>
                             </Card.Body>
                         </Card>

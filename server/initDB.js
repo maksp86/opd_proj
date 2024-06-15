@@ -3,6 +3,8 @@ const logger = require("winston")
 
 const UserRole = require("./model/userrole.model")
 const User = require("./model/user.model")
+const ServerInfo = require("./model/serverinfo.model")
+
 
 function genPass(passLen) {
     const pwdChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -32,6 +34,15 @@ async function databaseInit() {
         await (new User({ username: "admin", role: adminRole._id, passwordHash: passHash })).save()
 
         logger.info("Credentials: admin/%s please change password immediately", password)
+    }
+    if (!await ServerInfo.findOne()) {
+        const serverinfo = new ServerInfo({
+            name: "Education platform",
+            contactsText: "# Fill me",
+            attachments: [],
+            introduction: "Welcome text! Change me!"
+        })
+        await serverinfo.save()
     }
 }
 

@@ -101,7 +101,7 @@ async function processUserStats(req, res) {
             status: "no_error",
             value: {
                 foundUser: foundUser.toJSON(),
-                rating: userRating
+                rating: userRating,
             }
         })
     }
