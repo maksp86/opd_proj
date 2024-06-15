@@ -51,7 +51,7 @@ function UserProgressBar(props) {
                         style={{
                             backgroundColor: "var(--bs-success-bg-subtle)"
                         }}
-                        ref={tooltipElementRef}
+                        ref={(document.body.clientWidth > 576) ? tooltipElementRef : undefined}
                         className="progress">
 
                         <div
@@ -88,6 +88,7 @@ function UserProgressBar(props) {
                 </Col>
                 <Col xs="12" sm="auto" className="d-grid justify-content-end p-0">
                     <div
+                        ref={(document.body.clientWidth < 576) ? tooltipElementRef : undefined}
                         className="topbar-pxtext-borderbox"
                         style={{
                             "--props-computed-xp": (props.userContext.computedXp % 1000 / 1000 * 360) + "deg"
