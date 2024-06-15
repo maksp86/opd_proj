@@ -7,7 +7,9 @@ function TaskCard(props) {
     const navigate = useNavigate()
 
     return (
-        <Col xs="11" md="11" lg="5" className="category-card my-2 mx-2">
+        <Col xs="11" md="11" lg="5"
+            className="category-card my-2 mx-2"
+            onClick={() => navigate("/task/" + props.item._id)}>
             <Row>
                 <Col xs className="align-items-center my-3">
                     <div className="w-100 my-auto mx-2">
@@ -27,9 +29,9 @@ function TaskCard(props) {
                     </IsAdmin>
 
                     <Button
-                        variant=""
-                        onClick={() => navigate("/task/" + props.item._id)}>
-                        <CaretRightFill className="category-card-go-icon" size={20} />
+                        className="border-0"
+                        variant="">
+                        <CaretRightFill size={20} />
                     </Button>
                 </Col>
             </Row>

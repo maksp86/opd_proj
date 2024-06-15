@@ -40,5 +40,7 @@ Status codes:
 - [x] Various helping modals
 - [x] Image cropping for profile picture
 - [x] Dark and Light theme
+- [x] Customisable server info and introducion on home page
+- [ ] Everyday goals
 
 ### Production server is already located at https://edplatform.maksp.gsqd.ru (https only)

@@ -1,5 +1,5 @@
 import { Container, Row, Col, Button, Dropdown, Overlay, Tooltip } from "react-bootstrap"
-import { CaretLeftFill, CursorFill, DoorOpenFill, MoonFill, SunFill, ThreeDotsVertical, WrenchAdjustable } from "react-bootstrap-icons"
+import { CaretLeftFill, CursorFill, DoorOpenFill, InfoCircleFill, MoonFill, SunFill, ThreeDotsVertical, WrenchAdjustable } from "react-bootstrap-icons"
 
 import { useMatch, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/user.context"
@@ -10,6 +10,7 @@ import { BreadcrumbsContext } from "../context/breadcrumbs.context"
 import IsAdmin from "../components/IsAdmin"
 import { ThemeContext } from "../context/theme.context"
 import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
+import { ServerInfoContext } from "../context/serverinfo.context"
 
 function ShowForPath(props) {
     const isMatch = useMatch(props.path)
@@ -124,6 +125,7 @@ function TopBar() {
     const navigate = useNavigate()
     const userContext = useContext(UserContext)
     const breadCrumbscontext = useContext(BreadcrumbsContext)
+    const serverInfo = useContext(ServerInfoContext)
     const api = useContext(ApiContext)
 
     async function processLogout() {
@@ -175,7 +177,7 @@ function TopBar() {
                                 }} />
                         </Col>
                         <Col xs="auto" sm className="align-items-left">
-                            <h3 className="m-0 topbar-logo-text">CTF Navigator</h3>
+                            <h3 className="m-0 topbar-logo-text">{serverInfo.serverInfo.name}</h3>
                         </Col>
                     </Row>
                 </Col>
@@ -186,6 +188,14 @@ function TopBar() {
     function AccountActions() {
         return (
             <Row className="justify-content-center topbar-accountactions">
+                <Col xs="12" sm="auto">
+                    <Button
+                        variant=""
+                        onClick={() => navigate("/contacts")}>
+                        <InfoCircleFill />
+                        <span>Contacts</span>
+                    </Button>
+                </Col>
                 <Col xs="12" sm="auto">
                     <ThemeSwitchButton />
                 </Col>
@@ -269,7 +279,7 @@ function TopBar() {
                         </Col>
 
                         <Col xs="8" sm="5" md>
-                            <h3 className="m-0">Task</h3>
+                            <h3 className="m-0">{breadCrumbscontext.lastTask && (breadCrumbscontext.lastTask.parent.isLearning ? "Article" : "Task")}</h3>
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
@@ -290,6 +300,13 @@ function TopBar() {
                     <ShowForPath path={"/"}>
                         <LogoAndName />
                         <Col />
+                        <Col xs="auto">
+                            <Button
+                                variant=""
+                                onClick={() => navigate("/contacts")}>
+                                <InfoCircleFill />
+                            </Button>
+                        </Col>
                     </ShowForPath>
 
                     <ShowForPath path={"/login"}>
@@ -297,8 +314,12 @@ function TopBar() {
                         <Col />
                     </ShowForPath>
                 </OnlyLogined>
+
+                <ShowForPath path={"/contacts"}>
+                    <LogoAndName />
+                </ShowForPath>
             </Row>
-        </Container >
+        </Container>
     )
 }
 

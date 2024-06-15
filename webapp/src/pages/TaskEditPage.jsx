@@ -120,7 +120,7 @@ function TaskEditPage() {
         return (
             <Row
                 className="p-2 my-2 align-items-center"
-                style={{ backgroundColor: "var(--bs-body-bg)", borderRadius: "5px" }}>
+                style={{ backgroundColor: "var(--bs-body-bg)", borderRadius: "15px" }}>
                 <Col>
                     <p className="fw-semibold m-0">{props.item.name}</p>
                 </Col>

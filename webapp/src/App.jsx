@@ -26,10 +26,13 @@ import TasksPage from './pages/TasksPage.jsx'
 import TaskEditPage from './pages/TaskEditPage.jsx'
 import TaskPage from './pages/TaskPage.jsx'
 import { BreadcrumbsContext } from './context/breadcrumbs.context.js'
+import { ServerInfoContext } from './context/serverinfo.context.js'
 import { useBreadcrumbs } from './hooks/breadcrumbs.hook.js'
 import { useTheme } from './hooks/theme.hook.js'
 import ManagementPage from './pages/UsersEditPage.jsx'
 import UserViewPage from './pages/UserViewPage.jsx'
+import { useServerInfo } from './hooks/serverInfo.hook.js'
+import ContactsPage from './pages/ContactsPage.jsx'
 
 
 function App() {
@@ -38,6 +41,7 @@ function App() {
     const modalHook = useModal();
     const breadcrumbsHook = useBreadcrumbs();
     const themeHook = useTheme();
+    const serverinfoHook = useServerInfo();
 
     async function fetchUserStats() {
         userHook.setUpdateRequest(false)
@@ -49,10 +53,20 @@ function App() {
         }
     }
 
+    async function fetchServerInfo() {
+        let result = await apiHook.request("/info/")
+
+        if (result) {
+            serverinfoHook.set(result.data.value)
+        }
+    }
+
     useConstructor(() => {
         themeHook.load();
         userHook.load();
+        serverinfoHook.load();
         userHook.setUpdateRequest(true);
+        fetchServerInfo();
     })
 
     useEffect(() => {
@@ -79,56 +93,59 @@ function App() {
     return (
         <ApiContext.Provider value={apiHook}>
             <UserContext.Provider value={userHook}>
-                <ModalContext.Provider value={modalHook}>
-                    <BreadcrumbsContext.Provider value={breadcrumbsHook}>
-                        <ThemeContext.Provider value={themeHook}>
-                            <Modal
-                                show={modalHook.isOpen}
-                                onHide={() => modalHook.close()}
-                                aria-labelledby="contained-modal-title-vcenter"
-                                centered
-                                backdrop={modalHook.isClosable ? true : "static"}
-                                keyboard={modalHook.isClosable}
-                            >
-                                <Modal.Body>
-                                    {modalHook.content}
-                                </Modal.Body>
-                            </Modal>
-                            <BrowserRouter>
-                                <TopBar user={userHook.user} />
-                                <Container className="maincontainer py-4">
-                                    <Routes>
-                                        <Route path='/' element={<Home />} />
-                                        {(userHook.loggedIn === false) &&
-                                            <>
-                                                <Route path='/login' element={<LoginPage />} />
-                                                <Route path='*' element={<Navigate replace to="/login" />} />
-                                            </>
-                                        }
+                <ServerInfoContext.Provider value={serverinfoHook}>
+                    <ModalContext.Provider value={modalHook}>
+                        <BreadcrumbsContext.Provider value={breadcrumbsHook}>
+                            <ThemeContext.Provider value={themeHook}>
+                                <Modal
+                                    show={modalHook.isOpen}
+                                    onHide={() => modalHook.close()}
+                                    aria-labelledby="contained-modal-title-vcenter"
+                                    centered
+                                    backdrop={modalHook.isClosable ? true : "static"}
+                                    keyboard={modalHook.isClosable}
+                                >
+                                    <Modal.Body>
+                                        {modalHook.content}
+                                    </Modal.Body>
+                                </Modal>
+                                <BrowserRouter>
+                                    <TopBar user={userHook.user} />
+                                    <Container className="maincontainer py-4">
+                                        <Routes>
+                                            <Route path='/' element={<Home />} />
+                                            <Route path='/contacts' element={<ContactsPage />} />
+                                            {(userHook.loggedIn === false) &&
+                                                <>
+                                                    <Route path='/login' element={<LoginPage />} />
+                                                    <Route path='*' element={<Navigate replace to="/login" />} />
+                                                </>
+                                            }
 
-                                        {(userHook.loggedIn === true) &&
-                                            <>
-                                                <Route path='/account' element={<Account />} />
-                                                <Route path='/learning' key="learningCategories" element={<CategoriesPage isLearning={true} />} />
-                                                <Route path='/learning/:category' key="learning" element={<TasksPage />} />
-                                                <Route path='/tasks' element={<CategoriesPage key="taskCategories" isLearning={false} />} />
-                                                <Route path='/task/:id' element={<TaskPage key="taskView" />} />
-                                                <Route path='/tasks/:category' element={<TasksPage key="tasks" />} />
-                                                <Route path='/category/edit/' element={<CategoryEditPage />} />
-                                                <Route path='/task/edit/' element={<TaskEditPage />} />
-                                                <Route path='/user/:id' element={<UserViewPage />} />
-                                                <Route path='/manage' element={<ManagementPage />} />
-                                                <Route path='*' key="notfound" element={<NotFound />} />
-                                            </>
-                                        }
+                                            {(userHook.loggedIn === true) &&
+                                                <>
+                                                    <Route path='/account' element={<Account />} />
+                                                    <Route path='/learning' key="learningCategories" element={<CategoriesPage isLearning={true} />} />
+                                                    <Route path='/learning/:category' key="learning" element={<TasksPage />} />
+                                                    <Route path='/tasks' element={<CategoriesPage key="taskCategories" isLearning={false} />} />
+                                                    <Route path='/task/:id' element={<TaskPage key="taskView" />} />
+                                                    <Route path='/tasks/:category' element={<TasksPage key="tasks" />} />
+                                                    <Route path='/category/edit/' element={<CategoryEditPage />} />
+                                                    <Route path='/task/edit/' element={<TaskEditPage />} />
+                                                    <Route path='/user/:id' element={<UserViewPage />} />
+                                                    <Route path='/manage' element={<ManagementPage />} />
+                                                    <Route path='*' key="notfound" element={<NotFound />} />
+                                                </>
+                                            }
 
-                                    </Routes>
-                                </Container>
-                                <Navigation />
-                            </BrowserRouter>
-                        </ThemeContext.Provider>
-                    </BreadcrumbsContext.Provider>
-                </ModalContext.Provider>
+                                        </Routes>
+                                    </Container>
+                                    <Navigation />
+                                </BrowserRouter>
+                            </ThemeContext.Provider>
+                        </BreadcrumbsContext.Provider>
+                    </ModalContext.Provider>
+                </ServerInfoContext.Provider>
             </UserContext.Provider>
         </ApiContext.Provider>
     )

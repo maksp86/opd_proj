@@ -16,7 +16,7 @@ user_router.post("/register",
         rejectIfAlreadyLogined,
         check('username', "field_empty").isAlphanumeric().isLength({ min: 5, max: 30 }).withMessage("invalid_length"),
         check('name', "field_empty").isString().isLength({ min: 5, max: 100 }).withMessage("invalid_length"),
-        check('password', "field_empty").isString().isLength({ min: 10, max: 255 }).withMessage("invalid_length"),
+        check('password', "field_empty").isString().isLength({ min: 8, max: 255 }).withMessage("invalid_length"),
         processValidaion
     ], processRegister);
 
@@ -24,7 +24,7 @@ user_router.post("/login",
     [
         rejectIfAlreadyLogined,
         check('username', "field_empty").isAlphanumeric().isLength({ min: 5, max: 30 }).withMessage("invalid_length"),
-        check('password', "field_empty").isString().isLength({ min: 10, max: 255 }).withMessage("invalid_length"),
+        check('password', "field_empty").isString().isLength({ min: 8, max: 255 }).withMessage("invalid_length"),
         processValidaion
     ], processLogin);
 
@@ -44,8 +44,8 @@ user_router.post("/edit",
 user_router.post("/editpassword",
     [
         rejectIfNotLogined,
-        check('oldpassword', "field_empty").isString().isLength({ min: 10, max: 255 }).withMessage("invalid_length"),
-        check('newpassword', "field_empty").isString().isLength({ min: 10, max: 255 }).withMessage("invalid_length"),
+        check('oldpassword', "field_empty").isString().isLength({ min: 8, max: 255 }).withMessage("invalid_length"),
+        check('newpassword', "field_empty").isString().isLength({ min: 8, max: 255 }).withMessage("invalid_length"),
         processValidaion
     ],
     processEditPassword
@@ -56,19 +56,22 @@ async function processEditPassword(req, res) {
 
     const isValidOldPassword = await bcrypt.compare(oldpassword, req.user.passwordHash)
     if (isValidOldPassword) {
-        const newPasswordHash = await bcrypt.hash(newpassword, 10);
-        req.user.passwordHash = newPasswordHash;
-        await req.user.save();
-        res.status(200).json({ status: "no_error" });
+        if (oldpassword !== newpassword) {
+            const newPasswordHash = await bcrypt.hash(newpassword, 10);
+            req.user.passwordHash = newPasswordHash;
+            await req.user.save();
+            res.status(200).json({ status: "no_error" });
+        }
+        else
+            return res.status(400).json({ status: "validation_failed", errors: [{ msg: "user_same_password", path: "newpassword" }] });
     }
-    else {
-        res.status(400).json({ status: "user_wrong_password" });
-    }
+    else
+        return res.status(400).json({ status: "validation_failed", errors: [{ msg: "user_wrong_password", path: "oldpassword" }] });
 }
 
 async function processEditInfo(req, res) {
     const { bio, name, image } = req.body;
-    if (!image ||Attachment.exists({ _id: image })) {
+    if (!image || Attachment.exists({ _id: image })) {
         await req.user.updateOne({ bio, name, image })
         res.status(200).json({ status: "no_error" });
     }

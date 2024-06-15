@@ -5,7 +5,8 @@ import { ApiContext } from "../../context/api.context";
 import { UserContext } from "../../context/user.context";
 import getErrorMessage from "../../extras/getErrorMessage";
 import { ModalContext } from "../../context/modal.context";
-import { X } from "react-bootstrap-icons";
+import { PencilFill, X } from "react-bootstrap-icons";
+import PasswordChangeModal from "./PasswordChangeModal";
 
 function UserEditModal() {
     const modalContext = useContext(ModalContext)
@@ -55,24 +56,30 @@ function UserEditModal() {
             summary: null
         })
 
-        if (!formData.image) {
-            setErrors({ ...errors, image: getErrorMessage("field_empty") });
-            return
+        let imageId = undefined
+
+        if (formData.image) {
+            const imageUploadData = new FormData()
+            imageUploadData.append("type", "avatar")
+            imageUploadData.append("permissions", "744")
+            imageUploadData.append("file", formData.image)
+
+            const imageUploadResult = await api.request("/attachments/upload", "POST", imageUploadData)
+
+            if (imageUploadResult && imageUploadResult.data.value) {
+                console.log("Image uploaded ", imageUploadResult)
+                imageId = imageUploadResult.data.value._id
+            }
+            else {
+                setErrors({ ...errors, image: getErrorMessage("field_invalid") });
+                return
+            }
         }
-        const imageUploadData = new FormData()
-        imageUploadData.append("type", "avatar")
-        imageUploadData.append("permissions", "744")
-        imageUploadData.append("file", formData.image)
 
-        const imageUploadResult = await api.request("/attachments/upload", "POST", imageUploadData)
+        const result = await api.request("/user/edit", "POST", { ...formData, image: imageId })
 
-        if (imageUploadResult && imageUploadResult.data.value) {
-            console.log("Image uploaded ", imageUploadResult)
-            const result = await api.request("/user/edit", "POST", { ...formData, image: imageUploadResult.data.value._id })
-
-            if (result)
-                modalContext.close()
-        }
+        if (result)
+            modalContext.close()
     }
 
     async function getCroppedImg(imageSrc, pixelCrop) {
@@ -183,7 +190,7 @@ function UserEditModal() {
                                     <Form.Control
                                         ref={fileInputRef}
                                         className="d-none"
-                                        id="usereditmodal-fileinput"
+                                        // id="usereditmodal-fileinput"
                                         type="file"
                                         accept="image/png, image/jpeg, image/webp"
                                         onChange={(e) => {
@@ -198,6 +205,13 @@ function UserEditModal() {
                                         {errors.image}
                                     </Form.Control.Feedback>
                                 </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col className="px-4 my-2">
+                                <a href="#" onClick={() => { modalContext.show(<PasswordChangeModal />) }}>
+                                    Change password
+                                </a>
                             </Col>
                         </Row>
                         <Row className="px-4">

@@ -9,7 +9,9 @@ function CategoryCard(props) {
     const navigate = useNavigate()
     const themeContext = useContext(ThemeContext)
     return (
-        <Col xs="11" md="11" lg="5" className="category-card mx-2 my-2">
+        <Col xs="11" md="11" lg="5"
+            className="category-card mx-2 my-2"
+            onClick={() => navigate("./" + props.item.shortname, { state: { item: props.item } })}>
             <Row>
                 <Col xs="auto" className="p-0">
                     <div
@@ -60,10 +62,9 @@ function CategoryCard(props) {
                         </Button>
                     </IsAdmin>
                     <Button
-
-                        variant=""
-                        onClick={() => navigate("./" + props.item.shortname, { state: { item: props.item } })}>
-                        <CaretRightFill className="category-card-go-icon" size={20} />
+                        className="border-0"
+                        variant="">
+                        <CaretRightFill size={20} />
                     </Button>
                 </Col>
             </Row>

@@ -32,7 +32,7 @@ function AnswerEditForm(props) {
         <Col>
             <Row className="px-3 mb-3">
                 <p>Questions</p>
-                <ListGroup as="ol" numbered>
+                <ListGroup as="ol" numbered style={{ borderRadius: "15px" }}>
                     {
                         props.answers.map((item) =>
                             <ListGroup.Item

@@ -4,34 +4,18 @@
   position: absolute;
 }
 
-// $primary: #aac7ff;
-// $secondary: #bec6dc;
-// $success: #92d5ab;
-// $info: #ddbce0;
-// $warning: #ffb782;
-// $danger: #ffb4ab;
-// $light: #e2e2e9;
-// $dark: #2e3036;
-
-// $body-bg: #ffffff;
-// $body-color: #191c20;
-
-// $card-border-width: 0;
-// $card-bg: #f9f9ff;
-
-// $body-tertiary-color: #3f2844;
-// $body-tertiary-bg: #f3f3fa;
-
-// $secondary-text-emphasis: #283141;
-
-// $progress-bar-color: $body-color;
-
 $enable-reduced-motion: false;
 $card-border-width: 0;
+$border-radius:               .375rem * 2;
+$border-radius-sm:            .25rem * 2;
+$border-radius-lg:            .5rem * 2;
+$border-radius-xl:            1rem * 2;
+$border-radius-xxl:           2rem * 2;
+$border-radius-pill:          50rem;
 
 @import "./scss/light-mode.scss";
-
 @import "bootstrap/scss/bootstrap";
+
 
 [data-bs-theme="dark"] {
   --bs-body-bg: #000;
