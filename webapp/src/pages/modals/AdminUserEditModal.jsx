@@ -25,7 +25,7 @@ function AdminUserEditModal(props) {
 
     useEffect(() => {
         if (api.error && !api.error.preventNext) {
-            console.log("UserEditModal error", api.error);
+            console.error("AdminUserEditModal error", api.error);
             let errors = {}
             if (api.error.status === "validation_failed" && api.error.errors) {
                 api.error.errors.forEach((error) => errors[error.path] = getErrorMessage(error.msg))

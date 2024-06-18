@@ -23,7 +23,15 @@ function TaskCard(props) {
                     <IsAdmin>
                         <Button
                             variant=""
-                            onClick={() => navigate("/task/edit", { state: { item: props.item, parent: props.parent } })}>
+                            onClick={(e) => {
+                                navigate("/task/edit", {
+                                    state: {
+                                        item: props.item,
+                                        parent: props.parent
+                                    }
+                                })
+                                e.stopPropagation();
+                            }}>
                             <PencilFill className="category-card-edit-icon" size={20} />
                         </Button>
                     </IsAdmin>

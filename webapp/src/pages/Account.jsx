@@ -7,6 +7,7 @@ import { ModalContext } from "../context/modal.context";
 import UserEditModal from "./modals/UserEditModal";
 import AvatarImage from "../components/AvatarImage";
 import LastTasks from "../components/LastTasks";
+import { CameraFill } from "react-bootstrap-icons";
 
 function Account() {
     const pageTitle = usePageTitle();
@@ -36,9 +37,15 @@ function Account() {
     return (
         <>
             <Row className="justify-content-center">
-                <Col xs="12" sm="auto" className="align-self-center d-grid">
-                    <AvatarImage className="account-avatar-image mx-auto"
-                        avatar={userContext.user.image} />
+                <Col sm="12" md="auto" className="align-self-center d-grid">
+                    <div
+                        className="account-avatar-image-wrapper"
+                        onClick={() => modal.show(<UserEditModal isPhotoUpload={true} />, false)}>
+                        <AvatarImage
+                            className="account-avatar-image mx-auto"
+                            avatar={userContext.user.image} />
+                        <CameraFill className="account-avatar-image-icon" />
+                    </div>
                 </Col>
                 <Col xs="12" sm="8" className="d-grid">
                     <div className="my-auto account-bio-container">
@@ -53,7 +60,9 @@ function Account() {
                 <Col xs="6" md="auto" className="d-grid align-self-center">
                     <Button
                         variant="outline-dark"
-                        onClick={() => modal.show(<UserEditModal />, false)}>Edit</Button>
+                        onClick={() => modal.show(<UserEditModal />, false)}>
+                        Edit
+                    </Button>
                 </Col>
             </Row>
             <Row className="mt-5">

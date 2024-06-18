@@ -1,7 +1,7 @@
 import { Container, Row, Col, Button, Dropdown, Overlay, Tooltip } from "react-bootstrap"
 import { CaretLeftFill, CursorFill, DoorOpenFill, InfoCircleFill, MoonFill, SunFill, ThreeDotsVertical, WrenchAdjustable } from "react-bootstrap-icons"
 
-import { useMatch, useNavigate } from "react-router-dom"
+import { useLocation, useMatch, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/user.context"
 import { useContext, useEffect, useRef, useState } from "react"
 import OnlyLogined from "./OnlyLogined"
@@ -28,7 +28,7 @@ function UserProgressBar(props) {
     useEffect(() => {
         if (props.userContext.loggedIn) {
             if (props.userContext.computedXp > oldComputedXp.current) {
-                console.log(`UserProgressBar computedXp changed from ${oldComputedXp.current} to ${props.userContext.computedXp}`)
+                // console.log(`UserProgressBar computedXp changed from ${oldComputedXp.current} to ${props.userContext.computedXp}`)
                 setShowPopover({ open: true, text: props.userContext.computedXp - oldComputedXp.current })
             }
             oldComputedXp.current = props.userContext.computedXp;
@@ -43,7 +43,7 @@ function UserProgressBar(props) {
     }
 
     return (
-        <Col xs="3" sm="6" lg="6">
+        <Col xs="4" sm="6" lg="6">
             <Row className="align-items-center">
                 <Col className="topbar-progressbar align-items-center">
                     <div
@@ -124,6 +124,7 @@ function ThemeSwitchButton(props) {
 
 function TopBar() {
     const navigate = useNavigate()
+    const location = useLocation()
     const userContext = useContext(UserContext)
     const breadCrumbscontext = useContext(BreadcrumbsContext)
     const serverInfo = useContext(ServerInfoContext)
@@ -138,7 +139,11 @@ function TopBar() {
     }
 
     function onTaskBack() {
-        const pathBase = "/" + (breadCrumbscontext.lastTask.parent.isLearning ? "learning" : "tasks")
+        if (location.pathname.split('/').pop() === "edit") {
+            navigate(-1)
+            return
+        }
+        let pathBase = "/" + (breadCrumbscontext.lastTask.parent.isLearning ? "learning" : "tasks")
         navigate(pathBase + "/" + breadCrumbscontext.lastTask.parent.shortname,
             { state: { item: breadCrumbscontext.lastTask.parent } })
     }
@@ -154,7 +159,7 @@ function TopBar() {
                 <Col xs="1" sm="auto" lg="auto" className="p-0">
                     <Button variant="" onClick={() => onCategoryBack()}><CaretLeftFill /></Button>
                 </Col>
-                <Col xs="8" sm="5" md>
+                <Col className="pe-0" xs="7" sm="5" md>
                     <h3 className="m-0 text-truncate">{breadCrumbscontext.lastCategory && breadCrumbscontext.lastCategory.title}</h3>
                 </Col>
                 <UserProgressBar userContext={userContext} />
@@ -177,8 +182,8 @@ function TopBar() {
                                     minWidth: "30px",
                                 }} />
                         </Col>
-                        <Col xs="auto" sm className="align-items-left">
-                            <h3 className="m-0 topbar-logo-text">{serverInfo.serverInfo.name}</h3>
+                        <Col xs="auto" sm className="align-items-left d-grid">
+                            <h3 className="my-auto mx-0 topbar-logo-text">{serverInfo.serverInfo.name}</h3>
                         </Col>
                     </Row>
                 </Col>
@@ -253,15 +258,15 @@ function TopBar() {
                     </ShowForPath>
 
                     <ShowForPath path={"/tasks"}>
-                        <Col xs="8" sm="6" className="align-items-left">
-                            <h3 className="m-0">Task categories</h3>
+                        <Col xs="8" sm="6" className="align-items-left pe-0">
+                            <h3 className="m-0 text-truncate">Task categories</h3>
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
 
                     <ShowForPath path={"/learning"}>
-                        <Col xs="8" sm="6" className="align-items-left">
-                            <h3 className="m-0">Learning categories</h3>
+                        <Col xs="8" sm="6" className="align-items-left pe-0">
+                            <h3 className="m-0 text-truncate">Learning categories</h3>
                         </Col>
                         <UserProgressBar userContext={userContext} />
                     </ShowForPath>
@@ -279,7 +284,7 @@ function TopBar() {
                             <Button variant="" onClick={() => onTaskBack()}><CaretLeftFill /></Button>
                         </Col>
 
-                        <Col xs="8" sm="5" md>
+                        <Col className="pe-0" xs="7" sm="5" md>
                             <h3 className="m-0">{breadCrumbscontext.lastTask && (breadCrumbscontext.lastTask.parent.isLearning ? "Article" : "Task")}</h3>
                         </Col>
                         <UserProgressBar userContext={userContext} />
@@ -288,6 +293,7 @@ function TopBar() {
                     <ShowForPath path={"/manage"}>
                         <LogoAndName />
                     </ShowForPath>
+
                     <ShowForPath path={"/user/:id"}>
                         <Col xs="1" sm="auto" lg="auto" className="p-0">
                             <Button variant="" onClick={() => navigate(-1)}><CaretLeftFill /></Button>
@@ -295,6 +301,15 @@ function TopBar() {
                         <LogoAndName />
                         <Col />
                     </ShowForPath>
+
+                    <ShowForPath path={"/category/edit"}>
+                        <Col xs="1" sm="auto" lg="auto" className="p-0">
+                            <Button variant="" onClick={() => navigate(-1)}><CaretLeftFill /></Button>
+                        </Col>
+                        <LogoAndName />
+                        <Col />
+                    </ShowForPath>
+
                 </OnlyLogined>
 
                 <OnlyLogined inverse>

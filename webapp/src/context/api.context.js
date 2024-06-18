@@ -4,6 +4,6 @@ export const ApiContext = createContext(
     {
         busy: false,
         error: undefined,
-        request: () => { },
+        request: (endpoint, method = 'GET', body = undefined, headers = {}) => { },
         clearError: () => { }
     })

@@ -1,10 +1,9 @@
 import { useState, useEffect, useContext } from "react";
-import { Container, Row, Col, Button, FloatingLabel, Form, Modal, Alert } from "react-bootstrap"
+import { Container, Row, Col, Button, FloatingLabel, Form, Modal } from "react-bootstrap"
 import { ApiContext } from "../../context/api.context";
 import getErrorMessage from "../../extras/getErrorMessage";
 import { ModalContext } from "../../context/modal.context";
 import Switch from "../../components/Switch";
-import { passwordStrength } from "check-password-strength";
 import checkPasswordStrength from "../../extras/checkPasswordStrength";
 
 function PasswordChangeModal(props) {
@@ -30,7 +29,7 @@ function PasswordChangeModal(props) {
 
     useEffect(() => {
         if (api.error && !api.error.preventNext) {
-            console.log("PasswordChangeModal error", api.error);
+            console.error("PasswordChangeModal error", api.error);
             let errors = {}
             if (api.error.status === "validation_failed" && api.error.errors) {
                 api.error.errors.forEach((error) => errors[error.path] = getErrorMessage(error.msg))

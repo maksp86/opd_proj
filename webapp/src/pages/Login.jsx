@@ -70,7 +70,7 @@ function LoginPage() {
 
     useEffect(() => {
         if (api.error && !api.error.preventNext) {
-            console.log("Login error", api.error);
+            console.error("Login error", api.error);
             let errors = {}
             if (api.error.status === "validation_failed") {
                 api.error.errors.forEach((error) => errors[error.path] = getErrorMessage(error.msg))
