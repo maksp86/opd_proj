@@ -1,13 +1,48 @@
-.account-avatar-image {
-    max-height: 120px;
-    max-width: 120px;
-    width: 8vw;
-    height: 8vw;
-    min-height: 80px;
-    min-width: 80px;
+.account-avatar-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    margin: 0 auto;
+    border-radius: 50%
 }
 
-@media (max-width: 576px) {
+.account-avatar-image {
+    max-height: 140px;
+    max-width: 140px;
+    width: 10vw;
+    height: 10vw;
+    min-height: 100px;
+    min-width: 100px;
+    transition: all 0.1s ease-in-out;
+}
+
+[data-bs-theme=dark] .account-avatar-image-icon
+{
+    color: var(--bs-body-fg) !important;
+}
+
+.account-avatar-image-icon {
+    position: absolute;
+    color: $primary;
+    width: 30%;
+    height: 30%;
+    left: 50%;
+    top: 50%;
+    opacity: 0;
+    transition: all 0.1s ease-in-out;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+@media (min-width: 768px) {
+    .account-avatar-image-wrapper:hover .account-avatar-image-icon {
+        opacity: 1;
+    }
+
+    .account-avatar-image-wrapper:hover .account-avatar-image {
+        filter: brightness(70%);
+    }
+}
+
+@media (max-width: 768px) {
     .account-avatar-image {
         width: 80vw;
         height: 80vw;

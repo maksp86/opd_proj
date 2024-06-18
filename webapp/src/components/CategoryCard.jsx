@@ -57,7 +57,16 @@ function CategoryCard(props) {
                     <IsAdmin>
                         <Button
                             variant=""
-                            onClick={() => navigate("/category/edit", { state: { item: props.item, isLearning: props.item.isLearning } })}>
+                            onClick={(e) => {
+                                navigate("/category/edit", {
+                                    state:
+                                    {
+                                        item: props.item,
+                                        isLearning: props.item.isLearning
+                                    }
+                                })
+                                e.stopPropagation()
+                            }}>
                             <PencilFill className="category-card-edit-icon" size={20} />
                         </Button>
                     </IsAdmin>

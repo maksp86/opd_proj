@@ -5,10 +5,10 @@ import { ApiContext } from "../../context/api.context";
 import { UserContext } from "../../context/user.context";
 import getErrorMessage from "../../extras/getErrorMessage";
 import { ModalContext } from "../../context/modal.context";
-import { PencilFill, X } from "react-bootstrap-icons";
+import { X } from "react-bootstrap-icons";
 import PasswordChangeModal from "./PasswordChangeModal";
 
-function UserEditModal() {
+function UserEditModal(props) {
     const modalContext = useContext(ModalContext)
     const userContext = useContext(UserContext)
     const api = useContext(ApiContext);
@@ -38,7 +38,7 @@ function UserEditModal() {
 
     useEffect(() => {
         if (api.error && !api.error.preventNext) {
-            console.log("UserEditModal error", api.error);
+            console.error("UserEditModal error", api.error);
             let errors = {}
             if (api.error.status === "validation_failed" && api.error.errors) {
                 api.error.errors.forEach((error) => errors[error.path] = getErrorMessage(error.msg))
@@ -49,6 +49,14 @@ function UserEditModal() {
             setErrors(errors)
         }
     }, [api.error])
+
+    const isPhotoUploadHandled = useRef(false)
+    useEffect(() => {
+        if (props.isPhotoUpload === true && !isPhotoUploadHandled.current) {
+            isPhotoUploadHandled.current = true
+            fileInputRef.current?.click()
+        }
+    }, [props.isPhotoUpload])
 
     async function processEdit() {
         setErrors({
@@ -67,7 +75,7 @@ function UserEditModal() {
             const imageUploadResult = await api.request("/attachments/upload", "POST", imageUploadData)
 
             if (imageUploadResult && imageUploadResult.data.value) {
-                console.log("Image uploaded ", imageUploadResult)
+                // console.log("Image uploaded ", imageUploadResult)
                 imageId = imageUploadResult.data.value._id
             }
             else {
@@ -120,7 +128,7 @@ function UserEditModal() {
 
     return (
         <>
-            <Modal.Header closeButton>
+            <Modal.Header closeButton className="mb-2 border-0">
                 <Modal.Title>{isImageCrop ? "Crop image" : "Edit user"}</Modal.Title>
             </Modal.Header>
             <Container>

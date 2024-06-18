@@ -32,6 +32,7 @@ export const useUser = () => {
         setUser({})
         setComputedXp(0);
         localStorage.clear()
+        
     }, [])
 
     return { load, login, logout, user, updateUser, computedXp, setComputedXp, loggedIn, updateRequest, setUpdateRequest }

@@ -26,7 +26,7 @@ function AttachmentUploadModal(props) {
 
     useEffect(() => {
         if (api.error && !api.error.preventNext) {
-            console.log("AttachmentUploadModal error", api.error);
+            console.error("AttachmentUploadModal error", api.error);
             let errors = {}
             if (api.error.status === "validation_failed") {
                 api.error.preventNext = true;

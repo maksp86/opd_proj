@@ -23,7 +23,7 @@ function CommentsComponent(props) {
 
     useEffect(() => {
         if (api.error && !api.error.preventNext) {
-            console.log("Task error", api.error);
+            console.error("CommentsComponent error", api.error);
             let errors = {}
             if (api.error.status === "validation_failed") {
                 api.error.errors.forEach((error) => errors[error.path] = getErrorMessage(error.msg))
@@ -63,24 +63,28 @@ function CommentsComponent(props) {
                         avatar={props.item.author.image}
                     />
                 </Col>
-                <Col>
-                    <h5 className="m-0">{props.item.author.name} &#183; <i className="fs-6 fw-normal"><TimeAgo date={props.item.createdAt} /></i></h5>
+                <Col className="p-0">
+                    <h6 className="m-0">{props.item.author.name} &#183; <i className="fs-6 fw-normal"><TimeAgo date={props.item.createdAt} /></i></h6>
                     <p className="m-0 text-break">
                         {props.item.text}
                     </p>
                 </Col>
-                <Col xs="auto" className="p-0">
-                    <Button onClick={() => setReplyingComment(props.item)} variant="">
-                        <Reply></Reply>
-                    </Button>
+                <Col xs="1" sm="auto">
+                    <Row>
+                        <Col xs="auto" className="p-0">
+                            <Button onClick={() => setReplyingComment(props.item)} variant="">
+                                <Reply />
+                            </Button>
+                        </Col>
+                        <IsAdmin altStatement={props.item.author._id == userContext.user._id}>
+                            <Col xs="auto" className="p-0">
+                                <Button onClick={() => RemoveComment(props.item._id)} variant="">
+                                    <TrashFill />
+                                </Button>
+                            </Col>
+                        </IsAdmin>
+                    </Row>
                 </Col>
-                <IsAdmin altStatement={props.item.author._id == userContext.user._id}>
-                    <Col xs="auto" className="p-0">
-                        <Button onClick={() => RemoveComment(props.item._id)} variant="">
-                            <TrashFill />
-                        </Button>
-                    </Col>
-                </IsAdmin>
                 {props.item.children &&
                     <Row className="justify-content-center">
                         <Col xs="auto" className="d-none d-sm-grid">
@@ -130,7 +134,7 @@ function CommentsComponent(props) {
                         avatar={props.userContext.user.image}
                     />
                 </Col>
-                <Col>
+                <Col className="p-0">
                     <Row className="align-items-center">
                         <Col xs="auto">
                             <p className="m-0 mb-1 fw-semibold">

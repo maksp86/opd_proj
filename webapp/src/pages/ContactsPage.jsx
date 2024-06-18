@@ -1,16 +1,10 @@
-import { Row, Col, Button, Image, ListGroup, Table, FloatingLabel, Form, Overlay, Tooltip } from "react-bootstrap"
-import { Download, PencilFill, TrashFill } from "react-bootstrap-icons"
+import { Row, Col, Button, Image, Table, FloatingLabel, Form } from "react-bootstrap"
+import { PencilFill } from "react-bootstrap-icons"
 import { useContext, useEffect, useState } from "react"
 import { ApiContext } from "../context/api.context"
-import { useNavigate, useParams } from "react-router-dom"
 import { usePageTitle } from "../hooks/pageTitle.hook"
 import Markdown from 'markdown-to-jsx'
-import CommentsComponent from "../components/CommentsComponent"
-import { BreadcrumbsContext } from "../context/breadcrumbs.context"
 import IsAdmin from "../components/IsAdmin"
-import AnswersCard from "../components/AnswersCard"
-import { ModalContext } from "../context/modal.context"
-import DialogModal from "./modals/DialogModal"
 import MDEditor from "@uiw/react-md-editor"
 import rehypeSanitize from "rehype-sanitize";
 import { ThemeContext } from "../context/theme.context"
@@ -56,7 +50,7 @@ function ContactsPage() {
 
     useEffect(() => {
         if (api.error && !api.error.preventNext) {
-            console.log("Task edit error", api.error);
+            console.error("Task edit error", api.error);
             let errors = {}
             if (api.error.status === "validation_failed" && api.error.errors) {
                 api.error.errors.forEach((error) => errors[error.path] = getErrorMessage(error.msg))

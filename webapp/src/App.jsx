@@ -77,10 +77,11 @@ function App() {
 
     useEffect(() => {
         if (apiHook.error) {
-            console.log("api error in app.jsx ", JSON.stringify(apiHook.error))
+            console.error("api error in app.jsx ", JSON.stringify(apiHook.error))
             if (apiHook.error.status === "error_not_logined" && apiHook.error.httpcode === 403) {
                 userHook.logout();
                 document.location = "/"
+                window.location.reload();
             }
             else if (!apiHook.error.preventNext) {
                 modalHook.show(<ErrorMessageModal error={apiHook.error} />)

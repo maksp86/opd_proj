@@ -92,7 +92,7 @@ function TaskEditPage() {
 
     useEffect(() => {
         if (api.error && !api.error.preventNext) {
-            console.log("Task edit error", api.error);
+            console.error("Task edit error", api.error);
             let errors = {}
             if (api.error.status === "validation_failed" && api.error.errors) {
                 api.error.errors.forEach((error) => errors[error.path] = getErrorMessage(error.msg))

@@ -27,7 +27,7 @@ function AnswersCard(props) {
 
     useEffect(() => {
         if (api.error && !api.error.preventNext) {
-            console.log("Answers error", api.error);
+            console.error("AnswersCard error", api.error);
             let errors = {}
             if (api.error.status === "validation_failed") {
                 api.error.errors.forEach((error) => errors[error.path] = getErrorMessage(error.msg))
